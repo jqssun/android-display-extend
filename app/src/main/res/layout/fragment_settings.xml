@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <CheckBox
+        android:id="@+id/cbDisableUsbAudio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/disable_usb_audio"
+        android:layout_marginBottom="8dp"/>
+        
+    <CheckBox
+        android:id="@+id/cbForceDesktop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/force_desktop_mode"
+        android:layout_marginBottom="8dp"/>
+
+    <CheckBox
+        android:id="@+id/cbForceResizable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/force_resizable"
+        android:layout_marginBottom="8dp"/>
+
+    <CheckBox
+        android:id="@+id/cbEnableFreeform"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/enable_freeform"
+        android:layout_marginBottom="8dp"/>
+
+    <CheckBox
+        android:id="@+id/cbEnableNonResizable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/enable_non_resizable_multiwindow"
+        android:layout_marginBottom="8dp"/>
+
+    <CheckBox
+        android:id="@+id/cbDisableScreenShareProtection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/disable_screen_share_protection"
+        android:layout_marginBottom="8dp"/>
+
+    <CheckBox
+        android:id="@+id/cbUseRealScreenOff"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/use_real_screen_off"
+        android:layout_marginBottom="8dp"/>
+
+    <CheckBox
+        android:id="@+id/cbStayOnWhilePlugged"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/stay_on_while_plugged"
+        android:layout_marginBottom="8dp"/>
+
+    <LinearLayout
+        android:id="@+id/externalDeviceContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Spinner
+                android:id="@+id/spinnerDisplays"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/btnBind"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/bind_input_devices"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/external_input_devices"
+            android:textStyle="bold"
+            android:textSize="16sp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvExternalDevices"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/internal_input_devices"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvInternalDevices"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:visibility="gone" />
+</LinearLayout> 

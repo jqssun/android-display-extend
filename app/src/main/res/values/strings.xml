@@ -1,0 +1,159 @@
+<resources>
+    <string name="app_name">Extend</string>
+    <string name="accessibility_service_description">Accessibility service for simulating touch events on secondary screens</string>
+    <string name="go_dark_button">Toggle dark mode</string>
+    <string name="back_button">Back button</string>
+    <string name="home_button">Home button</string>
+
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="edit">Edit</string>
+    <string name="view">View</string>
+    <string name="bind">Bind</string>
+    <string name="exit">Exit</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="none">None</string>
+    <string name="unknown">Unknown</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
+
+    <!-- Home -->
+    <string name="shizuku_status_label">Shizuku:</string>
+    <string name="authorize">Authorize</string>
+    <string name="screens">Screens</string>
+    <string name="simulate_screen_off">Simulate screen off</string>
+    <string name="real_screen_off">Real screen off</string>
+    <string name="touchpad">Touchpad</string>
+    <string name="settings">Settings</string>
+    <string name="about">About</string>
+    <string name="home">Home</string>
+    <string name="shizuku_not_started">Not started</string>
+    <string name="no_projection_title">No app being projected</string>
+    <string name="no_projection_message">- USB-C DisplayPort: Connect a screen, then select it from the screen list to cast a single app\n\n- Wireless: Use Android\'s built-in wireless display, then find the screen in the list to cast a single app</string>
+    <string name="got_it">Got it</string>
+    <string name="shizuku_required">Shizuku permission is required</string>
+
+    <!-- Display list -->
+    <string name="display_list_header">Select a display to cast a single app. The built-in screen cannot be used for single-app casting.</string>
+    <string name="wireless_cast_hint">Android\'s built-in wireless display supports single-app casting</string>
+    <string name="display_id_format">Display ID: %1$d\nResolution: %2$dx%3$d</string>
+    <string name="display_name_format">Display name: %s</string>
+    <string name="screen_breadcrumb">Screen %d</string>
+
+    <!-- Display detail -->
+    <string name="resolution_format">Resolution: %1$dx%2$d</string>
+    <string name="display_detail_format">Display ID: %1$d\nName: %2$s\nRefresh rate: %3$.1f Hz\nState: %4$s\nHDR support: %5$s\nDisplay flags: %6$s\nCutout info: %7$s</string>
+    <string name="no_cutout">No cutout</string>
+    <string name="cutout_bounds">Cutout bounds:\n</string>
+    <string name="cutout_rect_format">Left: %1$d Top: %2$d Right: %3$d Bottom: %4$d\n</string>
+    <string name="supported_modes_collapsed">Supported display modes ▼</string>
+    <string name="supported_modes_expanded">Supported display modes ▲</string>
+    <string name="mode_format">Mode ID: %1$d, Resolution: %2$dx%3$d, Refresh rate: %4$.1f Hz\n</string>
+    <string name="cast_single_app">Cast single app</string>
+    <string name="auto_open_last_app">Auto-open last app</string>
+    <string name="show_floating_back_button">Show floating back button</string>
+    <string name="hide_floating_back_button">Hide floating back button</string>
+    <string name="force_landscape">Force landscape</string>
+    <string name="bridge_button_text">Bridge\n(Auto-rotate portrait apps)</string>
+    <string name="exit_bridge">Exit bridge</string>
+    <string name="shizuku_status_format">Shizuku: %s</string>
+    <string name="shizuku_status_granted">Granted</string>
+    <string name="shizuku_status_denied">Denied</string>
+    <string name="ime_policy_local">\nKeyboard policy: LOCAL</string>
+    <string name="ime_policy_fallback">\nKeyboard policy: FALLBACK_DISPLAY</string>
+    <string name="ime_policy_hide">\nKeyboard policy: HIDE</string>
+    <string name="ime_policy_other">\nKeyboard policy: %d</string>
+    <string name="ime_to_main_display">Show keyboard on main screen</string>
+    <string name="ime_to_this_display">Show keyboard on this screen</string>
+    <string name="default_mode_id_format">\nDefault mode ID: %d</string>
+    <string name="refresh_rate_override_format">\nRefresh rate override: %.1f Hz</string>
+    <string name="install_orientation_format">\nInstall orientation: %d</string>
+    <string name="windowing_mode_format">\nWindowing mode: %s</string>
+    <string name="select_display_mode">Select display mode</string>
+    <string name="display_mode_set_unlikely">Applied, but may not take effect</string>
+    <string name="rotation_format">Rotation: %s</string>
+    <string name="android15_rotation_hint">Android 15 supports direct rotation without bridge</string>
+
+    <!-- Settings -->
+    <string name="disable_usb_audio">Disable external display audio output</string>
+    <string name="force_desktop_mode">Force desktop mode (may require restart on Android 14 and below)</string>
+    <string name="force_resizable">Force activities to be resizable</string>
+    <string name="enable_freeform">Enable freeform windows</string>
+    <string name="enable_non_resizable_multiwindow">Allow non-resizable apps in multi-window mode</string>
+    <string name="disable_screen_share_protection">Disable screen sharing protection</string>
+    <string name="use_real_screen_off">Real screen off (wake with volume keys)</string>
+    <string name="stay_on_while_plugged">Stay on while charging</string>
+    <string name="bind_input_devices">Bind input devices</string>
+    <string name="external_input_devices">External input devices:</string>
+    <string name="internal_input_devices">Internal input devices:</string>
+    <string name="display_spinner_format">Display %1$d (%2$s)</string>
+
+    <!-- Touchpad -->
+    <string name="switch_mode">Switch mode</string>
+    <string name="mode_normal">Normal</string>
+    <string name="mode_cursor_locked">Cursor locked</string>
+    <string name="cursor_not_moved">Cursor stays fixed, single-finger gestures only</string>
+    <string name="move_cursor">Move cursor</string>
+    <string name="touchpad_help">Touch this area to control:\n• Single finger swipe — %s\n• Single finger tap — click\n• Multi-finger gesture — pass through to target screen\n• Back button — press back on target screen\n• Home button — reopen the selected app\n• Moon button — black screen to save power\n• If a Bluetooth controller can\'t control the display, use the moon button to turn off the main screen and shift focus</string>
+    <string name="show_cursor_failed">Failed to show cursor</string>
+
+    <!-- Dialogs -->
+    <string name="edit_dpi">Change DPI</string>
+    <string name="enter_dpi_hint">Enter DPI value</string>
+    <string name="invalid_number">Please enter a valid number</string>
+    <string name="edit_resolution">Change resolution</string>
+    <string name="width_label">Width:</string>
+    <string name="height_label">Height:</string>
+    <string name="resolution_warning">If content appears stretched, this device may not support the new aspect ratio. It will revert automatically after 2 seconds. Changing the aspect ratio on unsupported devices requires root.</string>
+    <string name="edit_rotation">Change rotation (tested on Android 15 only)</string>
+    <string name="rotation_none">Don\'t force</string>
+    <string name="confirm_dpi_format">Change DPI from %1$d to %2$d?</string>
+    <string name="confirm_resolution_format">Change resolution from %1$dx%2$d to %3$dx%4$d?</string>
+
+    <!-- Bridge dialog -->
+    <string name="bridge_settings">Bridge settings</string>
+    <string name="bridge_description">Bridge creates a virtual display to host projected apps, allowing you to control rotation and keep apps alive when the physical display disconnects.</string>
+    <string name="rotate_with_content">Rotate with content</string>
+    <string name="skip_media_projection_permission">Skip media projection permission</string>
+    <string name="auto_bridge_next_time">Auto-start bridge next time</string>
+    <string name="bridge_display">Bridge display</string>
+
+    <!-- App list / Launcher -->
+    <string name="cast">Cast</string>
+    <string name="back_to_phone">Back to phone</string>
+    <string name="search_apps_hint">Search apps</string>
+    <string name="show_all_apps">Show all apps</string>
+    <string name="floating_on">Floating on</string>
+    <string name="floating_off">Floating off</string>
+    <string name="query_apps_permission_required">QUERY_ALL_PACKAGES permission is required</string>
+    <string name="cannot_get_app_list">Cannot get app list, please check permissions</string>
+    <string name="first_launch_hint">Tap \'Back to phone\' once to grant permission, then return here and select the same app again.</string>
+    <string name="input_routing_limitation">Due to Android version limitation, tap \'Simulate screen off\' to use the touchscreen</string>
+
+    <!-- About -->
+    <string name="version_label">Version:</string>
+    <string name="version_format">Version: %1$s (Android %2$s)</string>
+    <string name="version_unknown">Version: unknown</string>
+    <string name="website_link">Website: github.com/jqssun/android-screen-extend</string>
+    <string name="export_log_requires_shizuku">Exporting logs requires Shizuku permission</string>
+
+    <!-- Fetch log -->
+    <string name="user_service_unavailable">Cannot start user service for log export</string>
+    <string name="grant_file_access">Please grant file access permission</string>
+    <string name="log_not_generated">Log file was not generated</string>
+    <string name="share_log">Share log file</string>
+    <string name="check_download_log">Check for \'Extend.log\' in the Downloads folder</string>
+
+    <!-- Input device detail -->
+    <string name="device_detail_format">Device ID: %1$d\nProduct ID: %2$d\nVendor ID: %3$d\nDescriptor: %4$s\nExternal: %5$s\nInput sources: %6$s</string>
+    <string name="source_keyboard">Keyboard</string>
+    <string name="source_gamepad">Gamepad</string>
+    <string name="source_touchscreen">Touchscreen</string>
+    <string name="source_mouse">Mouse</string>
+
+    <!-- ServiceUtils Toast messages -->
+    <string name="shizuku_launch_failed">Failed to launch app via Shizuku</string>
+
+</resources>
