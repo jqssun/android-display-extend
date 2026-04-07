@@ -6,8 +6,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
-
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import io.github.jqssun.displayextend.R;
 import io.github.jqssun.displayextend.State;
@@ -22,7 +21,7 @@ public class ResolutionDialog {
         widthInput.setText(String.valueOf(currentWidth));
         heightInput.setText(String.valueOf(currentHeight));
 
-        new AlertDialog.Builder(context)
+        new MaterialAlertDialogBuilder(context)
                 .setTitle(context.getString(R.string.edit_resolution))
                 .setView(dialogView)
                 .setPositiveButton(context.getString(R.string.ok), (dialog, which) -> {

@@ -7,8 +7,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import androidx.appcompat.app.AlertDialog;
-
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import io.github.jqssun.displayextend.R;
 import io.github.jqssun.displayextend.State;
@@ -32,7 +31,7 @@ public class RotationDialog {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         rotationSpinner.setAdapter(adapter);
 
-        new AlertDialog.Builder(context)
+        new MaterialAlertDialogBuilder(context)
                 .setTitle(context.getString(R.string.edit_rotation))
                 .setView(dialogView)
                 .setPositiveButton(context.getString(R.string.ok), (dialog, which) -> {

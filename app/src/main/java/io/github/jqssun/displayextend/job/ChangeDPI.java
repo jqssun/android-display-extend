@@ -4,7 +4,8 @@ import io.github.jqssun.displayextend.R;
 import io.github.jqssun.displayextend.State;
 import io.github.jqssun.displayextend.shizuku.ServiceUtils;
 import android.app.Activity;
-import android.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.view.IWindowManager;
 
 public class ChangeDPI implements Job {
@@ -54,7 +55,7 @@ public class ChangeDPI implements Job {
 
         if (!requestedConfirmation) {
             requestedConfirmation = true;
-            dialog = new AlertDialog.Builder(State.currentActivity.get())
+            dialog = new MaterialAlertDialogBuilder(State.currentActivity.get())
                 .setTitle(State.currentActivity.get().getString(R.string.edit_dpi))
                 .setMessage(State.currentActivity.get().getString(R.string.confirm_dpi_format, oldDpi, dpi))
                 .setPositiveButton(State.currentActivity.get().getString(R.string.ok), (dialog, which) -> {

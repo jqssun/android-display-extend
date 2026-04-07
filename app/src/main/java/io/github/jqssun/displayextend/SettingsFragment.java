@@ -10,8 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -20,6 +18,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.materialswitch.MaterialSwitch;
 
 import android.hardware.input.InputManager;
 import android.hardware.display.DisplayManager;
@@ -35,24 +35,24 @@ import java.util.List;
 public class SettingsFragment extends Fragment {
     private List<Display> displayList;
     private Spinner spinnerDisplays;
-    private Button btnBind;
+    private View btnBind;
     private RecyclerView rvExternalDevices;
     private RecyclerView rvInternalDevices;
-    private CheckBox cbForceDesktop;
-    private CheckBox cbForceResizable;
-    private CheckBox cbEnableFreeform;
-    private CheckBox cbEnableNonResizable;
-    private CheckBox cbDisableScreenShareProtection;
-    private CheckBox cbDisableUsbAudio;
-    private CheckBox cbUseRealScreenOff;
-    private CheckBox cbStayOnWhilePlugged;
+    private MaterialSwitch cbForceDesktop;
+    private MaterialSwitch cbForceResizable;
+    private MaterialSwitch cbEnableFreeform;
+    private MaterialSwitch cbEnableNonResizable;
+    private MaterialSwitch cbDisableScreenShareProtection;
+    private MaterialSwitch cbDisableUsbAudio;
+    private MaterialSwitch cbUseRealScreenOff;
+    private MaterialSwitch cbStayOnWhilePlugged;
     private View externalDeviceContainer;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
-        
+
         cbForceDesktop = view.findViewById(R.id.cbForceDesktop);
         cbForceResizable = view.findViewById(R.id.cbForceResizable);
         cbEnableFreeform = view.findViewById(R.id.cbEnableFreeform);
@@ -66,30 +66,30 @@ public class SettingsFragment extends Fragment {
         cbUseRealScreenOff = view.findViewById(R.id.cbUseRealScreenOff);
         cbStayOnWhilePlugged = view.findViewById(R.id.cbStayOnWhilePlugged);
         externalDeviceContainer = view.findViewById(R.id.externalDeviceContainer);
-        
+
         initializeDisplaySpinner();
         setupBindButton();
         setupDeviceLists();
 
-        if (PermissionManager.grant("android.permission.WRITE_SECURE_SETTINGS")) {
-            setupDisableScreenShareProtectionCheckbox();
-            setupForceDesktopCheckbox();
-            setupForceResizableCheckbox();
-            setupEnableFreeformCheckbox();
-            setupEnableNonResizableCheckbox();
-            setupDisableUsbAudioCheckbox();
-            setupUseRealScreenOffCheckbox();
-            setupStayOnWhilePluggedCheckbox();
-        } else {
-            cbDisableScreenShareProtection.setVisibility(View.GONE);
-            cbForceDesktop.setVisibility(View.GONE);
-            cbForceResizable.setVisibility(View.GONE);
-            cbEnableFreeform.setVisibility(View.GONE);
-            cbEnableNonResizable.setVisibility(View.GONE);
-            cbDisableUsbAudio.setVisibility(View.GONE);
-            cbStayOnWhilePlugged.setVisibility(View.GONE);
+        boolean granted = PermissionManager.grant("android.permission.WRITE_SECURE_SETTINGS");
+        setupDisableScreenShareProtectionCheckbox();
+        setupForceDesktopCheckbox();
+        setupForceResizableCheckbox();
+        setupEnableFreeformCheckbox();
+        setupEnableNonResizableCheckbox();
+        setupDisableUsbAudioCheckbox();
+        setupUseRealScreenOffCheckbox();
+        setupStayOnWhilePluggedCheckbox();
+        if (!granted) {
+            cbDisableScreenShareProtection.setEnabled(false);
+            cbForceDesktop.setEnabled(false);
+            cbForceResizable.setEnabled(false);
+            cbEnableFreeform.setEnabled(false);
+            cbEnableNonResizable.setEnabled(false);
+            cbDisableUsbAudio.setEnabled(false);
+            cbStayOnWhilePlugged.setEnabled(false);
         }
-        
+
         return view;
     }
 
@@ -129,10 +129,10 @@ public class SettingsFragment extends Fragment {
     private void setupDeviceLists() {
         InputManager inputManager = (InputManager) requireContext().getSystemService(Context.INPUT_SERVICE);
         int[] deviceIds = inputManager.getInputDeviceIds();
-        
+
         List<InputDevice> externalDevices = new ArrayList<>();
         List<InputDevice> internalDevices = new ArrayList<>();
-        
+
         for (int deviceId : deviceIds) {
             InputDevice device = InputDevice.getDevice(deviceId);
             if (device != null) {
@@ -145,21 +145,27 @@ public class SettingsFragment extends Fragment {
         }
 
         externalDeviceContainer.setVisibility(externalDevices.isEmpty() ? View.GONE : View.VISIBLE);
-        
+
         rvExternalDevices.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvInternalDevices.setLayoutManager(new LinearLayoutManager(requireContext()));
-        
+
         DeviceAdapter externalAdapter = new DeviceAdapter(externalDevices, this::showDeviceDetails);
         DeviceAdapter internalAdapter = new DeviceAdapter(internalDevices, this::showDeviceDetails);
-        
+
         rvExternalDevices.setAdapter(externalAdapter);
         rvInternalDevices.setAdapter(internalAdapter);
     }
 
     private void showDeviceDetails(InputDevice device) {
-        State.breadcrumbManager.pushBreadcrumb(device.getName(), () ->
-        InputDeviceDetailFragment.newInstance(device.getId())
-        );
+        if (getActivity() instanceof IMainActivity) {
+            ((IMainActivity) getActivity()).navigateToDetail(
+                InputDeviceDetailFragment.newInstance(device.getId())
+            );
+        }
+    }
+
+    private void _hideRow(View v) {
+        ((View) v.getParent()).setVisibility(View.GONE);
     }
 
     private void setupForceDesktopCheckbox() {
@@ -169,19 +175,15 @@ public class SettingsFragment extends Fragment {
         boolean isHuawei = Build.MANUFACTURER.toLowerCase().contains("huawei") ||
                           Build.BRAND.toLowerCase().contains("huawei") ||
                           Build.DEVICE.toLowerCase().contains("huawei");
-        
+
         if (isHuawei) {
-            // disabled on huawei devices
-            cbForceDesktop.setVisibility(View.GONE);
+            _hideRow(cbForceDesktop);
         }
 
         cbForceDesktop.setOnCheckedChangeListener((buttonView, isChecked) -> {
             try {
                 Settings.Global.putInt(requireContext().getContentResolver(),
                         "force_desktop_mode_on_external_displays", isChecked ? 1 : 0);
-                        
-                Settings.Global.putInt(requireContext().getContentResolver(),
-                "force_desktop_mode_on_external_displays", isChecked ? 1 : 0);
             } catch (SecurityException e) {
                 State.log("failed: " + e);
             }
@@ -251,7 +253,7 @@ public class SettingsFragment extends Fragment {
     private void setupDisableUsbAudioCheckbox() {
         boolean isDisabled = requireContext().getSharedPreferences("settings", Context.MODE_PRIVATE)
                 .getBoolean("usb_audio_disabled", false);
-                
+
         cbDisableUsbAudio.setChecked(isDisabled);
 
         cbDisableUsbAudio.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -272,7 +274,7 @@ public class SettingsFragment extends Fragment {
     private void setupUseRealScreenOffCheckbox() {
         boolean useRealScreenOff = requireContext().getSharedPreferences("settings", Context.MODE_PRIVATE)
                 .getBoolean("use_real_screen_off", false);
-                
+
         cbUseRealScreenOff.setChecked(useRealScreenOff);
 
         cbUseRealScreenOff.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -290,8 +292,6 @@ public class SettingsFragment extends Fragment {
 
         cbStayOnWhilePlugged.setOnCheckedChangeListener((buttonView, isChecked) -> {
             try {
-                // set to 7 to always keep screen when charging
-                // a/c: 1, usb: 2, wireless: 4
                 Settings.Global.putInt(requireContext().getContentResolver(),
                         "stay_on_while_plugged_in", isChecked ? 7 : 0);
             } catch (SecurityException e) {

@@ -16,6 +16,7 @@ import android.view.Display;
 import android.view.DisplayCutout;
 import android.view.DisplayInfo;
 import android.view.IWindowManager;
+import android.widget.LinearLayout;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
@@ -38,12 +39,13 @@ import io.github.jqssun.displayextend.shizuku.WindowingMode;
 public class DisplayDetailFragment extends Fragment {
     private static final String ARG_DISPLAY_ID = "display_id";
 
-    private TextView shizukuStatusText;
+    private LinearLayout infoTable;
+    private LinearLayout shizukuTable;
+    private LinearLayout shizukuCard;
     private Button launchButton;
     private int displayId;
     private Display display;
-    private Button supportedModesToggle;
-    private TextView supportedModesText;
+    private android.widget.TableLayout modesTable;
     private Button setImePolicyButton;
     private CheckBox autoOpenLastAppCheckbox;
     private Button floatingButtonToggle;
@@ -82,8 +84,10 @@ public class DisplayDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_display_detail, container, false);
         setImePolicyButton = view.findViewById(R.id.set_ime_policy_button);
-        supportedModesToggle = view.findViewById(R.id.supported_modes_toggle);
-        supportedModesText = view.findViewById(R.id.supported_modes_text);
+        modesTable = view.findViewById(R.id.modes_table);
+        infoTable = view.findViewById(R.id.info_table);
+        shizukuTable = view.findViewById(R.id.shizuku_table);
+        shizukuCard = view.findViewById(R.id.shizuku_card);
         autoOpenLastAppCheckbox = view.findViewById(R.id.autoOpenLastAppCheckbox);
         displayId = getArguments().getInt(ARG_DISPLAY_ID);
         DisplayManager displayManager = (DisplayManager) getContext().getSystemService(Context.DISPLAY_SERVICE);
@@ -113,27 +117,20 @@ public class DisplayDetailFragment extends Fragment {
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
 
-        TextView detailText = view.findViewById(R.id.detail_text);
         TextView resolutionText = view.findViewById(R.id.resolution_text);
+        resolutionText.setText(display.getWidth() + " x " + display.getHeight());
 
-        String resolution = String.format(getString(R.string.resolution_format), display.getWidth(), display.getHeight());
-        resolutionText.setText(resolution);
-
-        String details = String.format(
-            getString(R.string.display_detail_format),
-            display.getDisplayId(),
-            display.getName(),
-            display.getRefreshRate(),
-            display.getState() == Display.STATE_ON ? getString(R.string.on) : getString(R.string.off),
-            display.isHdr() ? getString(R.string.yes) : getString(R.string.no),
-            getDisplayFlags(display),
-            cutoutInfo
-        );
+        // Display info table
+        infoTable.removeAllViews();
+        _addInfoRow(infoTable, "Display ID", String.valueOf(display.getDisplayId()));
+        _addInfoRow(infoTable, "Name", display.getName());
+        _addInfoRow(infoTable, "Refresh rate", String.format("%.1f Hz", display.getRefreshRate()));
+        _addInfoRow(infoTable, "State", display.getState() == Display.STATE_ON ? getString(R.string.on) : getString(R.string.off));
+        _addInfoRow(infoTable, "HDR", display.isHdr() ? getString(R.string.yes) : getString(R.string.no));
+        _addInfoRow(infoTable, "Flags", getDisplayFlags(display));
+        _addInfoRow(infoTable, "Cutout", cutoutInfo);
 
         setupDisplayModes(display.getSupportedModes());
-        detailText.setText(details);
-
-        shizukuStatusText = view.findViewById(R.id.shizuku_status);
 
         launchButton = view.findViewById(R.id.start_launcher_button);
         if (displayId == 0) {
@@ -162,7 +159,7 @@ public class DisplayDetailFragment extends Fragment {
         }
 
         TextView dpiText = view.findViewById(R.id.dpi_text);
-        dpiText.setText(String.format("DPI: %d", metrics.densityDpi));
+        dpiText.setText(String.valueOf(metrics.densityDpi));
 
         Button editDpiButton = view.findViewById(R.id.edit_dpi_button);
         if(ShizukuUtils.hasShizukuStarted()) {
@@ -240,109 +237,100 @@ public class DisplayDetailFragment extends Fragment {
     }
 
     private void updateShizukuStatus() {
-        if (shizukuStatusText == null) {
-            return;
-        }
+        if (shizukuTable == null) return;
+        shizukuTable.removeAllViews();
+
         if (!ShizukuUtils.hasShizukuStarted()) {
-            shizukuStatusText.setText(getString(R.string.shizuku_status_format, getString(R.string.shizuku_not_started)));
+            _addInfoRow(shizukuTable, "Shizuku", getString(R.string.shizuku_not_started));
             return;
         }
         try {
             boolean hasPermission = ShizukuUtils.hasPermission();
-            String statusText = getString(R.string.shizuku_status_format, hasPermission ? getString(R.string.shizuku_status_granted) : getString(R.string.shizuku_status_denied));
-            if (hasPermission) {
-                Point baseSize = new Point();
-                IWindowManager windowManager = ServiceUtils.getWindowManager();
-                windowManager.getBaseDisplaySize(displayId, baseSize);
-                statusText += String.format("\nOverride size: %dx%d", baseSize.x, baseSize.y);
-                Point initialSize = new Point();
-                windowManager.getInitialDisplaySize(displayId, initialSize);
-                statusText += String.format("\nPhysical size: %dx%d", initialSize.x, initialSize.y);
-               try {
+            _addInfoRow(shizukuTable, "Shizuku", hasPermission ? getString(R.string.shizuku_status_granted) : getString(R.string.shizuku_status_denied));
+
+            if (!hasPermission) return;
+
+            IWindowManager windowManager = ServiceUtils.getWindowManager();
+
+            Point baseSize = new Point();
+            windowManager.getBaseDisplaySize(displayId, baseSize);
+            _addInfoRow(shizukuTable, "Override size", baseSize.x + "x" + baseSize.y);
+
+            Point initialSize = new Point();
+            windowManager.getInitialDisplaySize(displayId, initialSize);
+            _addInfoRow(shizukuTable, "Physical size", initialSize.x + "x" + initialSize.y);
+
+            try {
                 int imePolicy = windowManager.getDisplayImePolicy(displayId);
+                String imePolicyStr;
                 switch (imePolicy) {
-                    case 0:
-                        statusText += getString(R.string.ime_policy_local);
-                        break;
-                    case 1:
-                        statusText += getString(R.string.ime_policy_fallback);
-                        break;
-                    case 2:
-                        statusText += getString(R.string.ime_policy_hide);
-                        break;
-                    default:
-                        statusText += getString(R.string.ime_policy_other, imePolicy);
-                        break;
+                    case 0: imePolicyStr = "LOCAL"; break;
+                    case 1: imePolicyStr = "FALLBACK_DISPLAY"; break;
+                    case 2: imePolicyStr = "HIDE"; break;
+                    default: imePolicyStr = String.valueOf(imePolicy);
                 }
+                _addInfoRow(shizukuTable, "Keyboard policy", imePolicyStr);
 
-                   if (displayId != Display.DEFAULT_DISPLAY) {
-                       setImePolicyButton.setVisibility(View.VISIBLE);
-                       if(imePolicy == 0) {
-                           setImePolicyButton.setText(getString(R.string.ime_to_main_display));
-                           setImePolicyButton.setOnClickListener(v -> {
-                               windowManager.setDisplayImePolicy(Display.DEFAULT_DISPLAY, 0);
-                               windowManager.setDisplayImePolicy(displayId, 1);
-                               try {
-                                   State.breadcrumbManager.refreshCurrentFragment();
-                               } catch (Throwable e) {
-                                   State.log("failed to set IME to main display: " + e);
-                               }
-                           });
-                       } else {
-                           setImePolicyButton.setText(getString(R.string.ime_to_this_display));
-                           setImePolicyButton.setOnClickListener(v -> {
-                               windowManager.setDisplayImePolicy(Display.DEFAULT_DISPLAY, 1);
-                               try {
-                                   windowManager.setDisplayImePolicy(displayId, 0);
-                                   State.breadcrumbManager.refreshCurrentFragment();
-                               } catch (Throwable e) {
-                                   windowManager.setDisplayImePolicy(Display.DEFAULT_DISPLAY, 0);
-                                   State.log("failed to set IME to this display: " + e);
-                               }
-                           });
-                       }
-                   }
-               } catch(Throwable e) {
-                // ignore
-               }
+                if (displayId != Display.DEFAULT_DISPLAY) {
+                    setImePolicyButton.setVisibility(View.VISIBLE);
+                    if (imePolicy == 0) {
+                        setImePolicyButton.setText(getString(R.string.ime_to_main_display));
+                        setImePolicyButton.setOnClickListener(v -> {
+                            windowManager.setDisplayImePolicy(Display.DEFAULT_DISPLAY, 0);
+                            windowManager.setDisplayImePolicy(displayId, 1);
+                            try { State._refreshUI(); } catch (Throwable e) { State.log("failed: " + e); }
+                        });
+                    } else {
+                        setImePolicyButton.setText(getString(R.string.ime_to_this_display));
+                        setImePolicyButton.setOnClickListener(v -> {
+                            windowManager.setDisplayImePolicy(Display.DEFAULT_DISPLAY, 1);
+                            try {
+                                windowManager.setDisplayImePolicy(displayId, 0);
+                                State._refreshUI();
+                            } catch (Throwable e) {
+                                windowManager.setDisplayImePolicy(Display.DEFAULT_DISPLAY, 0);
+                                State.log("failed: " + e);
+                            }
+                        });
+                    }
+                }
+            } catch (Throwable e) { /* ignore */ }
 
-                DisplayInfo displayInfo = ServiceUtils.getDisplayManager().getDisplayInfo(displayId);
-                statusText += String.format(getString(R.string.default_mode_id_format), displayInfo.defaultModeId);
-                try {
-                    statusText += String.format(getString(R.string.refresh_rate_override_format), displayInfo.refreshRateOverride);
-                } catch(Throwable e) {
-                    // ignore
-                }
-                try {
-                    statusText += String.format(getString(R.string.install_orientation_format), displayInfo.installOrientation);
-                } catch(Throwable e) {
-                    // ignore
-                }
-                try {
-                    String windowingMode = WindowingMode.getWindowingMode(displayId);
-                    statusText += String.format(getString(R.string.windowing_mode_format), windowingMode);
-                } catch(Throwable e) {
-                }
-            }
-            shizukuStatusText.setText(statusText);
-        } catch(Exception e) {
-            shizukuStatusText.setText(getString(R.string.shizuku_status_format, getString(R.string.shizuku_status_denied)));
+            DisplayInfo displayInfo = ServiceUtils.getDisplayManager().getDisplayInfo(displayId);
+            _addInfoRow(shizukuTable, "Default mode ID", String.valueOf(displayInfo.defaultModeId));
+            try { _addInfoRow(shizukuTable, "Refresh rate override", String.format("%.1f Hz", displayInfo.refreshRateOverride)); } catch (Throwable e) { }
+            try { _addInfoRow(shizukuTable, "Install orientation", String.valueOf(displayInfo.installOrientation)); } catch (Throwable e) { }
+            try { _addInfoRow(shizukuTable, "Windowing mode", WindowingMode.getWindowingMode(displayId)); } catch (Throwable e) { }
+
+        } catch (Exception e) {
+            shizukuTable.removeAllViews();
+            _addInfoRow(shizukuTable, "Shizuku", getString(R.string.shizuku_status_denied));
             State.log("failed to get Shizuku permission: " + e.getMessage());
         }
     }
 
     private void setupDisplayModes(Display.Mode[] supportedModes) {
-        StringBuilder supportedModesStr = new StringBuilder();
-        for (Display.Mode mode : supportedModes) {
-            supportedModesStr.append(String.format(getString(R.string.mode_format),
-                    mode.getModeId(),
-                    mode.getPhysicalWidth(),
-                    mode.getPhysicalHeight(),
-                    mode.getRefreshRate()));
-        }
-        supportedModesText.setText(supportedModesStr.toString());
+        modesTable.removeAllViews();
 
-        supportedModesText.setOnClickListener(new View.OnClickListener() {
+        // Header row
+        android.widget.TableRow header = new android.widget.TableRow(getContext());
+        header.setPadding(0, 0, 0, 8);
+        header.addView(_modeCell(getString(R.string.mode_col_id), true));
+        header.addView(_modeCell(getString(R.string.mode_col_resolution), true));
+        header.addView(_modeCell(getString(R.string.mode_col_refresh), true));
+        modesTable.addView(header);
+
+        // Data rows
+        for (Display.Mode mode : supportedModes) {
+            android.widget.TableRow row = new android.widget.TableRow(getContext());
+            row.addView(_modeCell(String.valueOf(mode.getModeId()), false));
+            row.addView(_modeCell(mode.getPhysicalWidth() + "x" + mode.getPhysicalHeight(), false));
+            row.addView(_modeCell(String.format("%.1f Hz", mode.getRefreshRate()), false));
+            modesTable.addView(row);
+        }
+
+        // Double-tap table to select mode
+        modesTable.setOnClickListener(new View.OnClickListener() {
             private long lastClickTime = 0;
             @Override
             public void onClick(View v) {
@@ -353,13 +341,45 @@ public class DisplayDetailFragment extends Fragment {
                 lastClickTime = clickTime;
             }
         });
+    }
 
-        supportedModesToggle.setOnClickListener(v -> {
-            boolean isVisible = supportedModesText.getVisibility() == View.VISIBLE;
-            supportedModesText.setVisibility(isVisible ? View.GONE : View.VISIBLE);
-            supportedModesToggle.setText(getString(isVisible ? R.string.supported_modes_collapsed : R.string.supported_modes_expanded));
-            supportedModesText.requestLayout();
-        });
+    private void _addInfoRow(LinearLayout table, String label, String value) {
+        int dp16 = (int) (16 * getResources().getDisplayMetrics().density);
+        int dp12 = (int) (12 * getResources().getDisplayMetrics().density);
+        int dp2 = (int) (2 * getResources().getDisplayMetrics().density);
+        int dp56 = (int) (56 * getResources().getDisplayMetrics().density);
+
+        LinearLayout item = new LinearLayout(getContext());
+        item.setOrientation(LinearLayout.VERTICAL);
+        item.setPadding(dp16, dp12, dp16, dp12);
+        item.setMinimumHeight(dp56);
+
+        TextView labelTv = new TextView(getContext());
+        labelTv.setText(label);
+        labelTv.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge);
+        item.addView(labelTv);
+
+        TextView valueTv = new TextView(getContext());
+        valueTv.setText(value);
+        valueTv.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium);
+        valueTv.setTextColor(getResources().getColor(android.R.color.darker_gray, null));
+        valueTv.setPadding(0, dp2, 0, 0);
+        item.addView(valueTv);
+
+        table.addView(item);
+    }
+
+    private TextView _modeCell(String text, boolean isHeader) {
+        TextView tv = new TextView(getContext());
+        tv.setText(text);
+        tv.setPadding(0, 4, 24, 4);
+        if (isHeader) {
+            tv.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelMedium);
+            tv.setTextColor(getResources().getColor(android.R.color.darker_gray, null));
+        } else {
+            tv.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium);
+        }
+        return tv;
     }
 
     private void showDisplayModeDialog(Display.Mode[] supportedModes) {
@@ -378,7 +398,7 @@ public class DisplayDetailFragment extends Fragment {
                     mode.getRefreshRate());
         }
 
-        new androidx.appcompat.app.AlertDialog.Builder(getContext())
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(getContext())
             .setTitle(getString(R.string.select_display_mode))
             .setItems(items, (dialog, which) -> {
                 Display.Mode selectedMode = supportedModes[which];
@@ -414,7 +434,7 @@ private void updateUserRotationText(TextView rotationText) {
         default:
             rotationStr = getString(R.string.unknown);
     }
-    rotationText.setText(getString(R.string.rotation_format, rotationStr));
+    rotationText.setText(rotationStr);
 }
 
 private void showRotationDialog() {

@@ -55,10 +55,6 @@ public class PureBlackActivity extends AppCompatActivity {
         State.isInPureBlackActivity = this;
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
-
         getWindow().setFlags(
                 WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);

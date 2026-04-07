@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="8dp"
+    android:padding="12dp"
     android:gravity="center_vertical">
 
     <TextView
@@ -11,15 +11,15 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textSize="16sp"
-        android:textColor="@color/black"
-        android:layout_marginEnd="8dp"/>
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        android:layout_marginEnd="8dp" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/view"
-        android:minWidth="64dp"/>
+        android:minWidth="64dp"
+        style="@style/Widget.Material3.Button.TextButton" />
 
-</LinearLayout> 
+</LinearLayout>

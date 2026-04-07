@@ -9,11 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Display;
 import android.widget.TextView;
-import android.widget.Button;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.button.MaterialButton;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +47,11 @@ public class DisplayListFragment extends Fragment {
     }
 
     private void onDisplayItemClick(Display display) {
-        State.breadcrumbManager.pushBreadcrumb(getString(R.string.screen_breadcrumb, display.getDisplayId()), () -> DisplayDetailFragment.newInstance(display.getDisplayId()));
+        if (getActivity() instanceof IMainActivity) {
+            ((IMainActivity) getActivity()).navigateToDetail(
+                DisplayDetailFragment.newInstance(display.getDisplayId())
+            );
+        }
     }
 
     private static class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.ViewHolder> {
@@ -90,7 +96,7 @@ public class DisplayListFragment extends Fragment {
         public static class ViewHolder extends RecyclerView.ViewHolder {
             public final TextView displayId;
             public final TextView displayName;
-            public final Button btnViewDetail;
+            public final MaterialButton btnViewDetail;
 
             public ViewHolder(View view) {
                 super(view);

@@ -151,10 +151,6 @@ public class TouchpadActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
-
         setContentView(R.layout.activity_touchpad);
 
         modeSpinner = findViewById(R.id.modeSpinner);
@@ -186,16 +182,13 @@ public class TouchpadActivity extends AppCompatActivity {
             setupTouchListenerForInputManager();
         }
         
-        ImageButton goDarkButton = findViewById(R.id.goDarkButton);
-        goDarkButton.setOnClickListener(v -> toggleDarkMode());
-        
-        ImageButton backButton = findViewById(R.id.backButton);
-        backButton.setOnClickListener(v -> {
+        findViewById(R.id.goDarkButton).setOnClickListener(v -> toggleDarkMode());
+
+        findViewById(R.id.backButton).setOnClickListener(v -> {
             performBackGesture(inputManager, displayId);
         });
 
-        ImageButton homeButton = findViewById(R.id.homeButton);
-        homeButton.setOnClickListener(v -> {
+        findViewById(R.id.homeButton).setOnClickListener(v -> {
             launchLastPackage(this, displayId);
         });
 

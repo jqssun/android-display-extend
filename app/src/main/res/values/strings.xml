@@ -19,16 +19,24 @@
     <string name="on">On</string>
     <string name="off">Off</string>
 
+    <!-- Navigation -->
+    <string name="overview">Overview</string>
+    <string name="logs">Logs</string>
+    <string name="export">Export</string>
+    <string name="clear">Clear</string>
+    <string name="open_touchpad">Open Touchpad</string>
+    <string name="target_display_format">Target display: %1$d (%2$s)</string>
+    <string name="input_binding">Input device binding</string>
+
     <!-- Home -->
     <string name="shizuku_status_label">Shizuku:</string>
     <string name="authorize">Authorize</string>
-    <string name="screens">Screens</string>
+    <string name="screens">Displays</string>
     <string name="simulate_screen_off">Simulate screen off</string>
     <string name="real_screen_off">Real screen off</string>
     <string name="touchpad">Touchpad</string>
     <string name="settings">Settings</string>
     <string name="about">About</string>
-    <string name="home">Home</string>
     <string name="shizuku_not_started">Not started</string>
     <string name="no_projection_title">No app being projected</string>
     <string name="no_projection_message">- USB-C DisplayPort: Connect a screen, then select it from the screen list to cast a single app\n\n- Wireless: Use Android\'s built-in wireless display, then find the screen in the list to cast a single app</string>
@@ -37,20 +45,25 @@
 
     <!-- Display list -->
     <string name="display_list_header">Select a display to cast a single app. The built-in screen cannot be used for single-app casting.</string>
-    <string name="wireless_cast_hint">Android\'s built-in wireless display supports single-app casting</string>
+    <string name="wireless_cast_hint">Use Android\'s built-in wireless display</string>
     <string name="display_id_format">Display ID: %1$d\nResolution: %2$dx%3$d</string>
     <string name="display_name_format">Display name: %s</string>
     <string name="screen_breadcrumb">Screen %d</string>
 
     <!-- Display detail -->
-    <string name="resolution_format">Resolution: %1$dx%2$d</string>
-    <string name="display_detail_format">Display ID: %1$d\nName: %2$s\nRefresh rate: %3$.1f Hz\nState: %4$s\nHDR support: %5$s\nDisplay flags: %6$s\nCutout info: %7$s</string>
+    <string name="display_config_header">Configuration</string>
+    <string name="display_info_header">Display info</string>
+    <string name="advanced_info_header">Advanced</string>
+    <string name="resolution_label">Resolution</string>
+    <string name="rotation_label">Rotation</string>
+    <string name="actions_header">Actions</string>
     <string name="no_cutout">No cutout</string>
     <string name="cutout_bounds">Cutout bounds:\n</string>
     <string name="cutout_rect_format">Left: %1$d Top: %2$d Right: %3$d Bottom: %4$d\n</string>
-    <string name="supported_modes_collapsed">Supported display modes ▼</string>
-    <string name="supported_modes_expanded">Supported display modes ▲</string>
-    <string name="mode_format">Mode ID: %1$d, Resolution: %2$dx%3$d, Refresh rate: %4$.1f Hz\n</string>
+    <string name="supported_modes_header">Supported display modes</string>
+    <string name="mode_col_id">ID</string>
+    <string name="mode_col_resolution">Resolution</string>
+    <string name="mode_col_refresh">Refresh rate</string>
     <string name="cast_single_app">Cast single app</string>
     <string name="auto_open_last_app">Auto-open last app</string>
     <string name="show_floating_back_button">Show floating back button</string>
@@ -58,33 +71,34 @@
     <string name="force_landscape">Force landscape</string>
     <string name="bridge_button_text">Bridge\n(Auto-rotate portrait apps)</string>
     <string name="exit_bridge">Exit bridge</string>
-    <string name="shizuku_status_format">Shizuku: %s</string>
     <string name="shizuku_status_granted">Granted</string>
     <string name="shizuku_status_denied">Denied</string>
-    <string name="ime_policy_local">\nKeyboard policy: LOCAL</string>
-    <string name="ime_policy_fallback">\nKeyboard policy: FALLBACK_DISPLAY</string>
-    <string name="ime_policy_hide">\nKeyboard policy: HIDE</string>
-    <string name="ime_policy_other">\nKeyboard policy: %d</string>
     <string name="ime_to_main_display">Show keyboard on main screen</string>
     <string name="ime_to_this_display">Show keyboard on this screen</string>
-    <string name="default_mode_id_format">\nDefault mode ID: %d</string>
-    <string name="refresh_rate_override_format">\nRefresh rate override: %.1f Hz</string>
-    <string name="install_orientation_format">\nInstall orientation: %d</string>
-    <string name="windowing_mode_format">\nWindowing mode: %s</string>
     <string name="select_display_mode">Select display mode</string>
     <string name="display_mode_set_unlikely">Applied, but may not take effect</string>
-    <string name="rotation_format">Rotation: %s</string>
     <string name="android15_rotation_hint">Android 15 supports direct rotation without bridge</string>
 
     <!-- Settings -->
-    <string name="disable_usb_audio">Disable external display audio output</string>
-    <string name="force_desktop_mode">Force desktop mode (may require restart on Android 14 and below)</string>
-    <string name="force_resizable">Force activities to be resizable</string>
-    <string name="enable_freeform">Enable freeform windows</string>
-    <string name="enable_non_resizable_multiwindow">Allow non-resizable apps in multi-window mode</string>
-    <string name="disable_screen_share_protection">Disable screen sharing protection</string>
-    <string name="use_real_screen_off">Real screen off (wake with volume keys)</string>
+    <string name="settings_display">Display</string>
+    <string name="settings_power">Power</string>
+
+    <string name="disable_usb_audio">Disable USB audio routing</string>
+    <string name="disable_usb_audio_desc">Prevent audio from routing to external display</string>
+    <string name="force_desktop_mode">Force desktop mode</string>
+    <string name="force_desktop_mode_desc">May require restart on Android 14 and below</string>
+    <string name="force_resizable">Force resizable activities</string>
+    <string name="force_resizable_desc">Allow all apps to resize for multi-window</string>
+    <string name="enable_freeform">Freeform windows</string>
+    <string name="enable_freeform_desc">Enable freeform windowing support</string>
+    <string name="enable_non_resizable_multiwindow">Non-resizable multi-window</string>
+    <string name="enable_non_resizable_multiwindow_desc">Allow non-resizable apps in multi-window mode</string>
+    <string name="disable_screen_share_protection">Disable screen share protection</string>
+    <string name="disable_screen_share_protection_desc">Remove DRM restrictions when sharing screen</string>
+    <string name="use_real_screen_off">Real screen off</string>
+    <string name="use_real_screen_off_desc">Turn off screen instead of simulating a black image; wake with volume keys</string>
     <string name="stay_on_while_plugged">Stay on while charging</string>
+    <string name="stay_on_while_plugged_desc">Prevent screen from turning off when plugged in</string>
     <string name="bind_input_devices">Bind input devices</string>
     <string name="external_input_devices">External input devices:</string>
     <string name="internal_input_devices">Internal input devices:</string>
@@ -104,8 +118,8 @@
     <string name="enter_dpi_hint">Enter DPI value</string>
     <string name="invalid_number">Please enter a valid number</string>
     <string name="edit_resolution">Change resolution</string>
-    <string name="width_label">Width:</string>
-    <string name="height_label">Height:</string>
+    <string name="width">Width</string>
+    <string name="height">Height</string>
     <string name="resolution_warning">If content appears stretched, this device may not support the new aspect ratio. It will revert automatically after 2 seconds. Changing the aspect ratio on unsupported devices requires root.</string>
     <string name="edit_rotation">Change rotation (tested on Android 15 only)</string>
     <string name="rotation_none">Don\'t force</string>
@@ -122,21 +136,20 @@
 
     <!-- App list / Launcher -->
     <string name="cast">Cast</string>
-    <string name="back_to_phone">Back to phone</string>
+    <string name="back_to_phone">Return</string>
     <string name="search_apps_hint">Search apps</string>
     <string name="show_all_apps">Show all apps</string>
     <string name="floating_on">Floating on</string>
     <string name="floating_off">Floating off</string>
     <string name="query_apps_permission_required">QUERY_ALL_PACKAGES permission is required</string>
     <string name="cannot_get_app_list">Cannot get app list, please check permissions</string>
-    <string name="first_launch_hint">Tap \'Back to phone\' once to grant permission, then return here and select the same app again.</string>
+    <string name="first_launch_hint">Tap \'Return\' once to grant permission, then return here and select the same app again.</string>
     <string name="input_routing_limitation">Due to Android version limitation, tap \'Simulate screen off\' to use the touchscreen</string>
 
     <!-- About -->
-    <string name="version_label">Version:</string>
     <string name="version_format">Version: %1$s (Android %2$s)</string>
     <string name="version_unknown">Version: unknown</string>
-    <string name="website_link">Website: github.com/jqssun/android-screen-extend</string>
+    <string name="website_link">Source: github.com/jqssun/android-screen-extend</string>
     <string name="export_log_requires_shizuku">Exporting logs requires Shizuku permission</string>
 
     <!-- Fetch log -->

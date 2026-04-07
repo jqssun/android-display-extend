@@ -51,12 +51,6 @@
             android:theme="@style/AppTheme" />
         
         <activity
-            android:name=".MirrorActivity"
-            android:launchMode="singleTask"
-            android:exported="false"
-            android:theme="@style/AppTheme" />
-        
-        <activity
             android:name=".PureBlackActivity"
             android:launchMode="singleTask"
             android:exported="false"

@@ -3,34 +3,35 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:paddingHorizontal="24dp"
+    android:paddingTop="16dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/bridge_description"
-        android:textSize="14sp"
-        android:lineSpacingExtra="4dp"/>
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        android:textColor="?colorOnSurfaceVariant" />
 
-    <CheckBox
+    <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/rotatesWithContentCheckbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/rotate_with_content"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp" />
 
-    <CheckBox
+    <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/skipMediaProjectionPermissionCheckbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/skip_media_projection_permission"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="8dp" />
 
-    <CheckBox
+    <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/autoBridgeCheckbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/auto_bridge_next_time"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="8dp" />
 
-</LinearLayout> 
+</LinearLayout>

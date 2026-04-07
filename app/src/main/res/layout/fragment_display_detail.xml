@@ -1,181 +1,248 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingVertical="8dp">
 
+        <!-- Configuration -->
         <TextView
-            android:id="@+id/detail_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:lineSpacingExtra="8dp"/>
-
-        <TextView
-            android:id="@+id/shizuku_status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textSize="16sp"/>
-            
+            android:text="@string/display_config_header"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            android:textColor="?colorPrimary"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="4dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="8dp">
-
-            <TextView
-                android:id="@+id/resolution_text"
+            android:gravity="center_vertical"
+            android:minHeight="56dp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:background="?selectableItemBackground">
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textSize="16sp"/>
-
-            <Button
+                android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/resolution_label"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+                <TextView android:id="@+id/resolution_text"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?colorOnSurfaceVariant" />
+            </LinearLayout>
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/edit_resolution_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:text="@string/edit"/>
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/edit" android:visibility="gone"
+                style="@style/Widget.Material3.Button.TextButton" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="8dp">
-
-            <TextView
-                android:id="@+id/dpi_text"
+            android:gravity="center_vertical"
+            android:minHeight="56dp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:background="?selectableItemBackground">
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textSize="16sp"/>
-
-            <Button
+                android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="DPI"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+                <TextView android:id="@+id/dpi_text"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?colorOnSurfaceVariant" />
+            </LinearLayout>
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/edit_dpi_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:text="@string/edit"/>
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/edit" android:visibility="gone"
+                style="@style/Widget.Material3.Button.TextButton" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="8dp">
-
-            <TextView
-                android:id="@+id/user_rotation_text"
+            android:gravity="center_vertical"
+            android:minHeight="56dp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:background="?selectableItemBackground">
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textSize="16sp"/>
-
-            <Button
+                android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/rotation_label"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+                <TextView android:id="@+id/user_rotation_text"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?colorOnSurfaceVariant" />
+            </LinearLayout>
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/edit_rotation_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:text="@string/edit"/>
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/edit" android:visibility="gone"
+                style="@style/Widget.Material3.Button.TextButton" />
         </LinearLayout>
 
-        
+        <!-- Actions -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/actions_header"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            android:textColor="?colorPrimary"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="4dp" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="8dp">
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp">
 
-            <Button
-                android:id="@+id/supported_modes_toggle"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/supported_modes_collapsed"/>
+                android:gravity="center_vertical">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/start_launcher_button"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/cast_single_app" />
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/autoOpenLastAppCheckbox"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/auto_open_last_app"
+                    android:layout_marginStart="8dp" android:visibility="gone" />
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/supported_modes_text"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/touchpad_button"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:visibility="gone"
+                android:text="@string/touchpad"
+                style="@style/Widget.Material3.Button.TonalButton" />
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:padding="8dp"
-                android:textSize="14sp"
-                android:layout_marginStart="8dp"/>
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/floating_button_toggle"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:text="@string/show_floating_back_button"
+                    style="@style/Widget.Material3.Button.TonalButton" />
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/force_landscape_checkbox"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/force_landscape"
+                    android:layout_marginStart="8dp" android:visibility="gone" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/set_ime_policy_button"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:visibility="gone" android:layout_marginTop="8dp"
+                style="@style/Widget.Material3.Button.TonalButton" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/bridge_button"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:visibility="gone"
+                android:text="@string/bridge_button_text"
+                style="@style/Widget.Material3.Button.TonalButton" />
         </LinearLayout>
 
-        <LinearLayout
+        <!-- Display info -->
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="8dp">
-
-            <Button
-                android:id="@+id/start_launcher_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/cast_single_app"/>
-
-            <CheckBox
-                android:id="@+id/autoOpenLastAppCheckbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/auto_open_last_app"
-                android:layout_marginStart="8dp"
-                android:visibility="gone"/>
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/touchpad_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:visibility="gone"
-            android:text="@string/touchpad"/>
+            android:text="@string/display_info_header"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            android:textColor="?colorPrimary"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="4dp" />
 
         <LinearLayout
+            android:id="@+id/info_table"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="8dp">
+            android:orientation="vertical" />
 
-            <Button
-                android:id="@+id/floating_button_toggle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:text="@string/show_floating_back_button"/>
+        <!-- Advanced -->
+        <TextView
+            android:id="@+id/shizuku_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/advanced_info_header"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            android:textColor="?colorPrimary"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="4dp" />
 
-            <CheckBox
-                android:id="@+id/force_landscape_checkbox"
-                android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/shizuku_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <LinearLayout
+                android:id="@+id/shizuku_table"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/force_landscape"
-                android:layout_marginStart="8dp"
-                android:visibility="gone"/>
+                android:orientation="vertical" />
         </LinearLayout>
-            
-        <Button
-            android:id="@+id/set_ime_policy_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_marginTop="8dp"/>
 
-        <Button
-            android:id="@+id/bridge_button"
-            android:layout_width="wrap_content"
+        <!-- Supported display modes -->
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:visibility="gone"
-            android:text="@string/bridge_button_text"/>
+            android:text="@string/supported_modes_header"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            android:textColor="?colorPrimary"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="4dp" />
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp">
+            <TableLayout
+                android:id="@+id/modes_table"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:stretchColumns="1" />
+        </HorizontalScrollView>
+
 
     </LinearLayout>
 </ScrollView>

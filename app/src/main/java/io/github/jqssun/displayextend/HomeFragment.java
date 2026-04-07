@@ -3,72 +3,54 @@ package io.github.jqssun.displayextend;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
-import android.content.Intent;
-import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.app.AlertDialog;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import io.github.jqssun.displayextend.job.AcquireShizuku;
 import io.github.jqssun.displayextend.job.ExitAll;
+import io.github.jqssun.displayextend.job.FetchLogAndShare;
 import io.github.jqssun.displayextend.shizuku.ShizukuUtils;
 
 public class HomeFragment extends Fragment {
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
+        // Shizuku status
         TextView shizukuStatusPrefix = view.findViewById(R.id.shizukuStatusPrefix);
-        shizukuStatusPrefix.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
-        shizukuStatusPrefix.setPaintFlags(shizukuStatusPrefix.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-        shizukuStatusPrefix.setOnClickListener(v -> {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/rikkaapps/shizuku")));
-        });
+        shizukuStatusPrefix.setOnClickListener(v ->
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/rikkaapps/shizuku")))
+        );
 
-        Button shizukuPermissionBtn = view.findViewById(R.id.shizukuPermissionBtn);
-        shizukuPermissionBtn.setOnClickListener(v -> {
-            State.startNewJob(new AcquireShizuku());
-        });
+        com.google.android.material.button.MaterialButton shizukuPermissionBtn = view.findViewById(R.id.shizukuPermissionBtn);
+        shizukuPermissionBtn.setOnClickListener(v -> State.startNewJob(new AcquireShizuku()));
 
         TextView shizukuStatus = view.findViewById(R.id.shizukuStatus);
         updateShizukuStatus(shizukuStatus, shizukuPermissionBtn);
 
-        Button displayDeviceBtn = view.findViewById(R.id.displayDeviceBtn);
-        Button simulateScreenOffBtn = view.findViewById(R.id.simulateScreenOffBtn);
-        Button touchpadBtn = view.findViewById(R.id.touchpadBtn);
-        Button inputDeviceBtn = view.findViewById(R.id.inputDeviceBtn);
-        Button shizukuBtn = view.findViewById(R.id.shizukuBtn);
-        Button aboutBtn = view.findViewById(R.id.aboutBtn);
-        Button exitBtn = view.findViewById(R.id.exitBtn);
-
-        exitBtn.setOnClickListener(v -> {
-            ExitAll.execute(requireContext());
-        });
-
-        displayDeviceBtn.setOnClickListener(v -> {
-            State.breadcrumbManager.pushBreadcrumb(getString(R.string.screens), () -> new DisplayListFragment());
-        });
-
+        // Simulate screen off
+        com.google.android.material.button.MaterialButton simulateScreenOffBtn = view.findViewById(R.id.simulateScreenOffBtn);
         boolean useRealScreenOff = requireContext().getSharedPreferences("settings", Context.MODE_PRIVATE)
-        .getBoolean("use_real_screen_off", false);
-        if(useRealScreenOff) {
+            .getBoolean("use_real_screen_off", false);
+        if (useRealScreenOff) {
             simulateScreenOffBtn.setText(getString(R.string.real_screen_off));
         }
         simulateScreenOffBtn.setOnClickListener(v -> {
             if (State.lastSingleAppDisplay <= 0) {
-                showHelp();
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(getString(R.string.no_projection_title))
+                    .setMessage(getString(R.string.no_projection_message))
+                    .setPositiveButton(getString(R.string.got_it), null)
+                    .show();
             } else {
                 Intent intent = new Intent(getActivity(), PureBlackActivity.class);
                 ActivityOptions options = ActivityOptions.makeBasic();
@@ -76,57 +58,65 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        touchpadBtn.setOnClickListener(v -> {
-            if (State.lastSingleAppDisplay <= 0) {
-                showHelp();
-            } else {
-                TouchpadActivity.startTouchpad(getContext(), State.lastSingleAppDisplay, false);
+        // About info
+        TextView versionText = view.findViewById(R.id.versionText);
+        try {
+            String versionName = requireContext().getPackageManager()
+                .getPackageInfo(requireContext().getPackageName(), 0).versionName;
+            String androidVersion = android.os.Build.VERSION.RELEASE;
+            versionText.setText(getString(R.string.version_format, versionName, androidVersion));
+        } catch (Exception e) {
+            versionText.setText(getString(R.string.version_unknown));
+        }
+
+        view.findViewById(R.id.websiteLink).setOnClickListener(v ->
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/jqssun/android-screen-extend")))
+        );
+
+        // Double-tap about card to export logs
+        View aboutCard = view.findViewById(R.id.aboutCard);
+        GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                if (ShizukuUtils.hasPermission()) {
+                    State.startNewJob(new FetchLogAndShare(getContext()));
+                }
+                return true;
             }
+            @Override
+            public boolean onDown(MotionEvent e) { return true; }
+        });
+        aboutCard.setOnTouchListener((v, event) -> {
+            gestureDetector.onTouchEvent(event);
+            return true;
         });
 
-        inputDeviceBtn.setOnClickListener(v -> {
-            if (ShizukuUtils.hasPermission()) {
-                State.breadcrumbManager.pushBreadcrumb(getString(R.string.settings), () -> new SettingsFragment());
-            } else {
-                Toast.makeText(requireContext(), getString(R.string.shizuku_required), Toast.LENGTH_SHORT).show();
-            }
-        });
+        // Shizuku link
+        view.findViewById(R.id.shizukuBtn).setOnClickListener(v ->
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/rikkaapps/shizuku")))
+        );
 
-        shizukuBtn.setOnClickListener(v -> {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/rikkaapps/shizuku")));
-        });
-
-        aboutBtn.setOnClickListener(v -> {
-            State.breadcrumbManager.pushBreadcrumb(getString(R.string.about), () -> new AboutFragment());
-        });
+        // Exit
+        view.findViewById(R.id.exitBtn).setOnClickListener(v ->
+            ExitAll.execute(requireContext())
+        );
 
         return view;
     }
 
-    private void showHelp() {
-        new AlertDialog.Builder(requireContext())
-            .setTitle(getString(R.string.no_projection_title))
-            .setMessage(getString(R.string.no_projection_message))
-            .setPositiveButton(getString(R.string.got_it), null)
-            .show();
-    }
-
-    private void updateShizukuStatus(TextView statusView, Button permissionBtn) {
+    private void updateShizukuStatus(TextView statusView, View permissionBtn) {
         boolean started = ShizukuUtils.hasShizukuStarted();
         boolean hasPermission = ShizukuUtils.hasPermission();
-        
-        String status;
+
         if (!started) {
-            status = getString(R.string.shizuku_not_started);
+            statusView.setText(getString(R.string.shizuku_not_started));
             permissionBtn.setVisibility(View.GONE);
         } else if (!hasPermission) {
-            status = getString(R.string.shizuku_status_denied);
+            statusView.setText(getString(R.string.shizuku_status_denied));
             permissionBtn.setVisibility(View.VISIBLE);
         } else {
-            status = getString(R.string.shizuku_status_granted);
+            statusView.setText(getString(R.string.shizuku_status_granted));
             permissionBtn.setVisibility(View.GONE);
         }
-        
-        statusView.setText(status);
     }
 }

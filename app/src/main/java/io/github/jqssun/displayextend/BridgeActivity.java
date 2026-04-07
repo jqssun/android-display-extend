@@ -77,10 +77,6 @@ public class BridgeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         instance = this;
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
-
         getWindow().setFlags(
                 WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -116,10 +112,11 @@ public class BridgeActivity extends AppCompatActivity {
                     State.log("BridgeActivity reusing existing virtual display");
                 }
                 
-                State.breadcrumbManager.popBreadcrumb();
                 Display jumpToDisplay = State.bridgeVirtualDisplay.getDisplay();
-                State.breadcrumbManager.pushBreadcrumb(getString(R.string.screen_breadcrumb, jumpToDisplay.getDisplayId()),
-                    () -> DisplayDetailFragment.newInstance(jumpToDisplay.getDisplayId()));
+                if (State.currentActivity.get() instanceof IMainActivity) {
+                    ((IMainActivity) State.currentActivity.get()).navigateToDetail(
+                        DisplayDetailFragment.newInstance(jumpToDisplay.getDisplayId()));
+                }
             }
 
             @Override

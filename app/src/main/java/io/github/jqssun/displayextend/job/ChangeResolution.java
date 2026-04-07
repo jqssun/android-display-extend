@@ -5,6 +5,7 @@ import android.graphics.Point;
 import android.view.IWindowManager;
 
 import androidx.appcompat.app.AlertDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import io.github.jqssun.displayextend.R;
 import io.github.jqssun.displayextend.State;
@@ -59,7 +60,7 @@ public class ChangeResolution implements Job {
         }
         if (!requestedConfirmation) {
             requestedConfirmation = true;
-            dialog = new AlertDialog.Builder(State.currentActivity.get())
+            dialog = new MaterialAlertDialogBuilder(State.currentActivity.get())
             .setTitle(State.currentActivity.get().getString(R.string.edit_resolution))
             .setMessage(State.currentActivity.get().getString(R.string.confirm_resolution_format, oldWidth, oldHeight, width, height))
             .setPositiveButton(State.currentActivity.get().getString(R.string.ok), (dialog, which) -> {

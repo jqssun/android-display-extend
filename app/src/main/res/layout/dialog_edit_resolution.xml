@@ -1,52 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:paddingHorizontal="24dp"
+    android:paddingTop="16dp">
 
-    <LinearLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="8dp">
+        android:hint="@string/width"
+        android:layout_marginBottom="8dp"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/width_label"
-            android:layout_marginEnd="8dp"/>
-
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/width_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="number"/>
-    </LinearLayout>
+            android:inputType="number" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <LinearLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:hint="@string/height"
+        android:layout_marginBottom="12dp"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/height_label"
-            android:layout_marginEnd="8dp"/>
-
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/height_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="number"/>
-    </LinearLayout>
+            android:inputType="number" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/resolution_warning"
-        android:textColor="#FF5722" />
+        android:textAppearance="?attr/textAppearanceBodySmall"
+        android:textColor="?colorError" />
 
 </LinearLayout>

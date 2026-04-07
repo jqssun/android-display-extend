@@ -2,7 +2,6 @@ package io.github.jqssun.displayextend;
 
 import android.app.Activity;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.ServiceConnection;
 import android.hardware.display.VirtualDisplay;
 import android.media.projection.MediaProjection;
@@ -22,7 +21,6 @@ import rikka.shizuku.Shizuku;
 
 public class State {
     public static WeakReference<Activity> currentActivity = new WeakReference<>(null);
-    public static BreadcrumbManager breadcrumbManager;
     private static Job currentJob;
     public static List<String> logs = new ArrayList<>();
     private static MediaProjection mediaProjection;
@@ -36,7 +34,6 @@ public class State {
     public static FloatingButtonService floatingButtonService;
     public static Activity isInPureBlackActivity = null;
 
-
     private static final android.os.Handler mainHandler = new android.os.Handler(android.os.Looper.getMainLooper());
 
     public static final ServiceConnection userServiceConnection = new ServiceConnection() {
@@ -45,9 +42,7 @@ public class State {
             State.log("user service connected");
             State.userService = IUserService.Stub.asInterface(binder);
             if (State.currentActivity.get() != null) {
-                State.currentActivity.get().runOnUiThread(() -> {
-                    State.resumeJob();
-                });
+                State.currentActivity.get().runOnUiThread(() -> State.resumeJob());
             }
         }
 
@@ -59,14 +54,14 @@ public class State {
 
     public static Shizuku.UserServiceArgs userServiceArgs = new Shizuku.UserServiceArgs(new ComponentName(BuildConfig.APPLICATION_ID, UserService.class.getName()))
             .daemon(true)
-                .tag("temp7")
-                .processNameSuffix("connect-screen")
-                .debuggable(false)
-                .version(BuildConfig.VERSION_CODE);
+            .tag("temp7")
+            .processNameSuffix("connect-screen")
+            .debuggable(false)
+            .version(BuildConfig.VERSION_CODE);
 
     public static boolean isJobRunning() {
         return currentJob != null;
-    }   
+    }
 
     public static void startNewJob(Job job) {
         if (currentJob != null) {
@@ -89,12 +84,12 @@ public class State {
             State.log("stacktrace: " + stackTrace);
             currentJob = null;
         }
-        breadcrumbManager.refreshCurrentFragment();
+        _refreshUI();
     }
 
     public static void resumeJob() {
         if (currentJob == null) {
-            breadcrumbManager.refreshCurrentFragment();
+            _refreshUI();
             return;
         }
         try {
@@ -110,14 +105,12 @@ public class State {
             State.log("stacktrace: " + stackTrace);
             currentJob = null;
         }
-        breadcrumbManager.refreshCurrentFragment();
+        _refreshUI();
     }
 
     public static void resumeJobLater(long delayMillis) {
         if (currentActivity.get() != null) {
-            mainHandler.postDelayed(() -> {
-                resumeJob();
-            }, delayMillis);
+            mainHandler.postDelayed(() -> resumeJob(), delayMillis);
         }
     }
 
@@ -125,8 +118,19 @@ public class State {
         logs.add(message);
         Log.i("ConnectScreen", message);
         if (currentActivity != null && currentActivity.get() != null) {
-            IMainActivity  mainActivity = (IMainActivity) currentActivity.get();
+            IMainActivity mainActivity = (IMainActivity) currentActivity.get();
             mainActivity.updateLogs();
+        }
+    }
+
+    public static void _refreshUI() {
+        try {
+            Activity activity = currentActivity != null ? currentActivity.get() : null;
+            if (activity instanceof IMainActivity) {
+                ((IMainActivity) activity).refreshCurrentFragment();
+            }
+        } catch (Exception e) {
+            // ignore
         }
     }
 
@@ -150,16 +154,12 @@ public class State {
     }
 
     public static int getBridgeVirtualDisplayId() {
-        if (bridgeVirtualDisplay == null) {
-            return -1;
-        }
+        if (bridgeVirtualDisplay == null) return -1;
         return bridgeVirtualDisplay.getDisplay().getDisplayId();
     }
 
     public static int getMirrorVirtualDisplayId() {
-        if (mirrorVirtualDisplay == null) {
-            return -1;
-        }
+        if (mirrorVirtualDisplay == null) return -1;
         return mirrorVirtualDisplay.getDisplay().getDisplayId();
     }
 }

@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
 
-import androidx.appcompat.app.AlertDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import io.github.jqssun.displayextend.BridgePref;
 
@@ -37,7 +37,7 @@ public class BridgeDialog {
 
         Point initialSize = new Point();
         ServiceUtils.getWindowManager().getInitialDisplaySize(displayId, initialSize);
-        new AlertDialog.Builder(context)
+        new MaterialAlertDialogBuilder(context)
                 .setTitle(context.getString(R.string.bridge_settings))
                 .setView(dialogView)
                 .setPositiveButton(context.getString(R.string.ok), (dialog, which) -> {

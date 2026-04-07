@@ -45,8 +45,6 @@ public class LauncherActivity extends AppCompatActivity {
         
         int displayId = getIntent().getIntExtra(EXTRA_TARGET_DISPLAY_ID, Display.DEFAULT_DISPLAY);
         
-        getSupportActionBar().hide();
-
         setContentView(R.layout.activity_launcher);
 
         DisplayManager displayManager = (DisplayManager) getSystemService(Context.DISPLAY_SERVICE);
