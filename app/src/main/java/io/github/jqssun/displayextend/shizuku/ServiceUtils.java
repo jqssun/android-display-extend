@@ -125,10 +125,10 @@ public class ServiceUtils {
         }
         if (targetDisplayId != Display.DEFAULT_DISPLAY) {
             State.lastSingleAppDisplay = targetDisplayId;
-            State._refreshUI();
+            State.refreshUI();
         }
     }
-    public static void _launchPackage(Context context, String packageName, int targetDisplayId) {
+    private static void _launchPackage(Context context, String packageName, int targetDisplayId) {
         if (ShizukuUtils.hasPermission()) {
             launchAppWithShizuku(packageName, context, targetDisplayId);
             return;
@@ -273,7 +273,7 @@ public class ServiceUtils {
         }
         if (targetDisplayId != Display.DEFAULT_DISPLAY) {
             State.lastSingleAppDisplay = targetDisplayId;
-            State._refreshUI();
+            State.refreshUI();
         }
     }
 

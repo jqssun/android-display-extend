@@ -69,21 +69,31 @@ public class UserService extends IUserService.Stub  {
     }
 
     @Override
-    public String executeCommand(String command) throws RemoteException {
+    public String dumpInput() throws RemoteException {
+        return _exec("dumpsys input");
+    }
+
+    @Override
+    public void disablePhantomProcessMonitoring() throws RemoteException {
+        _exec("/system/bin/device_config set_sync_disabled_for_tests persistent");
+        _exec("/system/bin/device_config put activity_manager max_phantom_processes 2147483647");
+    }
+
+    private String _exec(String command) throws RemoteException {
         try {
             Process process = Runtime.getRuntime().exec(command);
             java.io.BufferedReader reader = new java.io.BufferedReader(
                 new java.io.InputStreamReader(process.getInputStream()));
-            
+
             StringBuilder output = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
                 output.append(line).append("\n");
             }
-            
+
             reader.close();
             process.waitFor();
-            
+
             return output.toString();
         } catch (Exception e) {
             Log.e("UserService", "execute command failed: " + command, e);

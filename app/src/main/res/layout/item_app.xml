@@ -5,20 +5,22 @@
     android:padding="8dp"
     android:orientation="horizontal">
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/launchBtn"
+        style="@style/Widget.Material3.Button.TonalButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:text="@string/cast"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/launchToDefaultBtn"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:text="@string/back_to_phone"/>
         
     <ImageView

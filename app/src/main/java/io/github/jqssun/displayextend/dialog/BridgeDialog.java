@@ -6,8 +6,7 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.CheckBox;
-
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import io.github.jqssun.displayextend.Pref;
@@ -21,9 +20,9 @@ public class BridgeDialog {
     public static void show(Context context, Display display, int displayId) {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_bridge, null);
         
-        CheckBox rotatesWithContentCheckbox = dialogView.findViewById(R.id.rotatesWithContentCheckbox);
-        CheckBox skipMediaProjectionPermissionCheckbox = dialogView.findViewById(R.id.skipMediaProjectionPermissionCheckbox);
-        CheckBox autoBridgeCheckbox = dialogView.findViewById(R.id.autoBridgeCheckbox);
+        MaterialCheckBox rotatesWithContentCheckbox = dialogView.findViewById(R.id.rotatesWithContentCheckbox);
+        MaterialCheckBox skipMediaProjectionPermissionCheckbox = dialogView.findViewById(R.id.skipMediaProjectionPermissionCheckbox);
+        MaterialCheckBox autoBridgeCheckbox = dialogView.findViewById(R.id.autoBridgeCheckbox);
         
         rotatesWithContentCheckbox.setChecked(Pref.getRotatesWithContent());
         skipMediaProjectionPermissionCheckbox.setChecked(Pref.getSkipMediaProjectionPermission());

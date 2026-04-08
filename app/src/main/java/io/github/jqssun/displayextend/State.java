@@ -24,6 +24,7 @@ import rikka.shizuku.Shizuku;
 public class State {
     public static WeakReference<Activity> currentActivity = new WeakReference<>(null);
     private static Job currentJob;
+    private static final int MAX_LOGS = 1000;
     public static List<String> logs = new ArrayList<>();
     public static final MutableLiveData<ExtendUiState> uiState = new MutableLiveData<>(new ExtendUiState());
     private static final java.util.concurrent.atomic.AtomicInteger _logVersion = new java.util.concurrent.atomic.AtomicInteger(0);
@@ -59,8 +60,8 @@ public class State {
 
     public static Shizuku.UserServiceArgs userServiceArgs = new Shizuku.UserServiceArgs(new ComponentName(BuildConfig.APPLICATION_ID, UserService.class.getName()))
             .daemon(true)
-            .tag("temp7")
-            .processNameSuffix("connect-screen")
+            .tag("extend")
+            .processNameSuffix("extend")
             .debuggable(false)
             .version(BuildConfig.VERSION_CODE);
 
@@ -85,16 +86,16 @@ public class State {
             State.log("job yielded: " + job.getClass().getSimpleName() + ", " + e.getMessage());
         } catch (RuntimeException e) {
             State.log("job failed: " + job.getClass().getSimpleName());
-            String stackTrace = android.util.Log.getStackTraceString(e);
+            String stackTrace = Log.getStackTraceString(e);
             State.log("stacktrace: " + stackTrace);
             currentJob = null;
         }
-        _refreshUI();
+        refreshUI();
     }
 
     public static void resumeJob() {
         if (currentJob == null) {
-            _refreshUI();
+            refreshUI();
             return;
         }
         try {
@@ -106,11 +107,11 @@ public class State {
             State.log("job yielded: " + currentJob.getClass().getSimpleName() + ", " + e.getMessage());
         } catch (RuntimeException e) {
             State.log("job resume failed: " + currentJob.getClass().getSimpleName());
-            String stackTrace = android.util.Log.getStackTraceString(e);
+            String stackTrace = Log.getStackTraceString(e);
             State.log("stacktrace: " + stackTrace);
             currentJob = null;
         }
-        _refreshUI();
+        refreshUI();
     }
 
     public static void resumeJobLater(long delayMillis) {
@@ -121,11 +122,14 @@ public class State {
 
     public static void log(String message) {
         logs.add(message);
-        Log.i("ConnectScreen", message);
+        if (logs.size() > MAX_LOGS) {
+            logs.remove(0);
+        }
+        Log.i("Extend", message);
         logVersion.postValue(_logVersion.incrementAndGet());
     }
 
-    public static void _refreshUI() {
+    public static void refreshUI() {
         Activity activity = currentActivity != null ? currentActivity.get() : null;
         if (activity != null) {
             activity.runOnUiThread(() -> _updateUiState(activity));
@@ -140,9 +144,9 @@ public class State {
         try {
             String ver = activity.getPackageManager()
                     .getPackageInfo(activity.getPackageName(), 0).versionName;
-            state.versionText = "Version: " + ver + " (Android " + android.os.Build.VERSION.RELEASE + ")";
+            state.versionText = activity.getString(R.string.version_format, ver, android.os.Build.VERSION.RELEASE);
         } catch (Exception e) {
-            state.versionText = "Version: unknown";
+            state.versionText = activity.getString(R.string.version_unknown);
         }
 
         boolean started = io.github.jqssun.displayextend.shizuku.ShizukuUtils.hasShizukuStarted();

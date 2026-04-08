@@ -18,6 +18,8 @@
     <string name="unknown">Unknown</string>
     <string name="on">On</string>
     <string name="off">Off</string>
+    <string name="shizuku">Shizuku</string>
+    <string name="dpi_label">DPI</string>
 
     <!-- Navigation -->
     <string name="overview">Overview</string>
@@ -35,7 +37,6 @@
     <string name="simulate_screen_off">Simulate screen off</string>
     <string name="touchpad">Touchpad</string>
     <string name="settings">Settings</string>
-    <string name="about">About</string>
     <string name="shizuku_not_started">Not started</string>
     <string name="no_projection_title">No app being projected</string>
     <string name="no_projection_message">- USB-C DisplayPort: Connect a screen, then select it from the screen list to cast an app\n\n- Wireless: Use Android\'s built-in wireless display, then find the screen in the list to cast an app</string>
@@ -87,8 +88,6 @@
     <string name="shizuku_status_denied">Denied</string>
     <string name="ime_to_main_display">Show keyboard on main screen</string>
     <string name="ime_to_this_display">Show keyboard on this screen</string>
-    <string name="select_display_mode">Select display mode</string>
-    <string name="display_mode_set_unlikely">Applied, but may not take effect</string>
     <string name="android15_rotation_hint">Android 15 supports direct rotation without bridge</string>
 
     <!-- Settings -->
@@ -119,10 +118,10 @@
     <!-- Touchpad -->
     <string name="switch_mode">Switch mode</string>
     <string name="mode_normal">Normal</string>
-    <string name="mode_cursor_locked">Cursor locked</string>
-    <string name="cursor_not_moved">Cursor stays fixed, single-finger gestures only</string>
-    <string name="move_cursor">Move cursor</string>
-    <string name="touchpad_help">Touch this area to control:\n- Single finger swipe: %s\n- Single finger tap: click\n- Multi-finger gesture: pass through to target screen\n- Back button: press back on target screen\n- Home button: reopen the selected app\n- Moon button: black screen to save power\n- If a Bluetooth controller can\'t control the display, use the moon button to turn off the main screen and shift focus</string>
+    <string name="mode_cursor_locked">Locked cursor</string>
+    <string name="touchpad_help_cursor_locked">Cursor stays fixed, single-finger gestures only</string>
+    <string name="touchpad_help_move_cursor">Move cursor</string>
+    <string name="touchpad_help_text">Touch this area to control the target screen:\n\n- Single-finger swipe: %s\n- Single-finger tap: Tap on the target screen\n- Multi-finger gesture: Sent to the target screen\n- Back button: Go back on the target screen\n- Home button: Reopen the selected app\n- Moon button: Black screen to save power\n\nIf a Bluetooth controller cannot control the display, use the moon button to turn off the main screen and shift focus.</string>
     <string name="show_cursor_failed">Failed to show cursor</string>
 
     <!-- Dialogs -->
@@ -153,6 +152,10 @@
     <string name="show_all_apps">Show all apps</string>
     <string name="floating_on">Floating on</string>
     <string name="floating_off">Floating off</string>
+    <string name="force_dpi">Force DPI</string>
+    <string name="force_dpi_format">DPI: %d</string>
+    <string name="force_dpi_off">DPI: Auto</string>
+    <string name="enter_force_dpi_hint">Enter DPI (Auto: 0)</string>
     <string name="query_apps_permission_required">QUERY_ALL_PACKAGES permission is required</string>
     <string name="cannot_get_app_list">Cannot get app list, please check permissions</string>
     <string name="first_launch_hint">Tap \'Return\' once to grant permission, then return here and select the same app again.</string>

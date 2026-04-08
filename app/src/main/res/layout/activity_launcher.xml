@@ -57,6 +57,14 @@
             android:text="@string/simulate_screen_off" />
 
         <com.google.android.material.chip.Chip
+            android:id="@+id/forceDpiBtn"
+            style="@style/Widget.Material3.Chip.Assist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checkable="false"
+            android:text="@string/force_dpi_off" />
+
+        <com.google.android.material.chip.Chip
             android:id="@+id/menu_button"
             style="@style/Widget.Material3.Chip.Filter"
             android:layout_width="wrap_content"

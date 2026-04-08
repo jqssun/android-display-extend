@@ -35,8 +35,7 @@ public class TermuxDisablePhantomProcess implements Job {
                     return;
                 }
                 if (State.userService != null) {
-                    State.userService.executeCommand("/system/bin/device_config set_sync_disabled_for_tests persistent");
-                    State.userService.executeCommand("/system/bin/device_config put activity_manager max_phantom_processes 2147483647");
+                    State.userService.disablePhantomProcessMonitoring();
                 }
                 Settings.Global.putInt(contentResolver,
                         "settings_enable_monitor_phantom_procs", 0);

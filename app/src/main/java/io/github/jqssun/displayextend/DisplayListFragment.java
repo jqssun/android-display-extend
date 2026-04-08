@@ -24,11 +24,11 @@ public class DisplayListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_display_list, container, false);
 
-        DisplayManager displayManager = (DisplayManager) getContext().getSystemService(Context.DISPLAY_SERVICE);
+        DisplayManager displayManager = (DisplayManager) requireContext().getSystemService(Context.DISPLAY_SERVICE);
         Display[] displays = displayManager.getDisplays();
 
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         List<Display> displayList = new ArrayList<>();
         for (Display display : displays) {
             if (display.getDisplayId() != State.bridgeDisplayId && display.getDisplayId() != State.mirrorDisplayId) {

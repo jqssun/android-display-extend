@@ -23,16 +23,16 @@ public class LogsFragment extends Fragment {
 
         logRecyclerView = view.findViewById(R.id.logRecyclerView);
         logAdapter = new LogAdapter(State.logs);
-        logRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        logRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         logRecyclerView.setAdapter(logAdapter);
         _scrollToBottom();
 
         view.findViewById(R.id.exportLogsBtn).setOnClickListener(v -> {
             if (!ShizukuUtils.hasPermission()) {
-                Toast.makeText(getContext(), getString(R.string.export_log_requires_shizuku), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.export_log_requires_shizuku), Toast.LENGTH_SHORT).show();
                 return;
             }
-            State.startNewJob(new FetchLogAndShare(getContext()));
+            State.startNewJob(new FetchLogAndShare(requireContext()));
         });
 
         view.findViewById(R.id.clearLogsBtn).setOnClickListener(v -> {

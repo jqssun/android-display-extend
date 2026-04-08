@@ -165,86 +165,41 @@ public class SettingsFragment extends Fragment {
         ((View) v.getParent()).setVisibility(View.GONE);
     }
 
+    private void _bindGlobalSetting(MaterialSwitch toggle, String key) {
+        toggle.setChecked(Settings.Global.getInt(requireContext().getContentResolver(), key, 0) == 1);
+        toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            try {
+                Settings.Global.putInt(requireContext().getContentResolver(), key, isChecked ? 1 : 0);
+            } catch (SecurityException e) {
+                State.log("failed: " + e);
+            }
+        });
+    }
+
     private void _setupForceDesktopCheckbox() {
-        boolean isForceDesktop = Settings.Global.getInt(requireContext().getContentResolver(),
-                "force_desktop_mode_on_external_displays", 0) == 1;
-        forceDesktopCheckbox.setChecked(isForceDesktop);
+        _bindGlobalSetting(forceDesktopCheckbox, "force_desktop_mode_on_external_displays");
         boolean isHuawei = Build.MANUFACTURER.toLowerCase().contains("huawei") ||
                           Build.BRAND.toLowerCase().contains("huawei") ||
                           Build.DEVICE.toLowerCase().contains("huawei");
-
         if (isHuawei) {
             _hideRow(forceDesktopCheckbox);
         }
-
-        forceDesktopCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            try {
-                Settings.Global.putInt(requireContext().getContentResolver(),
-                        "force_desktop_mode_on_external_displays", isChecked ? 1 : 0);
-            } catch (SecurityException e) {
-                State.log("failed: " + e);
-            }
-        });
     }
 
     private void _setupForceResizableCheckbox() {
-        boolean isForceResizable = Settings.Global.getInt(requireContext().getContentResolver(),
-                "force_resizable_activities", 0) == 1;
-        forceResizableCheckbox.setChecked(isForceResizable);
-
-        forceResizableCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            try {
-                Settings.Global.putInt(requireContext().getContentResolver(),
-                        "force_resizable_activities", isChecked ? 1 : 0);
-            } catch (SecurityException e) {
-                State.log("failed: " + e);
-            }
-        });
+        _bindGlobalSetting(forceResizableCheckbox, "force_resizable_activities");
     }
 
     private void _setupEnableFreeformCheckbox() {
-        boolean isEnableFreeform = Settings.Global.getInt(requireContext().getContentResolver(),
-                "enable_freeform_support", 0) == 1;
-        enableFreeformCheckbox.setChecked(isEnableFreeform);
-
-        enableFreeformCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            try {
-                Settings.Global.putInt(requireContext().getContentResolver(),
-                        "enable_freeform_support", isChecked ? 1 : 0);
-            } catch (SecurityException e) {
-                State.log("failed: " + e);
-            }
-        });
+        _bindGlobalSetting(enableFreeformCheckbox, "enable_freeform_support");
     }
 
     private void _setupEnableNonResizableCheckbox() {
-        boolean isEnableNonResizable = Settings.Global.getInt(requireContext().getContentResolver(),
-                "enable_non_resizable_multi_window", 0) == 1;
-        enableNonResizableCheckbox.setChecked(isEnableNonResizable);
-
-        enableNonResizableCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            try {
-                Settings.Global.putInt(requireContext().getContentResolver(),
-                        "enable_non_resizable_multi_window", isChecked ? 1 : 0);
-            } catch (SecurityException e) {
-                State.log("failed: " + e);
-            }
-        });
+        _bindGlobalSetting(enableNonResizableCheckbox, "enable_non_resizable_multi_window");
     }
 
     private void _setupDisableScreenShareProtectionCheckbox() {
-        boolean isDisabled = Settings.Global.getInt(requireContext().getContentResolver(),
-                "disable_screen_share_protections_for_apps_and_notifications", 0) == 1;
-        disableScreenShareProtectionCheckbox.setChecked(isDisabled);
-
-        disableScreenShareProtectionCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            try {
-                Settings.Global.putInt(requireContext().getContentResolver(),
-                        "disable_screen_share_protections_for_apps_and_notifications", isChecked ? 1 : 0);
-            } catch (SecurityException e) {
-                State.log("failed: " + e);
-            }
-        });
+        _bindGlobalSetting(disableScreenShareProtectionCheckbox, "disable_screen_share_protections_for_apps_and_notifications");
     }
 
     private void _setupDisableUsbAudioCheckbox() {

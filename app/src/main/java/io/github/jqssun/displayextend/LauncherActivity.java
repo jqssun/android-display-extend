@@ -15,8 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import java.util.List;
 
-import android.content.res.Resources;
-import android.content.res.Configuration;
 import android.util.DisplayMetrics;
 import android.widget.Toast;
 import android.text.Editable;
@@ -51,7 +49,7 @@ public class LauncherActivity extends AppCompatActivity {
         floatingButtonToggle = findViewById(R.id.floating_button_toggle);
         if (displayId != Display.DEFAULT_DISPLAY) {
             floatingButtonToggle.setVisibility(View.VISIBLE);
-            updateFloatingBackButtonText(Pref.getFloatingButton(display.getName()));
+            _updateFloatingBackButtonText(Pref.getFloatingButton(display.getName()));
             floatingButtonToggle.setOnClickListener(v -> {
                 boolean isEnabled = Pref.getFloatingButton(display.getName());
                 if (isEnabled) {
@@ -64,7 +62,7 @@ public class LauncherActivity extends AppCompatActivity {
                     }
                 }
                 Pref.setFloatingButton(display.getName(), isEnabled);
-                updateFloatingBackButtonText(isEnabled);
+                _updateFloatingBackButtonText(isEnabled);
             });
         }
         Chip touchpadButton = findViewById(R.id.touchpadBtn);
@@ -78,39 +76,14 @@ public class LauncherActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.app_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         
-        PackageManager pm = getPackageManager();
-        List<ApplicationInfo> packages = new ArrayList<>();
-        try {
-            packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-        } catch (SecurityException e) {
-            Toast.makeText(this, getString(R.string.query_apps_permission_required), Toast.LENGTH_LONG).show();
-            State.log("failed to query app list: " + e);
-        }
-
         Chip showAllChip = findViewById(R.id.menu_button);
         showAllChip.setChecked(Pref.getShowAllApps());
         showAllChip.setOnCheckedChangeListener((chip, isChecked) -> {
             Pref.setShowAllApps(isChecked);
-            PackageManager pm2 = getPackageManager();
-            List<ApplicationInfo> pkgs = new ArrayList<>();
-            try {
-                pkgs = pm2.getInstalledApplications(PackageManager.GET_META_DATA);
-            } catch (SecurityException e) {
-                Toast.makeText(this, getString(R.string.query_apps_permission_required), Toast.LENGTH_LONG).show();
-                State.log("failed to query app list: " + e);
-                return;
-            }
-            List<ApplicationInfo> filtered = pkgs.stream()
-                .filter(app -> isChecked || (app.flags & ApplicationInfo.FLAG_SYSTEM) == 0)
-                .collect(Collectors.toList());
-            adapter.updateAppList(filtered);
+            adapter.updateAppList(_getFilteredApps(isChecked));
         });
-        
-        boolean showAllApps = Pref.getShowAllApps();
-            
-        List<ApplicationInfo> userApps = packages.stream()
-            .filter(app -> showAllApps || (app.flags & ApplicationInfo.FLAG_SYSTEM) == 0)
-            .collect(Collectors.toList());
+
+        List<ApplicationInfo> userApps = _getFilteredApps(Pref.getShowAllApps());
         
         com.google.android.material.textfield.TextInputEditText searchBox = findViewById(R.id.search_box);
         searchBox.addTextChangedListener(new TextWatcher() {
@@ -126,17 +99,14 @@ public class LauncherActivity extends AppCompatActivity {
             }
         });
         
-        adapter = new AppListAdapter(userApps, pm, displayId);
+        adapter = new AppListAdapter(userApps, getPackageManager(), displayId);
         recyclerView.setAdapter(adapter);
-        
-        Resources resources = getResources();
-        Configuration configuration = resources.getConfiguration();
-        DisplayMetrics displayMetrics = resources.getDisplayMetrics();
-        
-        displayMetrics.densityDpi = 320; 
-        configuration.densityDpi = 320;
-        
-        resources.updateConfiguration(configuration, displayMetrics);
+
+        _applyDpi();
+
+        Chip forceDpiBtn = findViewById(R.id.forceDpiBtn);
+        _updateForceDpiText(forceDpiBtn);
+        forceDpiBtn.setOnClickListener(v -> _showForceDpiDialog(forceDpiBtn));
 
         findViewById(R.id.screenOffBtn).setOnClickListener(v -> {
             Intent intent = new Intent(this, PureBlackActivity.class);
@@ -144,16 +114,66 @@ public class LauncherActivity extends AppCompatActivity {
             startActivity(intent, options.toBundle());
         });
     }
-    private void updateFloatingBackButtonText(boolean isEnabled) {
+    private void _updateFloatingBackButtonText(boolean isEnabled) {
         floatingButtonToggle.setText(isEnabled ? getString(R.string.floating_on) : getString(R.string.floating_off));
     }
-    
 
-    public static void start(Context context, int displayId) {
-        PackageManager pm = context.getPackageManager();
+    private List<ApplicationInfo> _getFilteredApps(boolean showAll) {
         List<ApplicationInfo> packages = new ArrayList<>();
         try {
-            packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+            packages = getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA);
+        } catch (SecurityException e) {
+            Toast.makeText(this, getString(R.string.query_apps_permission_required), Toast.LENGTH_LONG).show();
+            State.log("failed to query app list: " + e);
+        }
+        return packages.stream()
+            .filter(app -> showAll || (app.flags & ApplicationInfo.FLAG_SYSTEM) == 0)
+            .collect(Collectors.toList());
+    }
+
+    private int _builtInDpi() {
+        return getResources().getDisplayMetrics().densityDpi;
+    }
+
+    private void _applyDpi() {
+        int dpi = Pref.getForceDpi();
+        if (dpi <= 0) dpi = _builtInDpi();
+        getResources().getDisplayMetrics().densityDpi = dpi;
+        getResources().getConfiguration().densityDpi = dpi;
+    }
+
+    private void _updateForceDpiText(Chip chip) {
+        int dpi = Pref.getForceDpi();
+        chip.setText(dpi > 0 ? getString(R.string.force_dpi_format, dpi) : getString(R.string.force_dpi_off));
+    }
+
+    private void _showForceDpiDialog(Chip chip) {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_force_dpi, null);
+        com.google.android.material.textfield.TextInputEditText input = dialogView.findViewById(R.id.force_dpi_input);
+        int current = Pref.getForceDpi();
+        input.setText(String.valueOf(current));
+
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.force_dpi))
+            .setView(dialogView)
+            .setPositiveButton(getString(R.string.ok), (d, w) -> {
+                try {
+                    int dpi = Integer.parseInt(input.getText().toString().trim());
+                    Pref.setForceDpi(Math.max(0, dpi));
+                    _applyDpi();
+                    _updateForceDpiText(chip);
+                } catch (NumberFormatException e) {
+                    Toast.makeText(this, getString(R.string.invalid_number), Toast.LENGTH_SHORT).show();
+                }
+            })
+            .setNegativeButton(getString(R.string.cancel), null)
+            .show();
+    }
+
+    public static void start(Context context, int displayId) {
+        List<ApplicationInfo> packages = new ArrayList<>();
+        try {
+            packages = context.getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA);
         } catch (SecurityException e) {
             Toast.makeText(context, context.getString(R.string.query_apps_permission_required), Toast.LENGTH_LONG).show();
             State.log("failed to query app list: " + e);

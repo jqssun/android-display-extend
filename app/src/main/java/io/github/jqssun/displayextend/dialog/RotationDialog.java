@@ -14,10 +14,6 @@ import io.github.jqssun.displayextend.State;
 import io.github.jqssun.displayextend.job.ChangeRotation;
 
 public class RotationDialog {
-    public interface OnRotationSelectedListener {
-        void onRotationSelected(int rotation);
-    }
-
     public static void show(Context context, int displayId) {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_edit_rotation, null);
         Spinner rotationSpinner = dialogView.findViewById(R.id.rotation_spinner);

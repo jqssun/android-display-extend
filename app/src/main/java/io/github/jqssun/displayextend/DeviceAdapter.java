@@ -4,13 +4,12 @@ import android.view.InputDevice;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-
+import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -46,7 +45,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
 
     static class DeviceViewHolder extends RecyclerView.ViewHolder {
         TextView tvDeviceName;
-        Button btnView;
+        MaterialButton btnView;
 
         DeviceViewHolder(@NonNull View itemView) {
             super(itemView);

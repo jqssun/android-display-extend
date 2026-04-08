@@ -17,9 +17,10 @@ import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.LinearLayout;
+
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.checkbox.MaterialCheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,13 +40,13 @@ public class DisplayDetailFragment extends Fragment {
     private LinearLayout infoTable;
     private LinearLayout shizukuTable;
     private LinearLayout shizukuCard;
-    private Button launchButton;
+    private MaterialButton launchButton;
     private int displayId;
     private Display display;
     private LinearLayout modesTable;
-    private Button setImePolicyButton;
-    private Button floatingButtonToggle;
-    private CheckBox forceLandscapeCheckbox;
+    private MaterialButton setImePolicyButton;
+    private MaterialButton floatingButtonToggle;
+    private MaterialCheckBox forceLandscapeCheckbox;
 
     public static DisplayDetailFragment newInstance(int displayId) {
         DisplayDetailFragment fragment = new DisplayDetailFragment();
@@ -136,7 +137,15 @@ public class DisplayDetailFragment extends Fragment {
             LauncherActivity.start(getContext(), displayId);
         });
 
-        Button touchpadButton = view.findViewById(R.id.touchpad_button);
+        MaterialCheckBox autoOpenLastAppCheckbox = view.findViewById(R.id.autoOpenLastAppCheckbox);
+        if (displayId != Display.DEFAULT_DISPLAY) {
+            autoOpenLastAppCheckbox.setVisibility(View.VISIBLE);
+            autoOpenLastAppCheckbox.setChecked(Pref.getAutoOpenLastApp(display.getName()));
+            autoOpenLastAppCheckbox.setOnCheckedChangeListener((buttonView, isChecked) ->
+                Pref.setAutoOpenLastApp(display.getName(), isChecked));
+        }
+
+        MaterialButton touchpadButton = view.findViewById(R.id.touchpad_button);
         if (displayId != Display.DEFAULT_DISPLAY) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R || ShizukuUtils.hasPermission()) {
                 touchpadButton.setVisibility(View.VISIBLE);
@@ -146,7 +155,7 @@ public class DisplayDetailFragment extends Fragment {
             TouchpadActivity.startTouchpad(getContext(), displayId, false);
         });
 
-        Button editResolutionButton = view.findViewById(R.id.edit_resolution_button);
+        MaterialButton editResolutionButton = view.findViewById(R.id.edit_resolution_button);
         if(ShizukuUtils.hasShizukuStarted()) {
             editResolutionButton.setVisibility(View.VISIBLE);
             editResolutionButton.setOnClickListener(v -> {
@@ -157,7 +166,7 @@ public class DisplayDetailFragment extends Fragment {
         TextView dpiText = view.findViewById(R.id.dpi_text);
         dpiText.setText(String.valueOf(metrics.densityDpi));
 
-        Button editDpiButton = view.findViewById(R.id.edit_dpi_button);
+        MaterialButton editDpiButton = view.findViewById(R.id.edit_dpi_button);
         if(ShizukuUtils.hasShizukuStarted()) {
             editDpiButton.setVisibility(View.VISIBLE);
             editDpiButton.setOnClickListener(v -> {
@@ -166,7 +175,7 @@ public class DisplayDetailFragment extends Fragment {
         }
 
         TextView userRotationText = view.findViewById(R.id.user_rotation_text);
-        Button editRotationButton = view.findViewById(R.id.edit_rotation_button);
+        MaterialButton editRotationButton = view.findViewById(R.id.edit_rotation_button);
 
         _updateUserRotationText(userRotationText);
 
@@ -181,7 +190,7 @@ public class DisplayDetailFragment extends Fragment {
 
         _updateShizukuStatus();
 
-        Button bridgeButton = view.findViewById(R.id.bridge_button);
+        MaterialButton bridgeButton = view.findViewById(R.id.bridge_button);
 
         if (displayId == State.getBridgeVirtualDisplayId() || displayId == State.bridgeDisplayId) {
             bridgeButton.setVisibility(View.VISIBLE);
@@ -275,7 +284,7 @@ public class DisplayDetailFragment extends Fragment {
                         setImePolicyButton.setOnClickListener(v -> {
                             windowManager.setDisplayImePolicy(Display.DEFAULT_DISPLAY, 0);
                             windowManager.setDisplayImePolicy(displayId, 1);
-                            try { State._refreshUI(); } catch (Throwable e) { State.log("failed: " + e); }
+                            try { State.refreshUI(); } catch (Throwable e) { State.log("failed: " + e); }
                         });
                     } else {
                         setImePolicyButton.setText(getString(R.string.ime_to_this_display));
@@ -283,7 +292,7 @@ public class DisplayDetailFragment extends Fragment {
                             windowManager.setDisplayImePolicy(Display.DEFAULT_DISPLAY, 1);
                             try {
                                 windowManager.setDisplayImePolicy(displayId, 0);
-                                State._refreshUI();
+                                State.refreshUI();
                             } catch (Throwable e) {
                                 windowManager.setDisplayImePolicy(Display.DEFAULT_DISPLAY, 0);
                                 State.log("failed: " + e);

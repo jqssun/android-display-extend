@@ -28,7 +28,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -172,8 +171,6 @@ public class TouchpadActivity extends AppCompatActivity {
 
         _showMouseCursor(targetDisplay);
 
-        touchpadArea = findViewById(R.id.touchpad_area);
-
         if (inputManager == null) {
             _setupTouchListenerForAccessibility();
         } else {
@@ -235,9 +232,7 @@ public class TouchpadActivity extends AppCompatActivity {
                         _replayGestureViaAccessibility();
                     }
                 }
-                gestureState.lastReplayed = 0;
-                gestureState.isSingleFinger = false;
-                gestureState.allMotionEvents.clear();
+                _recycleGestureEvents();
                 return true;
             }
 
@@ -288,9 +283,7 @@ public class TouchpadActivity extends AppCompatActivity {
                         _replayBufferedEvents();
                     }
                 }
-                gestureState.lastReplayed = 0;
-                gestureState.isSingleFinger = false;
-                gestureState.allMotionEvents.clear();
+                _recycleGestureEvents();
                 return true;
             }
 
@@ -334,14 +327,23 @@ public class TouchpadActivity extends AppCompatActivity {
         
         switch (selectedMode) {
             case MODE_CURSOR_LOCKED:
-                singleFingerAction = getString(R.string.cursor_not_moved);
+                singleFingerAction = getString(R.string.touchpad_help_cursor_locked);
                 break;
             default:
-                singleFingerAction = getString(R.string.move_cursor);
+                singleFingerAction = getString(R.string.touchpad_help_move_cursor);
                 break;
         }
-        
-        touchpadArea.setText(getString(R.string.touchpad_help, singleFingerAction));
+
+        touchpadArea.setText(getString(R.string.touchpad_help_text, singleFingerAction));
+    }
+
+    private void _recycleGestureEvents() {
+        for (MotionEvent e : gestureState.allMotionEvents) {
+            e.recycle();
+        }
+        gestureState.allMotionEvents.clear();
+        gestureState.lastReplayed = 0;
+        gestureState.isSingleFinger = false;
     }
 
     private void _replayBufferedEvents() {
@@ -536,9 +538,11 @@ public class TouchpadActivity extends AppCompatActivity {
                 switch (position) {
                     case MODE_NORMAL:
                         isCursorLocked = false;
+                        if (cursorView != null) cursorView.setVisibility(View.VISIBLE);
                         break;
                     case MODE_CURSOR_LOCKED:
                         isCursorLocked = true;
+                        if (cursorView != null) cursorView.setVisibility(View.GONE);
                         break;
                 }
                 _updateHelp();

@@ -8,11 +8,13 @@ interface IUserService {
 
     String fetchLogs() = 2;
 
-    String executeCommand(String command) = 3;
+    String dumpInput() = 3;
 
     void setScreenPower(int powerMode) = 4;
 
     void startListenVolumeKey() = 5;
 
     void stopListenVolumeKey() = 6;
+
+    void disablePhantomProcessMonitoring() = 7;
 }
