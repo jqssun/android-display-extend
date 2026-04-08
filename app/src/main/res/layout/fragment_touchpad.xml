@@ -24,7 +24,7 @@
         android:layout_marginBottom="16dp" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnStartTouchpad"
+        android:id="@+id/startTouchpadBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/open_touchpad"

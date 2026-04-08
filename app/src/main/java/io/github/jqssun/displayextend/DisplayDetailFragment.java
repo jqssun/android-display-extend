@@ -1,14 +1,11 @@
 package io.github.jqssun.displayextend;
 
-import static android.content.Context.MODE_PRIVATE;
-
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.display.DisplayManager;
-import android.hardware.display.IDisplayManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -16,24 +13,24 @@ import android.view.Display;
 import android.view.DisplayCutout;
 import android.view.DisplayInfo;
 import android.view.IWindowManager;
-import android.widget.LinearLayout;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
-import io.github.jqssun.displayextend.shizuku.ServiceUtils;
-import io.github.jqssun.displayextend.shizuku.ShizukuUtils;
-import io.github.jqssun.displayextend.dialog.RotationDialog;
-import io.github.jqssun.displayextend.dialog.ResolutionDialog;
 import io.github.jqssun.displayextend.dialog.BridgeDialog;
 import io.github.jqssun.displayextend.dialog.DpiDialog;
+import io.github.jqssun.displayextend.dialog.ResolutionDialog;
+import io.github.jqssun.displayextend.dialog.RotationDialog;
+import io.github.jqssun.displayextend.shizuku.ServiceUtils;
+import io.github.jqssun.displayextend.shizuku.ShizukuUtils;
 import io.github.jqssun.displayextend.shizuku.WindowingMode;
 
 public class DisplayDetailFragment extends Fragment {
@@ -45,9 +42,8 @@ public class DisplayDetailFragment extends Fragment {
     private Button launchButton;
     private int displayId;
     private Display display;
-    private android.widget.TableLayout modesTable;
+    private LinearLayout modesTable;
     private Button setImePolicyButton;
-    private CheckBox autoOpenLastAppCheckbox;
     private Button floatingButtonToggle;
     private CheckBox forceLandscapeCheckbox;
 
@@ -59,7 +55,7 @@ public class DisplayDetailFragment extends Fragment {
         return fragment;
     }
 
-    private String getDisplayFlags(Display display) {
+    private String _getDisplayFlags(Display display) {
         int flags = display.getFlags();
         StringBuilder flagsStr = new StringBuilder();
 
@@ -76,10 +72,6 @@ public class DisplayDetailFragment extends Fragment {
         return flagsStr.length() > 0 ? flagsStr.toString() : getString(R.string.none);
     }
 
-    private void showToast(String message) {
-        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_display_detail, container, false);
@@ -88,13 +80,17 @@ public class DisplayDetailFragment extends Fragment {
         infoTable = view.findViewById(R.id.info_table);
         shizukuTable = view.findViewById(R.id.shizuku_table);
         shizukuCard = view.findViewById(R.id.shizuku_card);
-        autoOpenLastAppCheckbox = view.findViewById(R.id.autoOpenLastAppCheckbox);
-        displayId = getArguments().getInt(ARG_DISPLAY_ID);
-        DisplayManager displayManager = (DisplayManager) getContext().getSystemService(Context.DISPLAY_SERVICE);
+        Bundle args = getArguments();
+        if (args == null) return view;
+        displayId = args.getInt(ARG_DISPLAY_ID);
+        Context ctx = getContext();
+        if (ctx == null) return view;
+        DisplayManager displayManager = (DisplayManager) ctx.getSystemService(Context.DISPLAY_SERVICE);
         display = displayManager.getDisplay(displayId);
 
-        if(display == null) {
-            State.currentActivity.get().onBackPressed();
+        if (display == null) {
+            Activity activity = getActivity();
+            if (activity != null) activity.onBackPressed();
             return view;
         }
 
@@ -122,15 +118,15 @@ public class DisplayDetailFragment extends Fragment {
 
         // Display info table
         infoTable.removeAllViews();
-        _addInfoRow(infoTable, "Display ID", String.valueOf(display.getDisplayId()));
-        _addInfoRow(infoTable, "Name", display.getName());
-        _addInfoRow(infoTable, "Refresh rate", String.format("%.1f Hz", display.getRefreshRate()));
-        _addInfoRow(infoTable, "State", display.getState() == Display.STATE_ON ? getString(R.string.on) : getString(R.string.off));
-        _addInfoRow(infoTable, "HDR", display.isHdr() ? getString(R.string.yes) : getString(R.string.no));
-        _addInfoRow(infoTable, "Flags", getDisplayFlags(display));
-        _addInfoRow(infoTable, "Cutout", cutoutInfo);
+        _addInfoRow(infoTable, getString(R.string.info_display_id), String.valueOf(display.getDisplayId()));
+        _addInfoRow(infoTable, getString(R.string.info_name), display.getName());
+        _addInfoRow(infoTable, getString(R.string.info_refresh_rate), String.format("%.1f Hz", display.getRefreshRate()));
+        _addInfoRow(infoTable, getString(R.string.info_state), display.getState() == Display.STATE_ON ? getString(R.string.on) : getString(R.string.off));
+        _addInfoRow(infoTable, getString(R.string.info_hdr), display.isHdr() ? getString(R.string.yes) : getString(R.string.no));
+        _addInfoRow(infoTable, getString(R.string.info_flags), _getDisplayFlags(display));
+        _addInfoRow(infoTable, getString(R.string.info_cutout), cutoutInfo);
 
-        setupDisplayModes(display.getSupportedModes());
+        _setupDisplayModes(display.getSupportedModes());
 
         launchButton = view.findViewById(R.id.start_launcher_button);
         if (displayId == 0) {
@@ -172,18 +168,18 @@ public class DisplayDetailFragment extends Fragment {
         TextView userRotationText = view.findViewById(R.id.user_rotation_text);
         Button editRotationButton = view.findViewById(R.id.edit_rotation_button);
 
-        updateUserRotationText(userRotationText);
+        _updateUserRotationText(userRotationText);
 
         if(ShizukuUtils.hasShizukuStarted()) {
             if (displayId != Display.DEFAULT_DISPLAY) {
                 editRotationButton.setVisibility(View.VISIBLE);
             }
             editRotationButton.setOnClickListener(v -> {
-                showRotationDialog();
+                _showRotationDialog();
             });
         }
 
-        updateShizukuStatus();
+        _updateShizukuStatus();
 
         Button bridgeButton = view.findViewById(R.id.bridge_button);
 
@@ -198,7 +194,7 @@ public class DisplayDetailFragment extends Fragment {
             });
         } else if(displayId != Display.DEFAULT_DISPLAY && ShizukuUtils.hasShizukuStarted()) {
             bridgeButton.setVisibility(View.VISIBLE);
-            bridgeButton.setOnClickListener(v -> showBridgeDialog());
+            bridgeButton.setOnClickListener(v -> _showBridgeDialog());
         }
 
         floatingButtonToggle = view.findViewById(R.id.floating_button_toggle);
@@ -207,46 +203,47 @@ public class DisplayDetailFragment extends Fragment {
         if (displayId != Display.DEFAULT_DISPLAY) {
             floatingButtonToggle.setVisibility(View.VISIBLE);
             forceLandscapeCheckbox.setVisibility(View.VISIBLE);
-            SharedPreferences appPreferences = getActivity().getSharedPreferences("app_preferences", MODE_PRIVATE);
-            boolean isEnabled = appPreferences.getBoolean("FLOATING_BUTTON_" + display.getName(), false);
-            boolean forceLandscape = appPreferences.getBoolean("FLOATING_BUTTON_FORCE_LANDSCAPE", false);
-            
-            updateFloatingBackButtonText(isEnabled);
+            Activity activity = getActivity();
+            if (activity == null) return view;
+            boolean isEnabled = Pref.getFloatingButton(display.getName());
+            boolean forceLandscape = Pref.getForceLandscape();
+
+            _updateFloatingBackButtonText(isEnabled);
             forceLandscapeCheckbox.setChecked(forceLandscape);
-            
+
             floatingButtonToggle.setOnClickListener(v -> {
-                boolean newIsEnabled = !appPreferences.getBoolean("FLOATING_BUTTON_" + display.getName(), false);
+                boolean newIsEnabled = !Pref.getFloatingButton(display.getName());
                 if (newIsEnabled) {
                     if (FloatingButtonService.startFloating(getContext(), displayId, false)) {
-                        appPreferences.edit().putBoolean("FLOATING_BUTTON_" + display.getName(), true).apply();
+                        Pref.setFloatingButton(display.getName(), true);
                     }
                 } else {
                     Intent serviceIntent = new Intent(getContext(), FloatingButtonService.class);
                     getContext().stopService(serviceIntent);
-                    appPreferences.edit().putBoolean("FLOATING_BUTTON_" + display.getName(), false).apply();
+                    Pref.setFloatingButton(display.getName(), false);
                 }
-                updateFloatingBackButtonText(newIsEnabled);
+                _updateFloatingBackButtonText(newIsEnabled);
             });
 
             forceLandscapeCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                appPreferences.edit().putBoolean("FLOATING_BUTTON_FORCE_LANDSCAPE", isChecked).apply();
+                Pref.setForceLandscape(isChecked);
             });
         }
 
         return view;
     }
 
-    private void updateShizukuStatus() {
+    private void _updateShizukuStatus() {
         if (shizukuTable == null) return;
         shizukuTable.removeAllViews();
 
         if (!ShizukuUtils.hasShizukuStarted()) {
-            _addInfoRow(shizukuTable, "Shizuku", getString(R.string.shizuku_not_started));
+            _addInfoRow(shizukuTable, getString(R.string.info_shizuku), getString(R.string.shizuku_not_started));
             return;
         }
         try {
             boolean hasPermission = ShizukuUtils.hasPermission();
-            _addInfoRow(shizukuTable, "Shizuku", hasPermission ? getString(R.string.shizuku_status_granted) : getString(R.string.shizuku_status_denied));
+            _addInfoRow(shizukuTable, getString(R.string.info_shizuku), hasPermission ? getString(R.string.shizuku_status_granted) : getString(R.string.shizuku_status_denied));
 
             if (!hasPermission) return;
 
@@ -254,11 +251,11 @@ public class DisplayDetailFragment extends Fragment {
 
             Point baseSize = new Point();
             windowManager.getBaseDisplaySize(displayId, baseSize);
-            _addInfoRow(shizukuTable, "Override size", baseSize.x + "x" + baseSize.y);
+            _addInfoRow(shizukuTable, getString(R.string.info_override_size), baseSize.x + "x" + baseSize.y);
 
             Point initialSize = new Point();
             windowManager.getInitialDisplaySize(displayId, initialSize);
-            _addInfoRow(shizukuTable, "Physical size", initialSize.x + "x" + initialSize.y);
+            _addInfoRow(shizukuTable, getString(R.string.info_physical_size), initialSize.x + "x" + initialSize.y);
 
             try {
                 int imePolicy = windowManager.getDisplayImePolicy(displayId);
@@ -269,7 +266,7 @@ public class DisplayDetailFragment extends Fragment {
                     case 2: imePolicyStr = "HIDE"; break;
                     default: imePolicyStr = String.valueOf(imePolicy);
                 }
-                _addInfoRow(shizukuTable, "Keyboard policy", imePolicyStr);
+                _addInfoRow(shizukuTable, getString(R.string.info_keyboard_policy), imePolicyStr);
 
                 if (displayId != Display.DEFAULT_DISPLAY) {
                     setImePolicyButton.setVisibility(View.VISIBLE);
@@ -297,50 +294,27 @@ public class DisplayDetailFragment extends Fragment {
             } catch (Throwable e) { /* ignore */ }
 
             DisplayInfo displayInfo = ServiceUtils.getDisplayManager().getDisplayInfo(displayId);
-            _addInfoRow(shizukuTable, "Default mode ID", String.valueOf(displayInfo.defaultModeId));
-            try { _addInfoRow(shizukuTable, "Refresh rate override", String.format("%.1f Hz", displayInfo.refreshRateOverride)); } catch (Throwable e) { }
-            try { _addInfoRow(shizukuTable, "Install orientation", String.valueOf(displayInfo.installOrientation)); } catch (Throwable e) { }
-            try { _addInfoRow(shizukuTable, "Windowing mode", WindowingMode.getWindowingMode(displayId)); } catch (Throwable e) { }
+            _addInfoRow(shizukuTable, getString(R.string.info_default_mode_id), String.valueOf(displayInfo.defaultModeId));
+            try { _addInfoRow(shizukuTable, getString(R.string.info_refresh_rate_override), String.format("%.1f Hz", displayInfo.refreshRateOverride)); } catch (Throwable e) { }
+            try { _addInfoRow(shizukuTable, getString(R.string.info_install_orientation), String.valueOf(displayInfo.installOrientation)); } catch (Throwable e) { }
+            try { _addInfoRow(shizukuTable, getString(R.string.info_windowing_mode), WindowingMode.getWindowingMode(displayId)); } catch (Throwable e) { }
 
         } catch (Exception e) {
             shizukuTable.removeAllViews();
-            _addInfoRow(shizukuTable, "Shizuku", getString(R.string.shizuku_status_denied));
+            _addInfoRow(shizukuTable, getString(R.string.info_shizuku), getString(R.string.shizuku_status_denied));
             State.log("failed to get Shizuku permission: " + e.getMessage());
         }
     }
 
-    private void setupDisplayModes(Display.Mode[] supportedModes) {
+    private void _setupDisplayModes(Display.Mode[] supportedModes) {
         modesTable.removeAllViews();
 
-        // Header row
-        android.widget.TableRow header = new android.widget.TableRow(getContext());
-        header.setPadding(0, 0, 0, 8);
-        header.addView(_modeCell(getString(R.string.mode_col_id), true));
-        header.addView(_modeCell(getString(R.string.mode_col_resolution), true));
-        header.addView(_modeCell(getString(R.string.mode_col_refresh), true));
-        modesTable.addView(header);
-
-        // Data rows
         for (Display.Mode mode : supportedModes) {
-            android.widget.TableRow row = new android.widget.TableRow(getContext());
-            row.addView(_modeCell(String.valueOf(mode.getModeId()), false));
-            row.addView(_modeCell(mode.getPhysicalWidth() + "x" + mode.getPhysicalHeight(), false));
-            row.addView(_modeCell(String.format("%.1f Hz", mode.getRefreshRate()), false));
-            modesTable.addView(row);
+            String title = getString(R.string.mode_col_id) + " " + mode.getModeId();
+            String value = mode.getPhysicalWidth() + "x" + mode.getPhysicalHeight()
+                    + "@" + String.format("%.1f Hz", mode.getRefreshRate());
+            _addInfoRow(modesTable, title, value);
         }
-
-        // Double-tap table to select mode
-        modesTable.setOnClickListener(new View.OnClickListener() {
-            private long lastClickTime = 0;
-            @Override
-            public void onClick(View v) {
-                long clickTime = System.currentTimeMillis();
-                if (clickTime - lastClickTime < 300) {
-                    showDisplayModeDialog(supportedModes);
-                }
-                lastClickTime = clickTime;
-            }
-        });
     }
 
     private void _addInfoRow(LinearLayout table, String label, String value) {
@@ -369,53 +343,8 @@ public class DisplayDetailFragment extends Fragment {
         table.addView(item);
     }
 
-    private TextView _modeCell(String text, boolean isHeader) {
-        TextView tv = new TextView(getContext());
-        tv.setText(text);
-        tv.setPadding(0, 4, 24, 4);
-        if (isHeader) {
-            tv.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelMedium);
-            tv.setTextColor(getResources().getColor(android.R.color.darker_gray, null));
-        } else {
-            tv.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium);
-        }
-        return tv;
-    }
 
-    private void showDisplayModeDialog(Display.Mode[] supportedModes) {
-        if (!ShizukuUtils.hasShizukuStarted()) {
-            showToast(getString(R.string.shizuku_required));
-            return;
-        }
-
-        String[] items = new String[supportedModes.length];
-        for (int i = 0; i < supportedModes.length; i++) {
-            Display.Mode mode = supportedModes[i];
-            items[i] = String.format("ID:%d %dx%d %.1fHz",
-                    mode.getModeId(),
-                    mode.getPhysicalWidth(),
-                    mode.getPhysicalHeight(),
-                    mode.getRefreshRate());
-        }
-
-        new com.google.android.material.dialog.MaterialAlertDialogBuilder(getContext())
-            .setTitle(getString(R.string.select_display_mode))
-            .setItems(items, (dialog, which) -> {
-                Display.Mode selectedMode = supportedModes[which];
-                try {
-                    IDisplayManager displayManager = ServiceUtils.getDisplayManager();
-                    displayManager.setUserPreferredDisplayMode(displayId, selectedMode);
-                    showToast(getString(R.string.display_mode_set_unlikely));
-                } catch (Exception e) {
-                    State.log("failed to set display mode: " + e);
-                }
-            })
-            .setNegativeButton(getString(R.string.cancel), null)
-            .show();
-    }
-
-
-private void updateUserRotationText(TextView rotationText) {
+private void _updateUserRotationText(TextView rotationText) {
     int rotation = display.getRotation();
     String rotationStr;
     switch(rotation) {
@@ -437,18 +366,18 @@ private void updateUserRotationText(TextView rotationText) {
     rotationText.setText(rotationStr);
 }
 
-private void showRotationDialog() {
+private void _showRotationDialog() {
     RotationDialog.show(getContext(), displayId);
 }
 
-private void showBridgeDialog() {
+private void _showBridgeDialog() {
     if (android.os.Build.VERSION.SDK_INT >= 34) {
         Toast.makeText(getContext(), getString(R.string.android15_rotation_hint), Toast.LENGTH_SHORT).show();
     }
     BridgeDialog.show(getContext(), display, displayId);
 }
 
-private void updateFloatingBackButtonText(boolean isEnabled) {
+private void _updateFloatingBackButtonText(boolean isEnabled) {
     floatingButtonToggle.setText(isEnabled ? getString(R.string.hide_floating_back_button) : getString(R.string.show_floating_back_button));
 }
 }

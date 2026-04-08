@@ -71,7 +71,7 @@ public class UserService extends IUserService.Stub  {
     @Override
     public String executeCommand(String command) throws RemoteException {
         try {
-            Process process = Runtime.getRuntime().exec("dumpsys input");
+            Process process = Runtime.getRuntime().exec(command);
             java.io.BufferedReader reader = new java.io.BufferedReader(
                 new java.io.InputStreamReader(process.getInputStream()));
             

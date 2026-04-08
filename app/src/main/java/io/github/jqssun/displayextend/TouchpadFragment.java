@@ -19,7 +19,7 @@ public class TouchpadFragment extends Fragment {
 
         View noProjectionText = view.findViewById(R.id.noProjectionCard);
         TextView targetDisplayText = view.findViewById(R.id.targetDisplayText);
-        View startBtn = view.findViewById(R.id.btnStartTouchpad);
+        View startBtn = view.findViewById(R.id.startTouchpadBtn);
 
         int displayId = State.lastSingleAppDisplay;
         if (displayId <= 0) {

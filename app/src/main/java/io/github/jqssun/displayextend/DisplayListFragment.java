@@ -1,13 +1,13 @@
 package io.github.jqssun.displayextend;
 
 import android.content.Context;
-import android.content.Intent;
 import android.hardware.display.DisplayManager;
 import android.os.Bundle;
+import android.content.Intent;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Display;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -35,9 +35,9 @@ public class DisplayListFragment extends Fragment {
                 displayList.add(display);
             }
         }
-        recyclerView.setAdapter(new DisplayAdapter(displayList, this::onDisplayItemClick));
+        recyclerView.setAdapter(new DisplayAdapter(displayList, this::_onDisplayItemClick));
 
-        view.findViewById(R.id.btnOpenCast).setOnClickListener(v -> {
+        view.findViewById(R.id.openCastBtn).setOnClickListener(v -> {
             Intent intent = new Intent();
             intent.setAction(android.provider.Settings.ACTION_CAST_SETTINGS);
             startActivity(intent);
@@ -46,11 +46,9 @@ public class DisplayListFragment extends Fragment {
         return view;
     }
 
-    private void onDisplayItemClick(Display display) {
-        if (getActivity() instanceof IMainActivity) {
-            ((IMainActivity) getActivity()).navigateToDetail(
-                DisplayDetailFragment.newInstance(display.getDisplayId())
-            );
+    private void _onDisplayItemClick(Display display) {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).navigateToDisplayDetail(display.getDisplayId());
         }
     }
 
@@ -102,7 +100,7 @@ public class DisplayListFragment extends Fragment {
                 super(view);
                 displayId = view.findViewById(R.id.display_id);
                 displayName = view.findViewById(R.id.display_name);
-                btnViewDetail = view.findViewById(R.id.btn_view_detail);
+                btnViewDetail = view.findViewById(R.id.viewDetailBtn);
             }
         }
     }

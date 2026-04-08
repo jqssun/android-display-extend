@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,8 +29,8 @@ public class InputDeviceDetailFragment extends Fragment {
     private static final String ARG_DEVICE_ID = "device_id";
     private InputDevice device;
     private List<Display> displayList;
-    private Spinner spinnerDisplays;
-    private Button btnBind;
+    private Spinner displaySpinner;
+    private com.google.android.material.button.MaterialButton bindBtn;
 
     public static InputDeviceDetailFragment newInstance(int deviceId) {
         InputDeviceDetailFragment fragment = new InputDeviceDetailFragment();
@@ -55,8 +54,8 @@ public class InputDeviceDetailFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_input_device_detail, container, false);
         
-        TextView tvDeviceName = view.findViewById(R.id.tvDeviceName);
-        TextView tvDeviceDetails = view.findViewById(R.id.tvDeviceDetails);
+        TextView tvDeviceName = view.findViewById(R.id.deviceNameText);
+        TextView tvDeviceDetails = view.findViewById(R.id.deviceDetailsText);
         
         if (device != null) {
             tvDeviceName.setText(device.getName());
@@ -66,21 +65,21 @@ public class InputDeviceDetailFragment extends Fragment {
                 device.getVendorId(),
                 device.getDescriptor(),
                 device.isExternal() ? getString(R.string.yes) : getString(R.string.no),
-                getDeviceSources(device)
+                _getDeviceSources(device)
             );
             tvDeviceDetails.setText(details);
         }
         
-        spinnerDisplays = view.findViewById(R.id.spinnerDisplays);
-        btnBind = view.findViewById(R.id.btnBind);
+        displaySpinner = view.findViewById(R.id.displaySpinner);
+        bindBtn = view.findViewById(R.id.bindBtn);
         
-        initializeDisplaySpinner();
-        setupBindButton();
+        _initDisplaySpinner();
+        _setupBindButton();
         
         return view;
     }
 
-    private void initializeDisplaySpinner() {
+    private void _initDisplaySpinner() {
         DisplayManager displayManager = (DisplayManager) requireContext().getSystemService(Context.DISPLAY_SERVICE);
         Display[] displays = displayManager.getDisplays();
         displayList = Arrays.asList(displays);
@@ -96,16 +95,16 @@ public class InputDeviceDetailFragment extends Fragment {
             displayNames
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerDisplays.setAdapter(adapter);
+        displaySpinner.setAdapter(adapter);
     }
 
-    private void setupBindButton() {
-        btnBind.setOnClickListener(v -> {
+    private void _setupBindButton() {
+        bindBtn.setOnClickListener(v -> {
             if (!ShizukuUtils.hasShizukuStarted()) {
                 Toast.makeText(requireContext(), getString(R.string.shizuku_required), Toast.LENGTH_SHORT).show();
                 return;
             }
-            int selectedPosition = spinnerDisplays.getSelectedItemPosition();
+            int selectedPosition = displaySpinner.getSelectedItemPosition();
             if (selectedPosition != -1 && selectedPosition < displayList.size()) {
                 Display selectedDisplay = displayList.get(selectedPosition);
                 State.startNewJob(new BindInputToDisplay(device,selectedDisplay));
@@ -113,7 +112,7 @@ public class InputDeviceDetailFragment extends Fragment {
         });
     }
 
-    private String getDeviceSources(InputDevice device) {
+    private String _getDeviceSources(InputDevice device) {
         List<String> sources = new ArrayList<>();
 
         if ((device.getSources() & InputDevice.SOURCE_KEYBOARD) != 0) sources.add(getString(R.string.source_keyboard));

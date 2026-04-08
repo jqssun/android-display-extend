@@ -19,14 +19,14 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/tvDeviceName"
+                android:id="@+id/deviceNameText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?attr/textAppearanceTitleMedium"
                 android:layout_marginBottom="12dp" />
 
             <TextView
-                android:id="@+id/tvDeviceDetails"
+                android:id="@+id/deviceDetailsText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?attr/textAppearanceBodyLarge"
@@ -39,13 +39,13 @@
                 android:gravity="center_vertical">
 
                 <Spinner
-                    android:id="@+id/spinnerDisplays"
+                    android:id="@+id/displaySpinner"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnBind"
+                    android:id="@+id/bindBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/bind"

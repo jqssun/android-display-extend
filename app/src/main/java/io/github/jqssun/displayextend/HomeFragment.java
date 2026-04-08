@@ -1,7 +1,6 @@
 package io.github.jqssun.displayextend;
 
 import android.app.ActivityOptions;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,12 +13,19 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.button.MaterialButton;
+
 import io.github.jqssun.displayextend.job.AcquireShizuku;
 import io.github.jqssun.displayextend.job.ExitAll;
 import io.github.jqssun.displayextend.job.FetchLogAndShare;
 import io.github.jqssun.displayextend.shizuku.ShizukuUtils;
 
 public class HomeFragment extends Fragment {
+
+    private TextView shizukuStatus;
+    private MaterialButton shizukuPermissionBtn;
+    private MaterialButton simulateScreenOffBtn;
+    private TextView versionText;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -31,19 +37,13 @@ public class HomeFragment extends Fragment {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/rikkaapps/shizuku")))
         );
 
-        com.google.android.material.button.MaterialButton shizukuPermissionBtn = view.findViewById(R.id.shizukuPermissionBtn);
+        shizukuPermissionBtn = view.findViewById(R.id.shizukuPermissionBtn);
         shizukuPermissionBtn.setOnClickListener(v -> State.startNewJob(new AcquireShizuku()));
 
-        TextView shizukuStatus = view.findViewById(R.id.shizukuStatus);
-        updateShizukuStatus(shizukuStatus, shizukuPermissionBtn);
+        shizukuStatus = view.findViewById(R.id.shizukuStatus);
 
         // Simulate screen off
-        com.google.android.material.button.MaterialButton simulateScreenOffBtn = view.findViewById(R.id.simulateScreenOffBtn);
-        boolean useRealScreenOff = requireContext().getSharedPreferences("settings", Context.MODE_PRIVATE)
-            .getBoolean("use_real_screen_off", false);
-        if (useRealScreenOff) {
-            simulateScreenOffBtn.setText(getString(R.string.real_screen_off));
-        }
+        simulateScreenOffBtn = view.findViewById(R.id.simulateScreenOffBtn);
         simulateScreenOffBtn.setOnClickListener(v -> {
             if (State.lastSingleAppDisplay <= 0) {
                 new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
@@ -59,15 +59,7 @@ public class HomeFragment extends Fragment {
         });
 
         // About info
-        TextView versionText = view.findViewById(R.id.versionText);
-        try {
-            String versionName = requireContext().getPackageManager()
-                .getPackageInfo(requireContext().getPackageName(), 0).versionName;
-            String androidVersion = android.os.Build.VERSION.RELEASE;
-            versionText.setText(getString(R.string.version_format, versionName, androidVersion));
-        } catch (Exception e) {
-            versionText.setText(getString(R.string.version_unknown));
-        }
+        versionText = view.findViewById(R.id.versionText);
 
         view.findViewById(R.id.websiteLink).setOnClickListener(v ->
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/jqssun/android-screen-extend")))
@@ -101,22 +93,33 @@ public class HomeFragment extends Fragment {
             ExitAll.execute(requireContext())
         );
 
+        State.uiState.observe(getViewLifecycleOwner(), this::_updateUI);
+
         return view;
     }
 
-    private void updateShizukuStatus(TextView statusView, View permissionBtn) {
-        boolean started = ShizukuUtils.hasShizukuStarted();
-        boolean hasPermission = ShizukuUtils.hasPermission();
+    @Override
+    public void onResume() {
+        super.onResume();
+        State._refreshUI();
+    }
 
-        if (!started) {
-            statusView.setText(getString(R.string.shizuku_not_started));
-            permissionBtn.setVisibility(View.GONE);
-        } else if (!hasPermission) {
-            statusView.setText(getString(R.string.shizuku_status_denied));
-            permissionBtn.setVisibility(View.VISIBLE);
+    private void _updateUI(ExtendUiState state) {
+        if (state == null) return;
+
+        if (state.shizukuStatus != null) {
+            shizukuStatus.setText(state.shizukuStatus);
+        }
+        shizukuPermissionBtn.setVisibility(state.shizukuPermissionVisible ? View.VISIBLE : View.GONE);
+
+        if (state.useRealScreenOff) {
+            simulateScreenOffBtn.setText(getString(R.string.use_real_screen_off));
         } else {
-            statusView.setText(getString(R.string.shizuku_status_granted));
-            permissionBtn.setVisibility(View.GONE);
+            simulateScreenOffBtn.setText(getString(R.string.simulate_screen_off));
+        }
+
+        if (state.versionText != null) {
+            versionText.setText(state.versionText);
         }
     }
 }

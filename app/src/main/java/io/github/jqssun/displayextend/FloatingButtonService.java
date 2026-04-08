@@ -3,9 +3,9 @@ package io.github.jqssun.displayextend;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.PixelFormat;
+import android.hardware.display.DisplayManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
@@ -17,7 +17,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.hardware.display.DisplayManager;
 
 import io.github.jqssun.displayextend.job.StartFloatingButton;
 import io.github.jqssun.displayextend.shizuku.ServiceUtils;
@@ -29,9 +28,6 @@ public class FloatingButtonService extends Service {
     private int displayId;
     private float initialX, initialY;
     private float initialTouchX, initialTouchY;
-    private static final String PREFS_NAME = "FloatingButtonPrefs";
-    private static final String KEY_X = "button_x";
-    private static final String KEY_Y = "button_y";
     private static final int FADE_DELAY = 5000;
     private Runnable fadeOutRunnable;
     private android.os.Handler handler;
@@ -101,7 +97,7 @@ public class FloatingButtonService extends Service {
                 if (floatingView != null) {
                     this.onDestroy();
                 }
-                createFloatingButton();
+                _createFloatingButton();
             }
         }
         return START_STICKY;
@@ -114,17 +110,12 @@ public class FloatingButtonService extends Service {
     }
 
     public void onSingleAppLaunched() {
-        resetButtonVisibility();
+        _resetButtonVisibility();
     }
 
-    private void createFloatingButton() {
+    private void _createFloatingButton() {
         handler = new android.os.Handler();
-        fadeOutRunnable = new Runnable() {
-            @Override
-            public void run() {
-                fadeOutButton();
-            }
-        };
+        fadeOutRunnable = () -> _fadeOutButton();
 
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         floatingView = LayoutInflater.from(this).inflate(R.layout.floating_back_button, null);
@@ -140,14 +131,11 @@ public class FloatingButtonService extends Service {
         );
         params.gravity = Gravity.TOP | Gravity.START;
         
-        SharedPreferences appPreferences = getSharedPreferences("app_preferences", Context.MODE_PRIVATE);
-        boolean forceLandscape = appPreferences.getBoolean("FLOATING_BUTTON_FORCE_LANDSCAPE", false);
-        if (forceLandscape) {
+        if (Pref.getForceLandscape()) {
             params.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
         }
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        params.x = prefs.getInt(KEY_X, 0);
-        params.y = prefs.getInt(KEY_Y, 100);
+        params.x = Pref.getButtonX();
+        params.y = Pref.getButtonY();
         if (params.x < 0) {
             params.x = 0;
         }
@@ -174,7 +162,7 @@ public class FloatingButtonService extends Service {
         }
 
         floatingView.setOnTouchListener((v, event) -> {
-            resetButtonVisibility();
+            _resetButtonVisibility();
 
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
@@ -199,57 +187,44 @@ public class FloatingButtonService extends Service {
                             lastClickTime = 0;
                         } else {
                             if (!isReady) {
-                                resetButtonVisibility();
+                                _resetButtonVisibility();
                             } else {
                                 TouchpadActivity.performBackGesture(ServiceUtils.getInputManager(), displayId);
                             }
                             lastClickTime = clickTime;
                         }
                     } else {
-                        SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit();
-                        editor.putInt(KEY_X, params.x);
-                        editor.putInt(KEY_Y, params.y);
-                        editor.apply();
+                        Pref.setButtonPosition(params.x, params.y);
                     }
                     return true;
             }
             return false;
         });
 
-        startFadeOutTimer();
+        _startFadeOutTimer();
     }
 
-    private void startFadeOutTimer() {
+    private void _startFadeOutTimer() {
         handler.removeCallbacks(fadeOutRunnable);
         handler.postDelayed(fadeOutRunnable, FADE_DELAY);
     }
 
-    private void fadeOutButton() {
+    private void _fadeOutButton() {
         floatingView.animate()
                 .alpha(0.0f)
                 .setDuration(500)
-                .withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        isReady = false;
-                    }
-                })
+                .withEndAction(() -> isReady = false)
                 .start();
     }
 
-    private void resetButtonVisibility() {
+    private void _resetButtonVisibility() {
         handler.removeCallbacks(fadeOutRunnable);
         floatingView.animate()
                 .alpha(1.0f)
                 .setDuration(200)
-                .withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        isReady = true;
-                    }
-                })
+                .withEndAction(() -> isReady = true)
                 .start();
-        startFadeOutTimer();
+        _startFadeOutTimer();
     }
 
     @Override
@@ -267,7 +242,7 @@ public class FloatingButtonService extends Service {
 
     public void onDisplayChanged(int displayId) {
         if (this.displayId == displayId) {
-            resetButtonVisibility();
+            _resetButtonVisibility();
         }
     }
 }

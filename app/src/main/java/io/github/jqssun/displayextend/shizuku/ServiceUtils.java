@@ -10,7 +10,6 @@ import android.app.IActivityTaskManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.IPackageManager;
 import android.content.pm.PackageManager;
 import android.hardware.display.DisplayManager;
@@ -117,12 +116,11 @@ public class ServiceUtils {
         if (android.os.Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
             _launchPackage(context, packageName, targetDisplayId);
         }
-        SharedPreferences appPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE);
-        if (appPreferences.getBoolean("FLOATING_BUTTON_" + display.getName(), false)) {
+        if (io.github.jqssun.displayextend.Pref.getFloatingButton(display.getName())) {
             if (FloatingButtonService.startFloating(context, targetDisplayId, true)) {
                 FloatingButtonService.startFloating(context, targetDisplayId, false);
             } else {
-                appPreferences.edit().putBoolean("FLOATING_BUTTON_" + display.getName(), false).apply();
+                io.github.jqssun.displayextend.Pref.setFloatingButton(display.getName(), false);
             }
         }
         if (targetDisplayId != Display.DEFAULT_DISPLAY) {

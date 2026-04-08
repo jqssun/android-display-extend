@@ -1,7 +1,6 @@
 package io.github.jqssun.displayextend.job;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.hardware.display.DisplayManager;
 import android.media.AudioAttributes;
 import android.media.AudioDeviceAttributes;
@@ -13,7 +12,7 @@ import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.Display;
 
-import io.github.jqssun.displayextend.BridgePref;
+import io.github.jqssun.displayextend.Pref;
 import io.github.jqssun.displayextend.R;
 import io.github.jqssun.displayextend.State;
 import io.github.jqssun.displayextend.shizuku.ServiceUtils;
@@ -74,8 +73,7 @@ public class DisplayMonitor {
         if (!ShizukuUtils.hasPermission()) {
             return;
         }
-        boolean isDisabled = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-                .getBoolean("usb_audio_disabled", false);
+        boolean isDisabled = Pref.getUsbAudioDisabled();
         if (!isDisabled) {
             return;
         }
@@ -115,22 +113,20 @@ public class DisplayMonitor {
     }
 
     private static void handleAutoOpenLastApp(Context context, Display display) {
-        SharedPreferences appPreferences = context.getSharedPreferences("app_preferences", Context.MODE_PRIVATE);
-        boolean autoBridge = appPreferences.getBoolean("AUTO_BRIDGE_" + display.getName(), false);
+        boolean autoBridge = Pref.getAutoBridge(display.getName());
         if (ShizukuUtils.hasPermission() && (autoBridge || display.getDisplayId() == State.bridgeDisplayId)) {
-            BridgePref.load(context);
             new Handler().postDelayed(() -> {
                 DisplayMetrics metrics = new DisplayMetrics();
                 display.getMetrics(metrics);
-                State.startNewJob(new ProjectViaBridge(display, new VirtualDisplayArgs(context.getString(R.string.bridge_display), display.getWidth(), display.getHeight(), (int) display.getRefreshRate(), metrics.densityDpi, BridgePref.rotatesWithContent)));
+                State.startNewJob(new ProjectViaBridge(display, new VirtualDisplayArgs(context.getString(R.string.bridge_display), display.getWidth(), display.getHeight(), (int) display.getRefreshRate(), metrics.densityDpi, Pref.getRotatesWithContent())));
             }, 500);
             return;
         }
-        boolean autoOpen = appPreferences.getBoolean("AUTO_OPEN_LAST_APP_" + display.getName(), false);
+        boolean autoOpen = Pref.getAutoOpenLastApp(display.getName());
         if (!autoOpen) {
             return;
         }
-        String lastPackageName = appPreferences.getString("LAST_PACKAGE_NAME", null);
+        String lastPackageName = Pref.getLastPackageName();
         if (lastPackageName == null) {
             return;
         }

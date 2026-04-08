@@ -25,9 +25,9 @@ public class LogsFragment extends Fragment {
         logAdapter = new LogAdapter(State.logs);
         logRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         logRecyclerView.setAdapter(logAdapter);
-        scrollToBottom();
+        _scrollToBottom();
 
-        view.findViewById(R.id.btnExportLogs).setOnClickListener(v -> {
+        view.findViewById(R.id.exportLogsBtn).setOnClickListener(v -> {
             if (!ShizukuUtils.hasPermission()) {
                 Toast.makeText(getContext(), getString(R.string.export_log_requires_shizuku), Toast.LENGTH_SHORT).show();
                 return;
@@ -35,22 +35,24 @@ public class LogsFragment extends Fragment {
             State.startNewJob(new FetchLogAndShare(getContext()));
         });
 
-        view.findViewById(R.id.btnClearLogs).setOnClickListener(v -> {
+        view.findViewById(R.id.clearLogsBtn).setOnClickListener(v -> {
             State.logs.clear();
             logAdapter.notifyDataSetChanged();
         });
 
+        State.logVersion.observe(getViewLifecycleOwner(), version -> _refreshLogs());
+
         return view;
     }
 
-    void refreshLogs() {
+    private void _refreshLogs() {
         if (logAdapter != null) {
             logAdapter.notifyDataSetChanged();
-            scrollToBottom();
+            _scrollToBottom();
         }
     }
 
-    private void scrollToBottom() {
+    private void _scrollToBottom() {
         if (logAdapter != null && logAdapter.getItemCount() > 0) {
             logRecyclerView.scrollToPosition(logAdapter.getItemCount() - 1);
         }

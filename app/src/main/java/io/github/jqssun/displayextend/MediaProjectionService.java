@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.os.Binder;
-import android.os.Build;
 import android.os.IBinder;
 
 public class MediaProjectionService extends Service {
@@ -33,8 +32,8 @@ public class MediaProjectionService extends Service {
         super.onCreate();
         instance = this;
         State.log("MediaProjectionService onCreate");
-        createNotificationChannel();
-        startForeground(NOTIFICATION_ID, createNotification());
+        _createNotificationChannel();
+        startForeground(NOTIFICATION_ID, _createNotification());
     }
 
     @Override
@@ -73,19 +72,17 @@ public class MediaProjectionService extends Service {
         return binder;
     }
 
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel serviceChannel = new NotificationChannel(
-                    CHANNEL_ID,
-                    "Media Projection Service",
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(serviceChannel);
-        }
+    private void _createNotificationChannel() {
+        NotificationChannel serviceChannel = new NotificationChannel(
+                CHANNEL_ID,
+                "Media Projection Service",
+                NotificationManager.IMPORTANCE_DEFAULT
+        );
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        manager.createNotificationChannel(serviceChannel);
     }
 
-    private Notification createNotification() {
+    private Notification _createNotification() {
         Notification.Builder builder = new Notification.Builder(this, CHANNEL_ID)
                 .setContentTitle("Media Projection Service")
                 .setContentText("Running in the background")

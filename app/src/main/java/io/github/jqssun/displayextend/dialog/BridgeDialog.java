@@ -1,7 +1,6 @@
 package io.github.jqssun.displayextend.dialog;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -11,15 +10,12 @@ import android.widget.CheckBox;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import io.github.jqssun.displayextend.BridgePref;
-
+import io.github.jqssun.displayextend.Pref;
 import io.github.jqssun.displayextend.R;
 import io.github.jqssun.displayextend.State;
 import io.github.jqssun.displayextend.job.ProjectViaBridge;
 import io.github.jqssun.displayextend.job.VirtualDisplayArgs;
 import io.github.jqssun.displayextend.shizuku.ServiceUtils;
-
-import static android.content.Context.MODE_PRIVATE;
 
 public class BridgeDialog {
     public static void show(Context context, Display display, int displayId) {
@@ -29,11 +25,9 @@ public class BridgeDialog {
         CheckBox skipMediaProjectionPermissionCheckbox = dialogView.findViewById(R.id.skipMediaProjectionPermissionCheckbox);
         CheckBox autoBridgeCheckbox = dialogView.findViewById(R.id.autoBridgeCheckbox);
         
-        BridgePref.load(context);
-        rotatesWithContentCheckbox.setChecked(BridgePref.rotatesWithContent);
-        skipMediaProjectionPermissionCheckbox.setChecked(BridgePref.skipMediaProjectionPermission);
-        SharedPreferences appPreferences = context.getSharedPreferences("app_preferences", MODE_PRIVATE);
-        autoBridgeCheckbox.setChecked(appPreferences.getBoolean("AUTO_BRIDGE_" + display.getName(), false));
+        rotatesWithContentCheckbox.setChecked(Pref.getRotatesWithContent());
+        skipMediaProjectionPermissionCheckbox.setChecked(Pref.getSkipMediaProjectionPermission());
+        autoBridgeCheckbox.setChecked(Pref.getAutoBridge(display.getName()));
 
         Point initialSize = new Point();
         ServiceUtils.getWindowManager().getInitialDisplaySize(displayId, initialSize);
@@ -41,13 +35,12 @@ public class BridgeDialog {
                 .setTitle(context.getString(R.string.bridge_settings))
                 .setView(dialogView)
                 .setPositiveButton(context.getString(R.string.ok), (dialog, which) -> {
-                    BridgePref.rotatesWithContent = rotatesWithContentCheckbox.isChecked();
-                    BridgePref.skipMediaProjectionPermission = skipMediaProjectionPermissionCheckbox.isChecked();
-                    BridgePref.save(context);
+                    Pref.setRotatesWithContent(rotatesWithContentCheckbox.isChecked());
+                    Pref.setSkipMediaProjectionPermission(skipMediaProjectionPermissionCheckbox.isChecked());
                     boolean autoBridge = autoBridgeCheckbox.isChecked();
-                    appPreferences.edit().putBoolean("AUTO_BRIDGE_" + display.getName(), autoBridge).apply();
+                    Pref.setAutoBridge(display.getName(), autoBridge);
                     if (autoBridge) {
-                        appPreferences.edit().putBoolean("AUTO_OPEN_LAST_APP_" + display.getName(), false).apply();
+                        Pref.setAutoOpenLastApp(display.getName(), false);
                     }
 
                     DisplayMetrics metrics = new DisplayMetrics();
@@ -58,7 +51,7 @@ public class BridgeDialog {
                             initialSize.y,
                             (int) display.getRefreshRate(),
                             metrics.densityDpi,
-                            BridgePref.rotatesWithContent)));
+                            Pref.getRotatesWithContent())));
                 })
                 .setNegativeButton(context.getString(R.string.cancel), null)
                 .show();

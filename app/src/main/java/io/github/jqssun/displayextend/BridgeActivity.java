@@ -32,8 +32,9 @@ public class BridgeActivity extends AppCompatActivity {
     }
 
     private SurfaceView surfaceView;
+    private ImageReader keepAliveReader;
 
-    private static float[] adjustTouchCoordinates(float x, float y, int rotation,
+    private static float[] _adjustTouchCoordinates(float x, float y, int rotation,
                                                   int targetWidth, int targetHeight, int sourceWidth, int sourceHeight) {
         float scaleX = (float) targetWidth / sourceWidth;
         float scaleY = (float) targetHeight / sourceHeight;
@@ -113,9 +114,9 @@ public class BridgeActivity extends AppCompatActivity {
                 }
                 
                 Display jumpToDisplay = State.bridgeVirtualDisplay.getDisplay();
-                if (State.currentActivity.get() instanceof IMainActivity) {
-                    ((IMainActivity) State.currentActivity.get()).navigateToDetail(
-                        DisplayDetailFragment.newInstance(jumpToDisplay.getDisplayId()));
+                if (State.currentActivity.get() instanceof MainActivity) {
+                    ((MainActivity) State.currentActivity.get()).navigateToDisplayDetail(
+                        jumpToDisplay.getDisplayId());
                 }
             }
 
@@ -125,8 +126,9 @@ public class BridgeActivity extends AppCompatActivity {
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
                 if (State.bridgeVirtualDisplay != null) {
-                    ImageReader imageReader = ImageReader.newInstance(args.width, args.height, 1, 2);
-                    State.bridgeVirtualDisplay.setSurface(imageReader.getSurface());
+                    if (keepAliveReader != null) keepAliveReader.close();
+                    keepAliveReader = ImageReader.newInstance(args.width, args.height, 1, 2);
+                    State.bridgeVirtualDisplay.setSurface(keepAliveReader.getSurface());
                 }
             }
         });
@@ -140,7 +142,7 @@ public class BridgeActivity extends AppCompatActivity {
                 float x = event.getX();
                 float y = event.getY();
                 
-                float[] adjustedCoords = adjustTouchCoordinates(x, y, rotation, 
+                float[] adjustedCoords = _adjustTouchCoordinates(x, y, rotation, 
                     args.width, args.height,
                     surfaceView.getWidth(), surfaceView.getHeight());
                 
@@ -163,6 +165,10 @@ public class BridgeActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         Log.i("BridgeActivity", "BridgeActivity onDestroy");
+        if (keepAliveReader != null) {
+            keepAliveReader.close();
+            keepAliveReader = null;
+        }
         super.onDestroy();
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

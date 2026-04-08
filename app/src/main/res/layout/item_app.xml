@@ -6,7 +6,7 @@
     android:orientation="horizontal">
 
     <Button
-        android:id="@+id/btn_launch"
+        android:id="@+id/launchBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
@@ -14,7 +14,7 @@
         android:text="@string/cast"/>
 
     <Button
-        android:id="@+id/btn_launch_to_default_display"
+        android:id="@+id/launchToDefaultBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"

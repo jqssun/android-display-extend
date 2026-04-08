@@ -1,6 +1,5 @@
 package io.github.jqssun.displayextend;
 
-import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,14 +9,15 @@ import android.hardware.display.DisplayManager;
 import android.hardware.input.InputManager;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
-import android.os.Bundle;
 import android.os.Build;
+import android.os.Bundle;
 
 import org.lsposed.hiddenapibypass.HiddenApiBypass;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -30,13 +30,11 @@ import java.lang.ref.WeakReference;
 
 import rikka.shizuku.Shizuku;
 
-public class MainActivity extends AppCompatActivity implements IMainActivity {
+public class MainActivity extends AppCompatActivity {
     public static final String ACTION_USB_PERMISSION = "io.github.jqssun.displayextend.USB_PERMISSION";
     public static final int REQUEST_CODE_MEDIA_PROJECTION = 1001;
 
-    private BottomNavigationView bottomNav;
-    private int currentTabId = R.id.nav_overview;
-    private LogsFragment logsFragment;
+    private NavController navController;
 
     private final BroadcastReceiver usbPermissionReceiver = new BroadcastReceiver() {
         @Override
@@ -49,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         }
     };
 
-    private void onRequestPermissionsResult(int requestCode, int grantResult) {
+    private void _onPermissionResult(int requestCode, int grantResult) {
         if (requestCode == AcquireShizuku.SHIZUKU_PERMISSION_REQUEST_CODE) {
             State.log("Shizuku permission result: " + (grantResult == PackageManager.PERMISSION_GRANTED ? "granted" : "denied"));
             State.resumeJob();
@@ -59,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
     }
 
     private final Shizuku.OnRequestPermissionResultListener REQUEST_PERMISSION_RESULT_LISTENER =
-        this::onRequestPermissionsResult;
+        this::_onPermissionResult;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -87,14 +85,11 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
 
         State.currentActivity = new WeakReference<>(this);
 
-        bottomNav = findViewById(R.id.bottomNav);
-        bottomNav.setOnItemSelectedListener(item -> {
-            selectTab(item.getItemId());
-            return true;
-        });
-
-        // Show overview tab initially
-        selectTab(R.id.nav_overview);
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.nav_host_fragment);
+        navController = navHostFragment.getNavController();
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        NavigationUI.setupWithNavController(bottomNav, navController);
 
         Intent intent = getIntent();
         String action = intent.getAction();
@@ -109,52 +104,16 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         InputDeviceMonitor.init(inputManager);
     }
 
-    private void selectTab(int tabId) {
-        // Clear backstack when switching tabs
-        getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
-        currentTabId = tabId;
-        Fragment fragment;
-
-        if (tabId == R.id.nav_overview) {
-            fragment = new HomeFragment();
-        } else if (tabId == R.id.nav_screens) {
-            fragment = new DisplayListFragment();
-        } else if (tabId == R.id.nav_touchpad) {
-            fragment = new TouchpadFragment();
-        } else if (tabId == R.id.nav_logs) {
-            logsFragment = new LogsFragment();
-            fragment = logsFragment;
-        } else if (tabId == R.id.nav_settings) {
-            fragment = new SettingsFragment();
-        } else {
-            fragment = new HomeFragment();
-        }
-
-        getSupportFragmentManager().beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
-            .commit();
+    public void navigateToDisplayDetail(int displayId) {
+        Bundle args = new Bundle();
+        args.putInt("display_id", displayId);
+        navController.navigate(R.id.nav_display_detail, args);
     }
 
-    @Override
-    public void navigateToDetail(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
-            .addToBackStack(null)
-            .commit();
-    }
-
-    @Override
-    public void refreshCurrentFragment() {
-        try {
-            if (isFinishing() || isDestroyed()) return;
-            // Only refresh if on a top-level tab (no detail pages in backstack)
-            if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
-                selectTab(currentTabId);
-            }
-        } catch (Exception e) {
-            // ignore
-        }
+    public void navigateToInputDeviceDetail(int deviceId) {
+        Bundle args = new Bundle();
+        args.putInt("device_id", deviceId);
+        navController.navigate(R.id.nav_input_device_detail, args);
     }
 
     @Override
@@ -169,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
         super.onDestroy();
         State.unbindUserService();
         Shizuku.removeRequestPermissionResultListener(REQUEST_PERMISSION_RESULT_LISTENER);
-        State.currentActivity = null;
+        State.currentActivity = new WeakReference<>(null);
         unregisterReceiver(usbPermissionReceiver);
     }
 
@@ -200,22 +159,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivity {
                 State.log("user denied projection permission");
                 State.resumeJob();
             }
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            getSupportFragmentManager().popBackStack();
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public void updateLogs() {
-        if (logsFragment != null && logsFragment.isAdded()) {
-            logsFragment.refreshLogs();
         }
     }
 }

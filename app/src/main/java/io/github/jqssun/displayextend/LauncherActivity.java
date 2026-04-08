@@ -3,12 +3,10 @@ package io.github.jqssun.displayextend;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.hardware.display.DisplayManager;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.View;
-import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.pm.ApplicationInfo;
@@ -23,10 +21,7 @@ import android.util.DisplayMetrics;
 import android.widget.Toast;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.PopupMenu;
-import android.view.Menu;
+import com.google.android.material.chip.Chip;
 
 import io.github.jqssun.displayextend.shizuku.ShizukuUtils;
 
@@ -37,7 +32,7 @@ public class LauncherActivity extends AppCompatActivity {
     public static final String EXTRA_TARGET_DISPLAY_ID = "target_display_id";
     
     private AppListAdapter adapter;
-    private Button floatingButtonToggle;
+    private Chip floatingButtonToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,10 +51,9 @@ public class LauncherActivity extends AppCompatActivity {
         floatingButtonToggle = findViewById(R.id.floating_button_toggle);
         if (displayId != Display.DEFAULT_DISPLAY) {
             floatingButtonToggle.setVisibility(View.VISIBLE);
-            SharedPreferences appPreferences = this.getSharedPreferences("app_preferences", MODE_PRIVATE);
-            updateFloatingBackButtonText(appPreferences.getBoolean("FLOATING_BUTTON_" + display.getName(), false));
+            updateFloatingBackButtonText(Pref.getFloatingButton(display.getName()));
             floatingButtonToggle.setOnClickListener(v -> {
-                boolean isEnabled = appPreferences.getBoolean("FLOATING_BUTTON_" + display.getName(), false);
+                boolean isEnabled = Pref.getFloatingButton(display.getName());
                 if (isEnabled) {
                     Intent serviceIntent = new Intent(this, FloatingButtonService.class);
                     this.stopService(serviceIntent);
@@ -69,11 +63,11 @@ public class LauncherActivity extends AppCompatActivity {
                         isEnabled = true;
                     }
                 }
-                appPreferences.edit().putBoolean("FLOATING_BUTTON_" + display.getName(), isEnabled).apply();
+                Pref.setFloatingButton(display.getName(), isEnabled);
                 updateFloatingBackButtonText(isEnabled);
             });
         }
-        Button touchpadButton = findViewById(R.id.btn_touchpad);
+        Chip touchpadButton = findViewById(R.id.touchpadBtn);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R || ShizukuUtils.hasPermission()) {
             touchpadButton.setVisibility(View.VISIBLE);
         }
@@ -93,17 +87,32 @@ public class LauncherActivity extends AppCompatActivity {
             State.log("failed to query app list: " + e);
         }
 
-        ImageButton menuButton = findViewById(R.id.menu_button);
-        menuButton.setOnClickListener(v -> showMenu(v));
+        Chip showAllChip = findViewById(R.id.menu_button);
+        showAllChip.setChecked(Pref.getShowAllApps());
+        showAllChip.setOnCheckedChangeListener((chip, isChecked) -> {
+            Pref.setShowAllApps(isChecked);
+            PackageManager pm2 = getPackageManager();
+            List<ApplicationInfo> pkgs = new ArrayList<>();
+            try {
+                pkgs = pm2.getInstalledApplications(PackageManager.GET_META_DATA);
+            } catch (SecurityException e) {
+                Toast.makeText(this, getString(R.string.query_apps_permission_required), Toast.LENGTH_LONG).show();
+                State.log("failed to query app list: " + e);
+                return;
+            }
+            List<ApplicationInfo> filtered = pkgs.stream()
+                .filter(app -> isChecked || (app.flags & ApplicationInfo.FLAG_SYSTEM) == 0)
+                .collect(Collectors.toList());
+            adapter.updateAppList(filtered);
+        });
         
-        boolean showAllApps = getSharedPreferences("app_preferences", MODE_PRIVATE)
-            .getBoolean("show_all_apps", false);
+        boolean showAllApps = Pref.getShowAllApps();
             
         List<ApplicationInfo> userApps = packages.stream()
             .filter(app -> showAllApps || (app.flags & ApplicationInfo.FLAG_SYSTEM) == 0)
             .collect(Collectors.toList());
         
-        EditText searchBox = findViewById(R.id.search_box);
+        com.google.android.material.textfield.TextInputEditText searchBox = findViewById(R.id.search_box);
         searchBox.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -117,12 +126,7 @@ public class LauncherActivity extends AppCompatActivity {
             }
         });
         
-        adapter = new AppListAdapter(
-            userApps, 
-            pm, 
-            displayId,
-            getSharedPreferences("app_preferences", MODE_PRIVATE)
-        );
+        adapter = new AppListAdapter(userApps, pm, displayId);
         recyclerView.setAdapter(adapter);
         
         Resources resources = getResources();
@@ -134,7 +138,7 @@ public class LauncherActivity extends AppCompatActivity {
         
         resources.updateConfiguration(configuration, displayMetrics);
 
-        findViewById(R.id.btn_screen_off).setOnClickListener(v -> {
+        findViewById(R.id.screenOffBtn).setOnClickListener(v -> {
             Intent intent = new Intent(this, PureBlackActivity.class);
             ActivityOptions options = ActivityOptions.makeBasic();
             startActivity(intent, options.toBundle());
@@ -144,43 +148,6 @@ public class LauncherActivity extends AppCompatActivity {
         floatingButtonToggle.setText(isEnabled ? getString(R.string.floating_on) : getString(R.string.floating_off));
     }
     
-    private void showMenu(View anchor) {
-        PopupMenu popup = new PopupMenu(this, anchor);
-        popup.getMenu().add(Menu.NONE, 1, Menu.NONE, getString(R.string.show_all_apps))
-            .setCheckable(true)
-            .setChecked(getSharedPreferences("app_preferences", MODE_PRIVATE)
-                .getBoolean("show_all_apps", false));
-                
-        popup.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == 1) {
-                item.setChecked(!item.isChecked());
-                getSharedPreferences("app_preferences", MODE_PRIVATE)
-                    .edit()
-                    .putBoolean("show_all_apps", item.isChecked())
-                    .apply();
-                    
-                PackageManager pm = getPackageManager();
-                List<ApplicationInfo> packages = new ArrayList<>();
-                try {
-                    packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-                } catch (SecurityException e) {
-                    Toast.makeText(this, getString(R.string.query_apps_permission_required), Toast.LENGTH_LONG).show();
-                    State.log("failed to query app list: " + e);
-                    return true;
-                }
-                
-                List<ApplicationInfo> filteredApps = packages.stream()
-                    .filter(app -> item.isChecked() || (app.flags & ApplicationInfo.FLAG_SYSTEM) == 0)
-                    .collect(Collectors.toList());
-                    
-                adapter.updateAppList(filteredApps);
-                return true;
-            }
-            return false;
-        });
-        
-        popup.show();
-    }
 
     public static void start(Context context, int displayId) {
         PackageManager pm = context.getPackageManager();

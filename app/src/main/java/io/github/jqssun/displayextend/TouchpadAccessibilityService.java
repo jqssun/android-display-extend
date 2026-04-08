@@ -5,15 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
 import android.util.SparseArray;
-import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityWindowInfo;
-import android.view.accessibility.AccessibilityNodeInfo;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.view.KeyEvent;
+import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.accessibility.AccessibilityWindowInfo;
 
 import io.github.jqssun.displayextend.shizuku.PermissionManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TouchpadAccessibilityService extends AccessibilityService {
     private static TouchpadAccessibilityService instance;
@@ -91,7 +91,7 @@ public class TouchpadAccessibilityService extends AccessibilityService {
     public void onInterrupt() {
     }
 
-    private List<AccessibilityNodeInfo> findFocusableNodes(AccessibilityNodeInfo root, List<AccessibilityNodeInfo> results) {
+    private List<AccessibilityNodeInfo> _findFocusableNodes(AccessibilityNodeInfo root, List<AccessibilityNodeInfo> results) {
         if (root == null) return results;
         
         if (root.isFocusable()) {
@@ -104,7 +104,7 @@ public class TouchpadAccessibilityService extends AccessibilityService {
         for (int i = 0; i < root.getChildCount(); i++) {
             AccessibilityNodeInfo child = root.getChild(i);
             if (child != null) {
-                findFocusableNodes(child, results);
+                _findFocusableNodes(child, results);
                 if (results.size() >= 3) {
                     return results;
                 }
@@ -154,7 +154,7 @@ public class TouchpadAccessibilityService extends AccessibilityService {
 
             if (rootNode != null) {
                 try {
-                    List<AccessibilityNodeInfo> focusableNodes = findFocusableNodes(rootNode, new ArrayList<>());
+                    List<AccessibilityNodeInfo> focusableNodes = _findFocusableNodes(rootNode, new ArrayList<>());
                     android.util.Log.d("AccessibilityService", "found " + focusableNodes.size() + " focusable nodes");
 
                     boolean focusSuccess = false;

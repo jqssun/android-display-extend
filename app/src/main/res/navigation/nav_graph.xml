@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_overview">
+
+    <fragment
+        android:id="@+id/nav_overview"
+        android:name="io.github.jqssun.displayextend.HomeFragment"
+        android:label="@string/overview" />
+
+    <fragment
+        android:id="@+id/nav_screens"
+        android:name="io.github.jqssun.displayextend.DisplayListFragment"
+        android:label="@string/screens">
+        <action
+            android:id="@+id/action_screens_to_detail"
+            app:destination="@id/nav_display_detail" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_display_detail"
+        android:name="io.github.jqssun.displayextend.DisplayDetailFragment"
+        android:label="@string/screen_breadcrumb">
+        <argument
+            android:name="display_id"
+            app:argType="integer" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_touchpad"
+        android:name="io.github.jqssun.displayextend.TouchpadFragment"
+        android:label="@string/touchpad" />
+
+    <fragment
+        android:id="@+id/nav_logs"
+        android:name="io.github.jqssun.displayextend.LogsFragment"
+        android:label="@string/logs" />
+
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="io.github.jqssun.displayextend.SettingsFragment"
+        android:label="@string/settings">
+        <action
+            android:id="@+id/action_settings_to_device_detail"
+            app:destination="@id/nav_input_device_detail" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_input_device_detail"
+        android:name="io.github.jqssun.displayextend.InputDeviceDetailFragment"
+        android:label="">
+        <argument
+            android:name="device_id"
+            app:argType="integer" />
+    </fragment>
+
+</navigation>

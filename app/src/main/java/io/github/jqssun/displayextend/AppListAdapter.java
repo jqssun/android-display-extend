@@ -2,7 +2,6 @@ package io.github.jqssun.displayextend;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.view.LayoutInflater;
@@ -15,35 +14,31 @@ import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import io.github.jqssun.displayextend.shizuku.ServiceUtils;
 import io.github.jqssun.displayextend.shizuku.ShizukuUtils;
 
-import java.util.List;
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHolder> {
-    private static final String LAUNCH_TIME_PREFIX = "launch_time_";
     private List<ApplicationInfo> appList;
     private List<ApplicationInfo> filteredList;
     private int targetDisplayId;
-    private SharedPreferences sharedPreferences;
     private PackageManager packageManager;
 
-    public AppListAdapter(List<ApplicationInfo> appList, PackageManager packageManager, int targetDisplayId, SharedPreferences sharedPreferences) {
+    public AppListAdapter(List<ApplicationInfo> appList, PackageManager packageManager, int targetDisplayId) {
         this.packageManager = packageManager;
         this.targetDisplayId = targetDisplayId;
-        this.sharedPreferences = sharedPreferences;
         this.appList = appList != null ? appList : Collections.emptyList();
-        sortAppList(this.appList);
+        _sortAppList(this.appList);
         this.filteredList = new ArrayList<>(this.appList);
     }
 
-    private void sortAppList(List<ApplicationInfo> appList) {
+    private void _sortAppList(List<ApplicationInfo> appList) {
         Collections.sort(appList, (app1, app2) -> {
-            Long time1 = sharedPreferences.getLong(LAUNCH_TIME_PREFIX + app1.packageName, 0L);
-            Long time2 = sharedPreferences.getLong(LAUNCH_TIME_PREFIX + app2.packageName, 0L);
+            Long time1 = Pref.getLaunchTime(app1.packageName);
+            Long time2 = Pref.getLaunchTime(app2.packageName);
             
             if (time1.equals(time2)) {
                 return app1.loadLabel(packageManager)
@@ -68,13 +63,13 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
                 }
             }
         }
-        sortAppList(filteredList);
+        _sortAppList(filteredList);
         notifyDataSetChanged();
     }
 
     public void updateAppList(List<ApplicationInfo> newAppList) {
         this.appList = newAppList != null ? newAppList : Collections.emptyList();
-        sortAppList(this.appList);
+        _sortAppList(this.appList);
         this.filteredList = new ArrayList<>(this.appList);
         notifyDataSetChanged();
     }
@@ -99,16 +94,12 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
         }
 
         holder.btnLaunch.setOnClickListener(v -> {
-            if (!ShizukuUtils.hasPermission() && sharedPreferences.getLong(LAUNCH_TIME_PREFIX + app.packageName, 0) == 0) {
+            if (!ShizukuUtils.hasPermission() && Pref.getLaunchTime(app.packageName) == 0) {
                 Toast.makeText(v.getContext(), v.getContext().getString(R.string.first_launch_hint), Toast.LENGTH_SHORT).show();
                 return;
             }
-            sharedPreferences.edit()
-                    .putString("LAST_PACKAGE_NAME", app.packageName)
-                    .apply();
-            sharedPreferences.edit()
-                .putLong(LAUNCH_TIME_PREFIX + app.packageName, System.currentTimeMillis())
-                .apply();
+            Pref.setLastPackageName(app.packageName);
+            Pref.setLaunchTime(app.packageName, System.currentTimeMillis());
             ServiceUtils.launchPackage(v.getContext(), app.packageName, targetDisplayId);
             if (State.floatingButtonService != null) {
                 State.floatingButtonService.onSingleAppLaunched();
@@ -117,9 +108,7 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
         holder.btnLaunchToDefaultDisplay.setOnClickListener(v -> {
             Intent launchIntent = packageManager.getLaunchIntentForPackage(app.packageName);
             if (launchIntent != null) {
-                sharedPreferences.edit()
-                    .putLong(LAUNCH_TIME_PREFIX + app.packageName, System.currentTimeMillis())
-                    .apply();
+                Pref.setLaunchTime(app.packageName, System.currentTimeMillis());
                 ActivityOptions options = ActivityOptions.makeBasic();
                 v.getContext().startActivity(launchIntent, options.toBundle());
             }
@@ -143,8 +132,8 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
             appIcon = view.findViewById(R.id.app_icon);
             text1 = view.findViewById(R.id.text1);
             text2 = view.findViewById(R.id.text2);
-            btnLaunch = view.findViewById(R.id.btn_launch);
-            btnLaunchToDefaultDisplay = view.findViewById(R.id.btn_launch_to_default_display);
+            btnLaunch = view.findViewById(R.id.launchBtn);
+            btnLaunchToDefaultDisplay = view.findViewById(R.id.launchToDefaultBtn);
         }
     }
 }

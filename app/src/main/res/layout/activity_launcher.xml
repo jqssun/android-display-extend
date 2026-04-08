@@ -1,62 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <!-- Search bar -->
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        app:endIconMode="clear_text"
+        android:hint="@string/search_apps_hint">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/search_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:imeOptions="actionSearch" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Action chips - wraps instead of clipping -->
+    <com.google.android.material.chip.ChipGroup
         android:id="@+id/button_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp">
 
-        <Button
+        <com.google.android.material.chip.Chip
             android:id="@+id/floating_button_toggle"
+            style="@style/Widget.Material3.Chip.Assist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"/>
+            android:checkable="false" />
 
-        <Button
-            android:id="@+id/btn_touchpad"
+        <com.google.android.material.chip.Chip
+            android:id="@+id/touchpadBtn"
+            style="@style/Widget.Material3.Chip.Assist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checkable="false"
             android:visibility="gone"
-            android:text="@string/touchpad"/>
+            android:text="@string/touchpad" />
 
-        <Button
-            android:id="@+id/btn_screen_off"
+        <com.google.android.material.chip.Chip
+            android:id="@+id/screenOffBtn"
+            style="@style/Widget.Material3.Chip.Assist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="@string/simulate_screen_off"/>
+            android:checkable="false"
+            android:text="@string/simulate_screen_off" />
 
-        <ImageButton
+        <com.google.android.material.chip.Chip
             android:id="@+id/menu_button"
+            style="@style/Widget.Material3.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:src="@drawable/ic_more_vert"
-            android:background="?attr/selectableItemBackgroundBorderless"/>
+            android:text="@string/show_all_apps" />
 
-    </LinearLayout>
-
-    <EditText
-        android:id="@+id/search_box"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/button_container"
-        android:layout_marginTop="8dp"
-        android:hint="@string/search_apps_hint"
-        android:singleLine="true"
-        android:imeOptions="actionSearch"/>
+    </com.google.android.material.chip.ChipGroup>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/app_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/search_box"
-        android:layout_marginTop="8dp"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp" />
 
-</RelativeLayout>
+</LinearLayout>

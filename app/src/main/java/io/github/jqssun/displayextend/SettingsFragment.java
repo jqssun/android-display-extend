@@ -1,6 +1,8 @@
 package io.github.jqssun.displayextend;
 
 import android.content.Context;
+import android.hardware.display.DisplayManager;
+import android.hardware.input.InputManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -21,9 +23,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
 
-import android.hardware.input.InputManager;
-import android.hardware.display.DisplayManager;
-
 import io.github.jqssun.displayextend.job.BindAllExternalInputToDisplay;
 import io.github.jqssun.displayextend.shizuku.PermissionManager;
 import io.github.jqssun.displayextend.shizuku.ShizukuUtils;
@@ -34,18 +33,18 @@ import java.util.List;
 
 public class SettingsFragment extends Fragment {
     private List<Display> displayList;
-    private Spinner spinnerDisplays;
-    private View btnBind;
-    private RecyclerView rvExternalDevices;
-    private RecyclerView rvInternalDevices;
-    private MaterialSwitch cbForceDesktop;
-    private MaterialSwitch cbForceResizable;
-    private MaterialSwitch cbEnableFreeform;
-    private MaterialSwitch cbEnableNonResizable;
-    private MaterialSwitch cbDisableScreenShareProtection;
-    private MaterialSwitch cbDisableUsbAudio;
-    private MaterialSwitch cbUseRealScreenOff;
-    private MaterialSwitch cbStayOnWhilePlugged;
+    private Spinner displaySpinner;
+    private View bindBtn;
+    private RecyclerView externalDevicesRecycler;
+    private RecyclerView internalDevicesRecycler;
+    private MaterialSwitch forceDesktopCheckbox;
+    private MaterialSwitch forceResizableCheckbox;
+    private MaterialSwitch enableFreeformCheckbox;
+    private MaterialSwitch enableNonResizableCheckbox;
+    private MaterialSwitch disableScreenShareProtectionCheckbox;
+    private MaterialSwitch disableUsbAudioCheckbox;
+    private MaterialSwitch useRealScreenOffCheckbox;
+    private MaterialSwitch stayOnWhilePluggedCheckbox;
     private View externalDeviceContainer;
 
     @Nullable
@@ -53,47 +52,47 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        cbForceDesktop = view.findViewById(R.id.cbForceDesktop);
-        cbForceResizable = view.findViewById(R.id.cbForceResizable);
-        cbEnableFreeform = view.findViewById(R.id.cbEnableFreeform);
-        cbEnableNonResizable = view.findViewById(R.id.cbEnableNonResizable);
-        cbDisableScreenShareProtection = view.findViewById(R.id.cbDisableScreenShareProtection);
-        spinnerDisplays = view.findViewById(R.id.spinnerDisplays);
-        btnBind = view.findViewById(R.id.btnBind);
-        rvExternalDevices = view.findViewById(R.id.rvExternalDevices);
-        rvInternalDevices = view.findViewById(R.id.rvInternalDevices);
-        cbDisableUsbAudio = view.findViewById(R.id.cbDisableUsbAudio);
-        cbUseRealScreenOff = view.findViewById(R.id.cbUseRealScreenOff);
-        cbStayOnWhilePlugged = view.findViewById(R.id.cbStayOnWhilePlugged);
+        forceDesktopCheckbox = view.findViewById(R.id.forceDesktopCheckbox);
+        forceResizableCheckbox = view.findViewById(R.id.forceResizableCheckbox);
+        enableFreeformCheckbox = view.findViewById(R.id.enableFreeformCheckbox);
+        enableNonResizableCheckbox = view.findViewById(R.id.enableNonResizableCheckbox);
+        disableScreenShareProtectionCheckbox = view.findViewById(R.id.disableScreenShareProtectionCheckbox);
+        displaySpinner = view.findViewById(R.id.displaySpinner);
+        bindBtn = view.findViewById(R.id.bindBtn);
+        externalDevicesRecycler = view.findViewById(R.id.externalDevicesRecycler);
+        internalDevicesRecycler = view.findViewById(R.id.internalDevicesRecycler);
+        disableUsbAudioCheckbox = view.findViewById(R.id.disableUsbAudioCheckbox);
+        useRealScreenOffCheckbox = view.findViewById(R.id.useRealScreenOffCheckbox);
+        stayOnWhilePluggedCheckbox = view.findViewById(R.id.stayOnWhilePluggedCheckbox);
         externalDeviceContainer = view.findViewById(R.id.externalDeviceContainer);
 
-        initializeDisplaySpinner();
-        setupBindButton();
-        setupDeviceLists();
+        _initDisplaySpinner();
+        _setupBindButton();
+        _setupDeviceLists();
 
         boolean granted = PermissionManager.grant("android.permission.WRITE_SECURE_SETTINGS");
-        setupDisableScreenShareProtectionCheckbox();
-        setupForceDesktopCheckbox();
-        setupForceResizableCheckbox();
-        setupEnableFreeformCheckbox();
-        setupEnableNonResizableCheckbox();
-        setupDisableUsbAudioCheckbox();
-        setupUseRealScreenOffCheckbox();
-        setupStayOnWhilePluggedCheckbox();
+        _setupDisableScreenShareProtectionCheckbox();
+        _setupForceDesktopCheckbox();
+        _setupForceResizableCheckbox();
+        _setupEnableFreeformCheckbox();
+        _setupEnableNonResizableCheckbox();
+        _setupDisableUsbAudioCheckbox();
+        _setupUseRealScreenOffCheckbox();
+        _setupStayOnWhilePluggedCheckbox();
         if (!granted) {
-            cbDisableScreenShareProtection.setEnabled(false);
-            cbForceDesktop.setEnabled(false);
-            cbForceResizable.setEnabled(false);
-            cbEnableFreeform.setEnabled(false);
-            cbEnableNonResizable.setEnabled(false);
-            cbDisableUsbAudio.setEnabled(false);
-            cbStayOnWhilePlugged.setEnabled(false);
+            disableScreenShareProtectionCheckbox.setEnabled(false);
+            forceDesktopCheckbox.setEnabled(false);
+            forceResizableCheckbox.setEnabled(false);
+            enableFreeformCheckbox.setEnabled(false);
+            enableNonResizableCheckbox.setEnabled(false);
+            disableUsbAudioCheckbox.setEnabled(false);
+            stayOnWhilePluggedCheckbox.setEnabled(false);
         }
 
         return view;
     }
 
-    private void initializeDisplaySpinner() {
+    private void _initDisplaySpinner() {
         DisplayManager displayManager = (DisplayManager) requireContext().getSystemService(Context.DISPLAY_SERVICE);
         Display[] displays = displayManager.getDisplays();
         displayList = Arrays.asList(displays);
@@ -109,16 +108,16 @@ public class SettingsFragment extends Fragment {
             displayNames
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerDisplays.setAdapter(adapter);
+        displaySpinner.setAdapter(adapter);
     }
 
-    private void setupBindButton() {
-        btnBind.setOnClickListener(v -> {
+    private void _setupBindButton() {
+        bindBtn.setOnClickListener(v -> {
             if (!ShizukuUtils.hasShizukuStarted()) {
                 Toast.makeText(requireContext(), getString(R.string.shizuku_required), Toast.LENGTH_SHORT).show();
                 return;
             }
-            int selectedPosition = spinnerDisplays.getSelectedItemPosition();
+            int selectedPosition = displaySpinner.getSelectedItemPosition();
             if (selectedPosition != -1 && selectedPosition < displayList.size()) {
                 Display selectedDisplay = displayList.get(selectedPosition);
                 State.startNewJob(new BindAllExternalInputToDisplay(selectedDisplay.getDisplayId()));
@@ -126,7 +125,7 @@ public class SettingsFragment extends Fragment {
         });
     }
 
-    private void setupDeviceLists() {
+    private void _setupDeviceLists() {
         InputManager inputManager = (InputManager) requireContext().getSystemService(Context.INPUT_SERVICE);
         int[] deviceIds = inputManager.getInputDeviceIds();
 
@@ -146,21 +145,19 @@ public class SettingsFragment extends Fragment {
 
         externalDeviceContainer.setVisibility(externalDevices.isEmpty() ? View.GONE : View.VISIBLE);
 
-        rvExternalDevices.setLayoutManager(new LinearLayoutManager(requireContext()));
-        rvInternalDevices.setLayoutManager(new LinearLayoutManager(requireContext()));
+        externalDevicesRecycler.setLayoutManager(new LinearLayoutManager(requireContext()));
+        internalDevicesRecycler.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        DeviceAdapter externalAdapter = new DeviceAdapter(externalDevices, this::showDeviceDetails);
-        DeviceAdapter internalAdapter = new DeviceAdapter(internalDevices, this::showDeviceDetails);
+        DeviceAdapter externalAdapter = new DeviceAdapter(externalDevices, this::_showDeviceDetails);
+        DeviceAdapter internalAdapter = new DeviceAdapter(internalDevices, this::_showDeviceDetails);
 
-        rvExternalDevices.setAdapter(externalAdapter);
-        rvInternalDevices.setAdapter(internalAdapter);
+        externalDevicesRecycler.setAdapter(externalAdapter);
+        internalDevicesRecycler.setAdapter(internalAdapter);
     }
 
-    private void showDeviceDetails(InputDevice device) {
-        if (getActivity() instanceof IMainActivity) {
-            ((IMainActivity) getActivity()).navigateToDetail(
-                InputDeviceDetailFragment.newInstance(device.getId())
-            );
+    private void _showDeviceDetails(InputDevice device) {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).navigateToInputDeviceDetail(device.getId());
         }
     }
 
@@ -168,19 +165,19 @@ public class SettingsFragment extends Fragment {
         ((View) v.getParent()).setVisibility(View.GONE);
     }
 
-    private void setupForceDesktopCheckbox() {
+    private void _setupForceDesktopCheckbox() {
         boolean isForceDesktop = Settings.Global.getInt(requireContext().getContentResolver(),
                 "force_desktop_mode_on_external_displays", 0) == 1;
-        cbForceDesktop.setChecked(isForceDesktop);
+        forceDesktopCheckbox.setChecked(isForceDesktop);
         boolean isHuawei = Build.MANUFACTURER.toLowerCase().contains("huawei") ||
                           Build.BRAND.toLowerCase().contains("huawei") ||
                           Build.DEVICE.toLowerCase().contains("huawei");
 
         if (isHuawei) {
-            _hideRow(cbForceDesktop);
+            _hideRow(forceDesktopCheckbox);
         }
 
-        cbForceDesktop.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        forceDesktopCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             try {
                 Settings.Global.putInt(requireContext().getContentResolver(),
                         "force_desktop_mode_on_external_displays", isChecked ? 1 : 0);
@@ -190,12 +187,12 @@ public class SettingsFragment extends Fragment {
         });
     }
 
-    private void setupForceResizableCheckbox() {
+    private void _setupForceResizableCheckbox() {
         boolean isForceResizable = Settings.Global.getInt(requireContext().getContentResolver(),
                 "force_resizable_activities", 0) == 1;
-        cbForceResizable.setChecked(isForceResizable);
+        forceResizableCheckbox.setChecked(isForceResizable);
 
-        cbForceResizable.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        forceResizableCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             try {
                 Settings.Global.putInt(requireContext().getContentResolver(),
                         "force_resizable_activities", isChecked ? 1 : 0);
@@ -205,12 +202,12 @@ public class SettingsFragment extends Fragment {
         });
     }
 
-    private void setupEnableFreeformCheckbox() {
+    private void _setupEnableFreeformCheckbox() {
         boolean isEnableFreeform = Settings.Global.getInt(requireContext().getContentResolver(),
                 "enable_freeform_support", 0) == 1;
-        cbEnableFreeform.setChecked(isEnableFreeform);
+        enableFreeformCheckbox.setChecked(isEnableFreeform);
 
-        cbEnableFreeform.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        enableFreeformCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             try {
                 Settings.Global.putInt(requireContext().getContentResolver(),
                         "enable_freeform_support", isChecked ? 1 : 0);
@@ -220,12 +217,12 @@ public class SettingsFragment extends Fragment {
         });
     }
 
-    private void setupEnableNonResizableCheckbox() {
+    private void _setupEnableNonResizableCheckbox() {
         boolean isEnableNonResizable = Settings.Global.getInt(requireContext().getContentResolver(),
                 "enable_non_resizable_multi_window", 0) == 1;
-        cbEnableNonResizable.setChecked(isEnableNonResizable);
+        enableNonResizableCheckbox.setChecked(isEnableNonResizable);
 
-        cbEnableNonResizable.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        enableNonResizableCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             try {
                 Settings.Global.putInt(requireContext().getContentResolver(),
                         "enable_non_resizable_multi_window", isChecked ? 1 : 0);
@@ -235,12 +232,12 @@ public class SettingsFragment extends Fragment {
         });
     }
 
-    private void setupDisableScreenShareProtectionCheckbox() {
+    private void _setupDisableScreenShareProtectionCheckbox() {
         boolean isDisabled = Settings.Global.getInt(requireContext().getContentResolver(),
                 "disable_screen_share_protections_for_apps_and_notifications", 0) == 1;
-        cbDisableScreenShareProtection.setChecked(isDisabled);
+        disableScreenShareProtectionCheckbox.setChecked(isDisabled);
 
-        cbDisableScreenShareProtection.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        disableScreenShareProtectionCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             try {
                 Settings.Global.putInt(requireContext().getContentResolver(),
                         "disable_screen_share_protections_for_apps_and_notifications", isChecked ? 1 : 0);
@@ -250,47 +247,34 @@ public class SettingsFragment extends Fragment {
         });
     }
 
-    private void setupDisableUsbAudioCheckbox() {
-        boolean isDisabled = requireContext().getSharedPreferences("settings", Context.MODE_PRIVATE)
-                .getBoolean("usb_audio_disabled", false);
+    private void _setupDisableUsbAudioCheckbox() {
+        disableUsbAudioCheckbox.setChecked(Pref.getUsbAudioDisabled());
 
-        cbDisableUsbAudio.setChecked(isDisabled);
-
-        cbDisableUsbAudio.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        disableUsbAudioCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             try {
                 Settings.Secure.putInt(requireContext().getContentResolver(),
                         "usb_audio_automatic_routing_disabled", isChecked ? 1 : 0);
-
-                requireContext().getSharedPreferences("settings", Context.MODE_PRIVATE)
-                        .edit()
-                        .putBoolean("usb_audio_disabled", isChecked)
-                        .apply();
+                Pref.setUsbAudioDisabled(isChecked);
             } catch (SecurityException e) {
                 State.log("failed: " + e);
             }
         });
     }
 
-    private void setupUseRealScreenOffCheckbox() {
-        boolean useRealScreenOff = requireContext().getSharedPreferences("settings", Context.MODE_PRIVATE)
-                .getBoolean("use_real_screen_off", false);
+    private void _setupUseRealScreenOffCheckbox() {
+        useRealScreenOffCheckbox.setChecked(Pref.getUseRealScreenOff());
 
-        cbUseRealScreenOff.setChecked(useRealScreenOff);
-
-        cbUseRealScreenOff.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            requireContext().getSharedPreferences("settings", Context.MODE_PRIVATE)
-                    .edit()
-                    .putBoolean("use_real_screen_off", isChecked)
-                    .apply();
+        useRealScreenOffCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            Pref.setUseRealScreenOff(isChecked);
         });
     }
 
-    private void setupStayOnWhilePluggedCheckbox() {
+    private void _setupStayOnWhilePluggedCheckbox() {
         boolean isStayOnWhilePlugged = Settings.Global.getInt(requireContext().getContentResolver(),
                 "stay_on_while_plugged_in", 0) != 0;
-        cbStayOnWhilePlugged.setChecked(isStayOnWhilePlugged);
+        stayOnWhilePluggedCheckbox.setChecked(isStayOnWhilePlugged);
 
-        cbStayOnWhilePlugged.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        stayOnWhilePluggedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             try {
                 Settings.Global.putInt(requireContext().getContentResolver(),
                         "stay_on_while_plugged_in", isChecked ? 7 : 0);

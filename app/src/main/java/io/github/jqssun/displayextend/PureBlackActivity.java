@@ -1,5 +1,6 @@
 package io.github.jqssun.displayextend;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -12,14 +13,13 @@ import android.os.Handler;
 import android.os.RemoteException;
 import android.view.Display;
 import android.view.InputDevice;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.MotionEventHidden;
 import android.view.Surface;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.KeyEvent;
-import android.content.BroadcastReceiver;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -79,8 +79,7 @@ public class PureBlackActivity extends AppCompatActivity {
         view.setBackgroundColor(Color.BLACK);
         setContentView(view);
 
-        useRealScreenOff = getSharedPreferences("settings", Context.MODE_PRIVATE)
-                .getBoolean("use_real_screen_off", false);
+        useRealScreenOff = Pref.getUseRealScreenOff();
         
         view.setOnGenericMotionListener((v, event) -> {
             TouchpadActivity.setFocus(inputManager, Display.DEFAULT_DISPLAY);
@@ -93,7 +92,7 @@ public class PureBlackActivity extends AppCompatActivity {
         DisplayManager displayManager = (DisplayManager) getSystemService(DISPLAY_SERVICE);
 
         view.setOnTouchListener((v, event) -> {
-            if (isExternalDevice(event)) {
+            if (_isExternalDevice(event)) {
                 Display targetDisplay = displayManager.getDisplay(State.lastSingleAppDisplay);
                 if (targetDisplay == null)
                     return true;
@@ -141,7 +140,7 @@ public class PureBlackActivity extends AppCompatActivity {
            inputManager = ServiceUtils.getInputManager();
            TouchpadActivity.setFocus(inputManager, State.lastSingleAppDisplay);
            TouchpadAccessibilityService.startServiceByShizuku(this);
-           powerOffScreen();
+           _powerOffScreen();
            new Handler().postDelayed(() -> {
                TouchpadActivity.setFocus(inputManager, State.lastSingleAppDisplay);
            }, 500);
@@ -159,7 +158,7 @@ public class PureBlackActivity extends AppCompatActivity {
        }
     }
 
-    private void powerOffScreen() {
+    private void _powerOffScreen() {
         if (useRealScreenOff && State.userService != null) {
             try {
                 State.userService.startListenVolumeKey();
@@ -184,7 +183,7 @@ public class PureBlackActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isExternalDevice(MotionEvent event) {
+    private boolean _isExternalDevice(MotionEvent event) {
         if (!hasShizukuPermission) {
             return false;
         }

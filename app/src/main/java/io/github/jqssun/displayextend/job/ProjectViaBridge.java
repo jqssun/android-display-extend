@@ -9,7 +9,7 @@ import android.view.Display;
 import android.view.DisplayHidden;
 
 import io.github.jqssun.displayextend.BridgeActivity;
-import io.github.jqssun.displayextend.BridgePref;
+import io.github.jqssun.displayextend.Pref;
 import io.github.jqssun.displayextend.MainActivity;
 import io.github.jqssun.displayextend.MediaProjectionService;
 import io.github.jqssun.displayextend.State;
@@ -54,7 +54,7 @@ public class ProjectViaBridge implements Job {
         if (State.bridgeVirtualDisplay != null) {
             return true;
         }
-        if (BridgePref.skipMediaProjectionPermission || isWifiDisplay) {
+        if (Pref.getSkipMediaProjectionPermission() || isWifiDisplay) {
             // no media projection needed for wifi displays
             return true;
         }

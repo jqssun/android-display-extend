@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_display"
+            android:text="@string/section_display"
             android:textAppearance="?attr/textAppearanceLabelLarge"
             android:textColor="?colorPrimary"
             android:paddingHorizontal="16dp"
@@ -46,7 +46,7 @@
                     android:layout_marginTop="2dp" />
             </LinearLayout>
             <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/cbDisableUsbAudio"
+                android:id="@+id/disableUsbAudioCheckbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
@@ -76,7 +76,7 @@
                     android:layout_marginTop="2dp" />
             </LinearLayout>
             <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/cbForceDesktop"
+                android:id="@+id/forceDesktopCheckbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
@@ -106,7 +106,7 @@
                     android:layout_marginTop="2dp" />
             </LinearLayout>
             <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/cbForceResizable"
+                android:id="@+id/forceResizableCheckbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
@@ -136,7 +136,7 @@
                     android:layout_marginTop="2dp" />
             </LinearLayout>
             <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/cbEnableFreeform"
+                android:id="@+id/enableFreeformCheckbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
@@ -166,7 +166,7 @@
                     android:layout_marginTop="2dp" />
             </LinearLayout>
             <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/cbEnableNonResizable"
+                android:id="@+id/enableNonResizableCheckbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
@@ -196,7 +196,7 @@
                     android:layout_marginTop="2dp" />
             </LinearLayout>
             <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/cbDisableScreenShareProtection"
+                android:id="@+id/disableScreenShareProtectionCheckbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
@@ -205,7 +205,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_power"
+            android:text="@string/section_power"
             android:textAppearance="?attr/textAppearanceLabelLarge"
             android:textColor="?colorPrimary"
             android:paddingHorizontal="16dp"
@@ -237,7 +237,7 @@
                     android:layout_marginTop="2dp" />
             </LinearLayout>
             <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/cbUseRealScreenOff"
+                android:id="@+id/useRealScreenOffCheckbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
@@ -267,7 +267,7 @@
                     android:layout_marginTop="2dp" />
             </LinearLayout>
             <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/cbStayOnWhilePlugged"
+                android:id="@+id/stayOnWhilePluggedCheckbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
@@ -298,13 +298,13 @@
                 android:paddingVertical="8dp">
 
                 <Spinner
-                    android:id="@+id/spinnerDisplays"
+                    android:id="@+id/displaySpinner"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnBind"
+                    android:id="@+id/bindBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/bind_input_devices"
@@ -322,7 +322,7 @@
                 android:paddingHorizontal="16dp" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvExternalDevices"
+                android:id="@+id/externalDevicesRecycler"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -339,7 +339,7 @@
             android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvInternalDevices"
+            android:id="@+id/internalDevicesRecycler"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"

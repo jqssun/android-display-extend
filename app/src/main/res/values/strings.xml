@@ -33,19 +33,18 @@
     <string name="authorize">Authorize</string>
     <string name="screens">Displays</string>
     <string name="simulate_screen_off">Simulate screen off</string>
-    <string name="real_screen_off">Real screen off</string>
     <string name="touchpad">Touchpad</string>
     <string name="settings">Settings</string>
     <string name="about">About</string>
     <string name="shizuku_not_started">Not started</string>
     <string name="no_projection_title">No app being projected</string>
-    <string name="no_projection_message">- USB-C DisplayPort: Connect a screen, then select it from the screen list to cast a single app\n\n- Wireless: Use Android\'s built-in wireless display, then find the screen in the list to cast a single app</string>
+    <string name="no_projection_message">- USB-C DisplayPort: Connect a screen, then select it from the screen list to cast an app\n\n- Wireless: Use Android\'s built-in wireless display, then find the screen in the list to cast an app</string>
     <string name="got_it">Got it</string>
     <string name="shizuku_required">Shizuku permission is required</string>
 
     <!-- Display list -->
-    <string name="display_list_header">Select a display to cast a single app. The built-in screen cannot be used for single-app casting.</string>
-    <string name="wireless_cast_hint">Use Android\'s built-in wireless display</string>
+    <string name="display_list_header">Select a display to cast an app. The built-in screen cannot be used for casting.</string>
+    <string name="wireless_cast_hint">Use Android\'s wireless display</string>
     <string name="display_id_format">Display ID: %1$d\nResolution: %2$dx%3$d</string>
     <string name="display_name_format">Display name: %s</string>
     <string name="screen_breadcrumb">Screen %d</string>
@@ -57,19 +56,32 @@
     <string name="resolution_label">Resolution</string>
     <string name="rotation_label">Rotation</string>
     <string name="actions_header">Actions</string>
+    <string name="info_display_id">Display ID</string>
+    <string name="info_name">Name</string>
+    <string name="info_refresh_rate">Refresh rate</string>
+    <string name="info_state">State</string>
+    <string name="info_hdr">HDR</string>
+    <string name="info_flags">Flags</string>
+    <string name="info_cutout">Cutout</string>
+    <string name="info_shizuku">Shizuku</string>
+    <string name="info_override_size">Override size</string>
+    <string name="info_physical_size">Physical size</string>
+    <string name="info_keyboard_policy">Keyboard policy</string>
+    <string name="info_default_mode_id">Default mode ID</string>
+    <string name="info_refresh_rate_override">Refresh rate override</string>
+    <string name="info_install_orientation">Install orientation</string>
+    <string name="info_windowing_mode">Windowing mode</string>
     <string name="no_cutout">No cutout</string>
     <string name="cutout_bounds">Cutout bounds:\n</string>
     <string name="cutout_rect_format">Left: %1$d Top: %2$d Right: %3$d Bottom: %4$d\n</string>
     <string name="supported_modes_header">Supported display modes</string>
-    <string name="mode_col_id">ID</string>
-    <string name="mode_col_resolution">Resolution</string>
-    <string name="mode_col_refresh">Refresh rate</string>
-    <string name="cast_single_app">Cast single app</string>
+    <string name="mode_col_id">Mode</string>
+    <string name="cast_single_app">Cast an app</string>
     <string name="auto_open_last_app">Auto-open last app</string>
     <string name="show_floating_back_button">Show floating back button</string>
     <string name="hide_floating_back_button">Hide floating back button</string>
     <string name="force_landscape">Force landscape</string>
-    <string name="bridge_button_text">Bridge\n(Auto-rotate portrait apps)</string>
+    <string name="bridge_button_text">Bridge mode\n(Enable rotation)</string>
     <string name="exit_bridge">Exit bridge</string>
     <string name="shizuku_status_granted">Granted</string>
     <string name="shizuku_status_denied">Denied</string>
@@ -80,8 +92,8 @@
     <string name="android15_rotation_hint">Android 15 supports direct rotation without bridge</string>
 
     <!-- Settings -->
-    <string name="settings_display">Display</string>
-    <string name="settings_power">Power</string>
+    <string name="section_display">Display</string>
+    <string name="section_power">Power</string>
 
     <string name="disable_usb_audio">Disable USB audio routing</string>
     <string name="disable_usb_audio_desc">Prevent audio from routing to external display</string>
@@ -110,7 +122,7 @@
     <string name="mode_cursor_locked">Cursor locked</string>
     <string name="cursor_not_moved">Cursor stays fixed, single-finger gestures only</string>
     <string name="move_cursor">Move cursor</string>
-    <string name="touchpad_help">Touch this area to control:\n• Single finger swipe — %s\n• Single finger tap — click\n• Multi-finger gesture — pass through to target screen\n• Back button — press back on target screen\n• Home button — reopen the selected app\n• Moon button — black screen to save power\n• If a Bluetooth controller can\'t control the display, use the moon button to turn off the main screen and shift focus</string>
+    <string name="touchpad_help">Touch this area to control:\n- Single finger swipe: %s\n- Single finger tap: click\n- Multi-finger gesture: pass through to target screen\n- Back button: press back on target screen\n- Home button: reopen the selected app\n- Moon button: black screen to save power\n- If a Bluetooth controller can\'t control the display, use the moon button to turn off the main screen and shift focus</string>
     <string name="show_cursor_failed">Failed to show cursor</string>
 
     <!-- Dialogs -->

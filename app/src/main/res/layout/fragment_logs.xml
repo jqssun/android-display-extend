@@ -22,14 +22,14 @@
             android:textAppearance="?attr/textAppearanceHeadlineSmall" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnExportLogs"
+            android:id="@+id/exportLogsBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/export"
             style="@style/Widget.Material3.Button.TextButton" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnClearLogs"
+            android:id="@+id/clearLogsBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/clear"

@@ -8,6 +8,8 @@ import android.media.projection.MediaProjection;
 import android.os.IBinder;
 import android.util.Log;
 
+import androidx.lifecycle.MutableLiveData;
+
 import io.github.jqssun.displayextend.job.Job;
 import io.github.jqssun.displayextend.job.YieldException;
 import io.github.jqssun.displayextend.shizuku.IUserService;
@@ -23,6 +25,9 @@ public class State {
     public static WeakReference<Activity> currentActivity = new WeakReference<>(null);
     private static Job currentJob;
     public static List<String> logs = new ArrayList<>();
+    public static final MutableLiveData<ExtendUiState> uiState = new MutableLiveData<>(new ExtendUiState());
+    private static final java.util.concurrent.atomic.AtomicInteger _logVersion = new java.util.concurrent.atomic.AtomicInteger(0);
+    public static final MutableLiveData<Integer> logVersion = new MutableLiveData<>(0);
     private static MediaProjection mediaProjection;
     public static MediaProjection mediaProjectionInUse;
     public static int lastSingleAppDisplay;
@@ -117,25 +122,47 @@ public class State {
     public static void log(String message) {
         logs.add(message);
         Log.i("ConnectScreen", message);
-        if (currentActivity != null && currentActivity.get() != null) {
-            IMainActivity mainActivity = (IMainActivity) currentActivity.get();
-            mainActivity.updateLogs();
-        }
+        logVersion.postValue(_logVersion.incrementAndGet());
     }
 
     public static void _refreshUI() {
-        try {
-            Activity activity = currentActivity != null ? currentActivity.get() : null;
-            if (activity instanceof IMainActivity) {
-                ((IMainActivity) activity).refreshCurrentFragment();
-            }
-        } catch (Exception e) {
-            // ignore
+        Activity activity = currentActivity != null ? currentActivity.get() : null;
+        if (activity != null) {
+            activity.runOnUiThread(() -> _updateUiState(activity));
         }
     }
 
+    private static void _updateUiState(Activity activity) {
+        ExtendUiState state = new ExtendUiState();
+        state.useRealScreenOff = Pref.getUseRealScreenOff();
+        state.hasProjection = lastSingleAppDisplay > 0;
+
+        try {
+            String ver = activity.getPackageManager()
+                    .getPackageInfo(activity.getPackageName(), 0).versionName;
+            state.versionText = "Version: " + ver + " (Android " + android.os.Build.VERSION.RELEASE + ")";
+        } catch (Exception e) {
+            state.versionText = "Version: unknown";
+        }
+
+        boolean started = io.github.jqssun.displayextend.shizuku.ShizukuUtils.hasShizukuStarted();
+        boolean hasPerm = io.github.jqssun.displayextend.shizuku.ShizukuUtils.hasPermission();
+        if (!started) {
+            state.shizukuStatus = activity.getString(R.string.shizuku_not_started);
+            state.shizukuPermissionVisible = false;
+        } else if (!hasPerm) {
+            state.shizukuStatus = activity.getString(R.string.shizuku_status_denied);
+            state.shizukuPermissionVisible = true;
+        } else {
+            state.shizukuStatus = activity.getString(R.string.shizuku_status_granted);
+            state.shizukuPermissionVisible = false;
+        }
+
+        uiState.setValue(state);
+    }
+
     public static void unbindUserService() {
-        if (userService == null) {
+        if (userService != null) {
             Shizuku.unbindUserService(State.userServiceArgs, userServiceConnection, true);
         }
     }
