@@ -49,20 +49,18 @@ public class LauncherActivity extends AppCompatActivity {
         floatingButtonToggle = findViewById(R.id.floating_button_toggle);
         if (displayId != Display.DEFAULT_DISPLAY) {
             floatingButtonToggle.setVisibility(View.VISIBLE);
-            _updateFloatingBackButtonText(Pref.getFloatingButton(display.getName()));
-            floatingButtonToggle.setOnClickListener(v -> {
-                boolean isEnabled = Pref.getFloatingButton(display.getName());
-                if (isEnabled) {
+            floatingButtonToggle.setChecked(Pref.getFloatingButton(display.getName()));
+            floatingButtonToggle.setOnCheckedChangeListener((chip, isChecked) -> {
+                if (isChecked) {
+                    if (!FloatingButtonService.startFloating(this, displayId, false)) {
+                        floatingButtonToggle.setChecked(false);
+                        return;
+                    }
+                } else {
                     Intent serviceIntent = new Intent(this, FloatingButtonService.class);
                     this.stopService(serviceIntent);
-                    isEnabled = false;
-                } else {
-                    if (FloatingButtonService.startFloating(this, displayId, false)) {
-                        isEnabled = true;
-                    }
                 }
-                Pref.setFloatingButton(display.getName(), isEnabled);
-                _updateFloatingBackButtonText(isEnabled);
+                Pref.setFloatingButton(display.getName(), isChecked);
             });
         }
         Chip touchpadButton = findViewById(R.id.touchpadBtn);
@@ -114,10 +112,6 @@ public class LauncherActivity extends AppCompatActivity {
             startActivity(intent, options.toBundle());
         });
     }
-    private void _updateFloatingBackButtonText(boolean isEnabled) {
-        floatingButtonToggle.setText(isEnabled ? getString(R.string.floating_on) : getString(R.string.floating_off));
-    }
-
     private List<ApplicationInfo> _getFilteredApps(boolean showAll) {
         List<ApplicationInfo> packages = new ArrayList<>();
         try {

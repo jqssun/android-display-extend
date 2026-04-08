@@ -24,7 +24,7 @@ public class HomeFragment extends Fragment {
 
     private TextView shizukuStatus;
     private MaterialButton shizukuPermissionBtn;
-    private MaterialButton simulateScreenOffBtn;
+    private MaterialButton screenOffBtn;
     private TextView versionText;
 
     @Override
@@ -42,9 +42,8 @@ public class HomeFragment extends Fragment {
 
         shizukuStatus = view.findViewById(R.id.shizukuStatus);
 
-        // Simulate screen off
-        simulateScreenOffBtn = view.findViewById(R.id.simulateScreenOffBtn);
-        simulateScreenOffBtn.setOnClickListener(v -> {
+        screenOffBtn = view.findViewById(R.id.screenOffBtn);
+        screenOffBtn.setOnClickListener(v -> {
             if (State.lastSingleAppDisplay <= 0) {
                 new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                     .setTitle(getString(R.string.no_projection_title))
@@ -113,9 +112,9 @@ public class HomeFragment extends Fragment {
         shizukuPermissionBtn.setVisibility(state.shizukuPermissionVisible ? View.VISIBLE : View.GONE);
 
         if (state.useRealScreenOff) {
-            simulateScreenOffBtn.setText(getString(R.string.use_real_screen_off));
+            screenOffBtn.setText(getString(R.string.screen_off_real));
         } else {
-            simulateScreenOffBtn.setText(getString(R.string.simulate_screen_off));
+            screenOffBtn.setText(getString(R.string.screen_off));
         }
 
         if (state.versionText != null) {

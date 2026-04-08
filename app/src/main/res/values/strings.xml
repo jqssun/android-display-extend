@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Extend</string>
     <string name="accessibility_service_description">Accessibility service for simulating touch events on secondary screens</string>
-    <string name="go_dark_button">Toggle dark mode</string>
+    <string name="display_off_button">Display off</string>
     <string name="back_button">Back button</string>
     <string name="home_button">Home button</string>
 
@@ -34,7 +34,8 @@
     <string name="shizuku_status_label">Shizuku:</string>
     <string name="authorize">Authorize</string>
     <string name="screens">Displays</string>
-    <string name="simulate_screen_off">Simulate screen off</string>
+    <string name="screen_off">Turn display off</string>
+    <string name="screen_off_real">Turn display off (real)</string>
     <string name="touchpad">Touchpad</string>
     <string name="settings">Settings</string>
     <string name="shizuku_not_started">Not started</string>
@@ -116,13 +117,15 @@
     <string name="display_spinner_format">Display %1$d (%2$s)</string>
 
     <!-- Touchpad -->
-    <string name="switch_mode">Switch mode</string>
+    <string name="switch_mode">Mode</string>
     <string name="mode_normal">Normal</string>
     <string name="mode_cursor_locked">Locked cursor</string>
     <string name="touchpad_help_cursor_locked">Cursor stays fixed, single-finger gestures only</string>
     <string name="touchpad_help_move_cursor">Move cursor</string>
-    <string name="touchpad_help_text">Touch this area to control the target screen:\n\n- Single-finger swipe: %s\n- Single-finger tap: Tap on the target screen\n- Multi-finger gesture: Sent to the target screen\n- Back button: Go back on the target screen\n- Home button: Reopen the selected app\n- Moon button: Black screen to save power\n\nIf a Bluetooth controller cannot control the display, use the moon button to turn off the main screen and shift focus.</string>
+    <string name="touchpad_help_text">Touch this area to control the target screen:\n\n- Single-finger swipe: %s\n- Single-finger tap: Tap on the target screen\n- Multi-finger gesture: Sent to the target screen\n- Back button: Go back on the target screen\n- Home button: Reopen the selected app\n- Display off button: Turn off the main screen to save power\n\nIf a Bluetooth controller cannot control the display, use the display off button to turn off the main screen and shift focus.</string>
     <string name="show_cursor_failed">Failed to show cursor</string>
+    <string name="rotate">Rotate</string>
+    <string name="rotate_cw">Rotate clockwise</string>
 
     <!-- Dialogs -->
     <string name="edit_dpi">Change DPI</string>
@@ -147,19 +150,18 @@
 
     <!-- App list / Launcher -->
     <string name="cast">Cast</string>
-    <string name="back_to_phone">Return</string>
+    <string name="open_on_phone">Open on phone</string>
     <string name="search_apps_hint">Search apps</string>
     <string name="show_all_apps">Show all apps</string>
-    <string name="floating_on">Floating on</string>
-    <string name="floating_off">Floating off</string>
+    <string name="floating_button">Floating button</string>
     <string name="force_dpi">Force DPI</string>
     <string name="force_dpi_format">DPI: %d</string>
     <string name="force_dpi_off">DPI: Auto</string>
     <string name="enter_force_dpi_hint">Enter DPI (Auto: 0)</string>
     <string name="query_apps_permission_required">QUERY_ALL_PACKAGES permission is required</string>
     <string name="cannot_get_app_list">Cannot get app list, please check permissions</string>
-    <string name="first_launch_hint">Tap \'Return\' once to grant permission, then return here and select the same app again.</string>
-    <string name="input_routing_limitation">Due to Android version limitation, tap \'Simulate screen off\' to use the touchscreen</string>
+    <string name="first_launch_hint">Opened on phone first to grant permissions. Tap again to cast.</string>
+    <string name="input_routing_limitation">Due to Android version limitation, tap \'Turn display off\' to use the touchscreen</string>
 
     <!-- About -->
     <string name="version_format">Version: %1$s (Android %2$s)</string>

@@ -4,48 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:orientation="vertical">
-
-    <!-- Top bar -->
-    <LinearLayout
-        android:id="@+id/topBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="12dp">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/switchModeButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:text="@string/switch_mode"
-            style="@style/Widget.Material3.Button.TextButton" />
-
-        <Spinner
-            android:id="@+id/modeSpinner"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/exitButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/exit"
-            style="@style/Widget.Material3.Button.TextButton" />
-    </LinearLayout>
+    android:orientation="horizontal">
 
     <!-- Touchpad + scroll strip -->
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:orientation="horizontal"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginVertical="16dp">
+        android:layout_margin="16dp">
 
         <TextView
             android:id="@+id/touchpad_area"
@@ -68,14 +35,14 @@
             android:background="@drawable/scroll_track_background" />
     </LinearLayout>
 
-    <!-- Bottom action buttons -->
+    <!-- Side action buttons -->
     <LinearLayout
         android:id="@+id/bottomButtons"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp"
-        android:paddingBottom="16dp"
-        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:paddingVertical="16dp"
+        android:paddingEnd="16dp"
+        android:orientation="vertical"
         android:gravity="center">
 
         <com.google.android.material.button.MaterialButton
@@ -132,5 +99,32 @@
             app:iconPadding="0dp"
             android:contentDescription="@string/rotate_cw"
             style="@style/Widget.Material3.Button.IconButton.Filled.Tonal" />
+    </LinearLayout>
+
+    <!-- Hidden views referenced by code but not shown in landscape -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/switchModeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <Spinner
+            android:id="@+id/modeSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/exitButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
     </LinearLayout>
 </LinearLayout>

@@ -40,7 +40,7 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
         Collections.sort(appList, (app1, app2) -> {
             Long time1 = Pref.getLaunchTime(app1.packageName);
             Long time2 = Pref.getLaunchTime(app2.packageName);
-            
+
             if (time1.equals(time2)) {
                 return app1.loadLabel(packageManager)
                     .toString()
@@ -87,33 +87,40 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
         ApplicationInfo app = filteredList.get(position);
         holder.text1.setText(app.loadLabel(packageManager));
         holder.text2.setText(app.packageName);
-        
+
         try {
             holder.appIcon.setImageDrawable(packageManager.getApplicationIcon(app.packageName));
         } catch (PackageManager.NameNotFoundException e) {
             holder.appIcon.setImageResource(android.R.drawable.sym_def_app_icon);
         }
 
-        holder.btnLaunch.setOnClickListener(v -> {
-            if (!ShizukuUtils.hasPermission() && Pref.getLaunchTime(app.packageName) == 0) {
-                Toast.makeText(v.getContext(), v.getContext().getString(R.string.first_launch_hint), Toast.LENGTH_SHORT).show();
-                return;
-            }
-            Pref.setLastPackageName(app.packageName);
+        View.OnClickListener castAction = v -> _castApp(v, app);
+        holder.btnLaunch.setOnClickListener(castAction);
+        holder.itemView.setOnClickListener(castAction);
+        holder.btnOpenOnPhone.setOnClickListener(v -> _openOnPhone(v, app));
+    }
+
+    private void _castApp(View v, ApplicationInfo app) {
+        if (!ShizukuUtils.hasPermission() && Pref.getLaunchTime(app.packageName) == 0) {
+            _openOnPhone(v, app);
+            Toast.makeText(v.getContext(), v.getContext().getString(R.string.first_launch_hint), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Pref.setLastPackageName(app.packageName);
+        Pref.setLaunchTime(app.packageName, System.currentTimeMillis());
+        ServiceUtils.launchPackage(v.getContext(), app.packageName, targetDisplayId);
+        if (State.floatingButtonService != null) {
+            State.floatingButtonService.onSingleAppLaunched();
+        }
+    }
+
+    private void _openOnPhone(View v, ApplicationInfo app) {
+        Intent launchIntent = packageManager.getLaunchIntentForPackage(app.packageName);
+        if (launchIntent != null) {
             Pref.setLaunchTime(app.packageName, System.currentTimeMillis());
-            ServiceUtils.launchPackage(v.getContext(), app.packageName, targetDisplayId);
-            if (State.floatingButtonService != null) {
-                State.floatingButtonService.onSingleAppLaunched();
-            }
-        });
-        holder.btnLaunchToDefaultDisplay.setOnClickListener(v -> {
-            Intent launchIntent = packageManager.getLaunchIntentForPackage(app.packageName);
-            if (launchIntent != null) {
-                Pref.setLaunchTime(app.packageName, System.currentTimeMillis());
-                ActivityOptions options = ActivityOptions.makeBasic();
-                v.getContext().startActivity(launchIntent, options.toBundle());
-            }
-        });
+            ActivityOptions options = ActivityOptions.makeBasic();
+            v.getContext().startActivity(launchIntent, options.toBundle());
+        }
     }
 
     @Override
@@ -125,16 +132,16 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
         ImageView appIcon;
         TextView text1;
         TextView text2;
+        ImageView btnOpenOnPhone;
         MaterialButton btnLaunch;
-        MaterialButton btnLaunchToDefaultDisplay;
 
         ViewHolder(View view) {
             super(view);
             appIcon = view.findViewById(R.id.app_icon);
             text1 = view.findViewById(R.id.text1);
             text2 = view.findViewById(R.id.text2);
+            btnOpenOnPhone = view.findViewById(R.id.openOnPhoneBtn);
             btnLaunch = view.findViewById(R.id.launchBtn);
-            btnLaunchToDefaultDisplay = view.findViewById(R.id.launchToDefaultBtn);
         }
     }
 }

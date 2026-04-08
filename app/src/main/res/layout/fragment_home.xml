@@ -50,15 +50,13 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Simulate screen off -->
+        <!-- Screen off -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/simulateScreenOffBtn"
+            android:id="@+id/screenOffBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:text="@string/simulate_screen_off"
-            app:icon="@drawable/ic_dark_mode"
-            app:iconGravity="start"
+            android:text="@string/screen_off"
             style="@style/Widget.Material3.Button.TonalButton" />
 
         <!-- About -->

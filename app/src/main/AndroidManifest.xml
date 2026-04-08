@@ -47,7 +47,6 @@
             android:name=".TouchpadActivity"
             android:launchMode="singleTask"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         
         <activity

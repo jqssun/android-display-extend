@@ -34,10 +34,11 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/floating_button_toggle"
-            style="@style/Widget.Material3.Chip.Assist"
+            style="@style/Widget.Material3.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checkable="false" />
+            android:text="@string/floating_button"
+            android:visibility="gone" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/touchpadBtn"
@@ -54,7 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checkable="false"
-            android:text="@string/simulate_screen_off" />
+            android:text="@string/screen_off" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/forceDpiBtn"
