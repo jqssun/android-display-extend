@@ -74,6 +74,15 @@ public class TouchpadAccessibilityService extends AccessibilityService {
         return instance;
     }
 
+    public static void disableAll(Context context) {
+        if (PermissionManager.grant("android.permission.WRITE_SECURE_SETTINGS")) {
+            Settings.Secure.putString(context.getContentResolver(),
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, "");
+            Settings.Secure.putString(context.getContentResolver(),
+                    Settings.Secure.ACCESSIBILITY_ENABLED, "0");
+        }
+    }
+
     @Override
     protected boolean onKeyEvent(KeyEvent event) {
         if (event.getKeyCode() == KeyEvent.KEYCODE_HOME && State.lastSingleAppDisplay > 0) {

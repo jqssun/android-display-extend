@@ -4,9 +4,7 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -16,16 +14,12 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.button.MaterialButton;
 
 import io.github.jqssun.displayextend.job.AcquireShizuku;
-import io.github.jqssun.displayextend.job.ExitAll;
-import io.github.jqssun.displayextend.job.FetchLogAndShare;
-import io.github.jqssun.displayextend.shizuku.ShizukuUtils;
 
 public class HomeFragment extends Fragment {
 
     private TextView shizukuStatus;
     private MaterialButton shizukuPermissionBtn;
     private MaterialButton screenOffBtn;
-    private TextView versionText;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -57,41 +51,6 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        // About info
-        versionText = view.findViewById(R.id.versionText);
-
-        view.findViewById(R.id.websiteLink).setOnClickListener(v ->
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/jqssun/android-screen-extend")))
-        );
-
-        // Double-tap about card to export logs
-        View aboutCard = view.findViewById(R.id.aboutCard);
-        GestureDetector gestureDetector = new GestureDetector(requireContext(), new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onDoubleTap(MotionEvent e) {
-                if (ShizukuUtils.hasPermission() && getContext() != null) {
-                    State.startNewJob(new FetchLogAndShare(getContext()));
-                }
-                return true;
-            }
-            @Override
-            public boolean onDown(MotionEvent e) { return true; }
-        });
-        aboutCard.setOnTouchListener((v, event) -> {
-            gestureDetector.onTouchEvent(event);
-            return true;
-        });
-
-        // Shizuku link
-        view.findViewById(R.id.shizukuBtn).setOnClickListener(v ->
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/rikkaapps/shizuku")))
-        );
-
-        // Exit
-        view.findViewById(R.id.exitBtn).setOnClickListener(v ->
-            ExitAll.execute(requireContext())
-        );
-
         State.uiState.observe(getViewLifecycleOwner(), this::_updateUI);
 
         return view;
@@ -117,8 +76,5 @@ public class HomeFragment extends Fragment {
             screenOffBtn.setText(getString(R.string.screen_off));
         }
 
-        if (state.versionText != null) {
-            versionText.setText(state.versionText);
-        }
     }
 }

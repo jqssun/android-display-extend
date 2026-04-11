@@ -272,7 +272,58 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
 
-        <!-- Input device binding -->
+        <!-- Auto screen off -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:minHeight="56dp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="16dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/auto_screen_off"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/auto_screen_off_desc"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?colorOnSurfaceVariant"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/autoScreenOffCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <!-- Input routing -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/section_input_routing"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            android:textColor="?colorPrimary"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="4dp" />
+
+        <!-- Auto route input -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:minHeight="56dp" android:paddingHorizontal="16dp" android:paddingVertical="12dp">
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:layout_marginEnd="16dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/auto_route_input" android:textAppearance="?attr/textAppearanceBodyLarge" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/auto_route_input_desc" android:textAppearance="?attr/textAppearanceBodyMedium" android:textColor="?colorOnSurfaceVariant" android:layout_marginTop="2dp" />
+            </LinearLayout>
+            <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/autoRouteInputCheckbox" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        </LinearLayout>
+
+
+        <!-- Manual input device binding -->
         <LinearLayout
             android:id="@+id/externalDeviceContainer"
             android:layout_width="match_parent"
@@ -344,6 +395,66 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:visibility="gone" />
+
+        <!-- About -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/aboutCard"
+            style="@style/Widget.Material3.CardView.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/versionText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+                <TextView
+                    android:id="@+id/websiteLink"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/website_label"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?colorPrimary" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="16dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/shizukuBtn"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/shizuku" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/exitBtn"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/exit" />
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

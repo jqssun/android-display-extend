@@ -24,30 +24,11 @@
             android:imeOptions="actionSearch" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Action chips - wraps instead of clipping -->
     <com.google.android.material.chip.ChipGroup
-        android:id="@+id/button_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="16dp"
         android:paddingVertical="8dp">
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/floating_button_toggle"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/floating_button"
-            android:visibility="gone" />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/touchpadBtn"
-            style="@style/Widget.Material3.Chip.Assist"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checkable="false"
-            android:visibility="gone"
-            android:text="@string/touchpad" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/screenOffBtn"
@@ -56,14 +37,6 @@
             android:layout_height="wrap_content"
             android:checkable="false"
             android:text="@string/screen_off" />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/forceDpiBtn"
-            style="@style/Widget.Material3.Chip.Assist"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checkable="false"
-            android:text="@string/force_dpi_off" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/menu_button"

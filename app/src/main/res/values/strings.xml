@@ -12,6 +12,8 @@
     <string name="view">View</string>
     <string name="bind">Bind</string>
     <string name="exit">Exit</string>
+    <string name="exit_vertical">Exit</string>
+    <string name="back_vertical">Back</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="none">None</string>
@@ -28,7 +30,7 @@
     <string name="clear">Clear</string>
     <string name="open_touchpad">Open Touchpad</string>
     <string name="target_display_format">Target display: %1$d (%2$s)</string>
-    <string name="input_binding">Input device binding</string>
+    <string name="input_binding">Route input to display</string>
 
     <!-- Home -->
     <string name="shizuku_status_label">Shizuku:</string>
@@ -80,16 +82,21 @@
     <string name="mode_col_id">Mode</string>
     <string name="cast_single_app">Cast an app</string>
     <string name="auto_open_last_app">Auto-open last app</string>
+    <string name="auto_open_last_app_desc">Launch the last app when this display connects</string>
     <string name="show_floating_back_button">Show floating back button</string>
     <string name="hide_floating_back_button">Hide floating back button</string>
+    <string name="floating_button_desc">Show a draggable back button on this display</string>
     <string name="force_landscape">Force landscape</string>
-    <string name="bridge_button_text">Bridge mode\n(Enable rotation)</string>
-    <string name="exit_bridge">Exit bridge</string>
+    <string name="force_landscape_desc">Force the floating button to landscape orientation</string>
+    <string name="ime_to_this_display_desc">Show the keyboard on this display instead of the main screen.</string>
+    <string name="bridge_button_text">Enable rotation control</string>
+    <string name="exit_bridge">Disable rotation control</string>
     <string name="shizuku_status_granted">Granted</string>
     <string name="shizuku_status_denied">Denied</string>
-    <string name="ime_to_main_display">Show keyboard on main screen</string>
-    <string name="ime_to_this_display">Show keyboard on this screen</string>
-    <string name="android15_rotation_hint">Android 15 supports direct rotation without bridge</string>
+    <string name="ime_to_main_display">Show keyboard on main display</string>
+    <string name="ime_to_this_display">Show keyboard on this display (requires companion app)</string>
+    <string name="ime_policy_unsupported">Cannot set keyboard policy on this virtual display</string>
+    <string name="android15_rotation_hint">Android 15+ supports rotation natively - this mode is not required</string>
 
     <!-- Settings -->
     <string name="section_display">Display</string>
@@ -107,11 +114,16 @@
     <string name="enable_non_resizable_multiwindow_desc">Allow non-resizable apps in multi-window mode</string>
     <string name="disable_screen_share_protection">Disable screen share protection</string>
     <string name="disable_screen_share_protection_desc">Remove DRM restrictions when sharing screen</string>
-    <string name="use_real_screen_off">Real screen off</string>
+    <string name="use_real_screen_off">Use real screen off</string>
     <string name="use_real_screen_off_desc">Turn off screen instead of simulating a black image; wake with volume keys</string>
     <string name="stay_on_while_plugged">Stay on while charging</string>
     <string name="stay_on_while_plugged_desc">Prevent screen from turning off when plugged in</string>
-    <string name="bind_input_devices">Bind input devices</string>
+    <string name="auto_screen_off">Turn screen off automatically when display connects</string>
+    <string name="auto_screen_off_desc">Automatically show a black screen on this device when an external display is detected</string>
+    <string name="section_input_routing">Input Routing When Casting an App</string>
+    <string name="auto_route_input">Move input devices to display</string>
+    <string name="auto_route_input_desc">Automatically redirect mouse, gamepad and keyboard hardware to the target display</string>
+    <string name="bind_input_devices">Route input to display</string>
     <string name="external_input_devices">External input devices:</string>
     <string name="internal_input_devices">Internal input devices:</string>
     <string name="display_spinner_format">Display %1$d (%2$s)</string>
@@ -135,18 +147,18 @@
     <string name="width">Width</string>
     <string name="height">Height</string>
     <string name="resolution_warning">If content appears stretched, this device may not support the new aspect ratio. It will revert automatically after 2 seconds. Changing the aspect ratio on unsupported devices requires root.</string>
-    <string name="edit_rotation">Change rotation (tested on Android 15 only)</string>
+    <string name="edit_rotation">Change rotation (Android 15+ only)</string>
     <string name="rotation_none">Don\'t force</string>
     <string name="confirm_dpi_format">Change DPI from %1$d to %2$d?</string>
     <string name="confirm_resolution_format">Change resolution from %1$dx%2$d to %3$dx%4$d?</string>
 
-    <!-- Bridge dialog -->
-    <string name="bridge_settings">Bridge settings</string>
-    <string name="bridge_description">Bridge creates a virtual display to host projected apps, allowing you to control rotation and keep apps alive when the physical display disconnects.</string>
-    <string name="rotate_with_content">Rotate with content</string>
-    <string name="skip_media_projection_permission">Skip media projection permission</string>
-    <string name="auto_bridge_next_time">Auto-start bridge next time</string>
-    <string name="bridge_display">Bridge display</string>
+    <!-- Rotation control dialog -->
+    <string name="bridge_settings">Rotation control settings</string>
+    <string name="bridge_description">Creates a virtual display layer that allows you to control the rotation of apps on this screen. Also keeps apps alive if the display disconnects.</string>
+    <string name="rotate_with_content">Follow app rotation</string>
+    <string name="skip_media_projection_permission">Skip screen capture permission</string>
+    <string name="auto_bridge_next_time">Auto-enable next time this display connects</string>
+    <string name="bridge_display">Virtual display</string>
 
     <!-- App list / Launcher -->
     <string name="cast">Cast</string>
@@ -166,6 +178,7 @@
     <!-- About -->
     <string name="version_format">Version: %1$s (Android %2$s)</string>
     <string name="version_unknown">Version: unknown</string>
+    <string name="website_label">Source: github.com/jqssun/android-screen-extend</string>
     <string name="website_link">Source: github.com/jqssun/android-screen-extend</string>
     <string name="export_log_requires_shizuku">Exporting logs requires Shizuku permission</string>
 

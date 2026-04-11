@@ -12,7 +12,10 @@ import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.Display;
 
+import android.content.Intent;
+
 import io.github.jqssun.displayextend.Pref;
+import io.github.jqssun.displayextend.PureBlackActivity;
 import io.github.jqssun.displayextend.R;
 import io.github.jqssun.displayextend.State;
 import io.github.jqssun.displayextend.shizuku.ServiceUtils;
@@ -65,8 +68,16 @@ public class DisplayMonitor {
         if (context == null) {
             return;
         }
+        handleAutoScreenOff(context);
         handleAutoOpenLastApp(context, display);
         handleDisableUsbAudio(context);
+    }
+
+    private static void handleAutoScreenOff(Context context) {
+        if (!Pref.getAutoScreenOff()) return;
+        Intent intent = new Intent(context, PureBlackActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 
     private static void handleDisableUsbAudio(Context context) {

@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -79,6 +80,8 @@ public class SettingsFragment extends Fragment {
         _setupDisableUsbAudioCheckbox();
         _setupUseRealScreenOffCheckbox();
         _setupStayOnWhilePluggedCheckbox();
+        _setupAutoScreenOffCheckbox(view);
+        _setupAutoRouteInputCheckbox(view);
         if (!granted) {
             disableScreenShareProtectionCheckbox.setEnabled(false);
             forceDesktopCheckbox.setEnabled(false);
@@ -88,6 +91,24 @@ public class SettingsFragment extends Fragment {
             disableUsbAudioCheckbox.setEnabled(false);
             stayOnWhilePluggedCheckbox.setEnabled(false);
         }
+
+        // About
+        TextView versionText = view.findViewById(R.id.versionText);
+        try {
+            String ver = requireContext().getPackageManager()
+                    .getPackageInfo(requireContext().getPackageName(), 0).versionName;
+            versionText.setText(getString(R.string.version_format, ver, android.os.Build.VERSION.RELEASE));
+        } catch (Exception e) {
+            versionText.setText(R.string.version_unknown);
+        }
+        view.findViewById(R.id.websiteLink).setOnClickListener(v ->
+            startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,
+                android.net.Uri.parse("https://github.com/jqssun/android-screen-extend"))));
+        view.findViewById(R.id.shizukuBtn).setOnClickListener(v ->
+            startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,
+                android.net.Uri.parse("https://github.com/rikkaapps/shizuku"))));
+        view.findViewById(R.id.exitBtn).setOnClickListener(v ->
+            io.github.jqssun.displayextend.job.ExitAll.execute(requireActivity()));
 
         return view;
     }
@@ -123,6 +144,18 @@ public class SettingsFragment extends Fragment {
                 State.startNewJob(new BindAllExternalInputToDisplay(selectedDisplay.getDisplayId()));
             }
         });
+    }
+
+    private void _setupAutoScreenOffCheckbox(View root) {
+        MaterialSwitch cb = root.findViewById(R.id.autoScreenOffCheckbox);
+        cb.setChecked(Pref.getAutoScreenOff());
+        cb.setOnCheckedChangeListener((b, c) -> Pref.setAutoScreenOff(c));
+    }
+
+    private void _setupAutoRouteInputCheckbox(View root) {
+        com.google.android.material.materialswitch.MaterialSwitch cb = root.findViewById(R.id.autoRouteInputCheckbox);
+        cb.setChecked(Pref.getAutoRouteInput());
+        cb.setOnCheckedChangeListener((b, c) -> Pref.setAutoRouteInput(c));
     }
 
     private void _setupDeviceLists() {
