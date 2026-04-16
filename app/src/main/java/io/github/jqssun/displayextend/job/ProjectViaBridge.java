@@ -54,7 +54,7 @@ public class ProjectViaBridge implements Job {
         if (State.bridgeVirtualDisplay != null) {
             return true;
         }
-        if (Pref.getSkipMediaProjectionPermission() || isWifiDisplay) {
+        if (Pref.getSkipScreenCapturePermission() || isWifiDisplay) {
             // no media projection needed for wifi displays
             return true;
         }
@@ -79,7 +79,7 @@ public class ProjectViaBridge implements Job {
             } else {
                 captureIntent = mediaProjectionManager.createScreenCaptureIntent();
             }
-            State.currentActivity.get().startActivityForResult(captureIntent, MainActivity.REQUEST_CODE_MEDIA_PROJECTION);
+            ((MainActivity) State.currentActivity.get()).getMediaProjectionLauncher().launch(captureIntent);
             throw new YieldException("waiting for projection permission");
         } else {
             throw new RuntimeException("cannot get MediaProjectionManager");

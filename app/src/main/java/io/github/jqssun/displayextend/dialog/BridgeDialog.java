@@ -21,11 +21,11 @@ public class BridgeDialog {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_bridge, null);
         
         MaterialCheckBox rotatesWithContentCheckbox = dialogView.findViewById(R.id.rotatesWithContentCheckbox);
-        MaterialCheckBox skipMediaProjectionPermissionCheckbox = dialogView.findViewById(R.id.skipMediaProjectionPermissionCheckbox);
+        MaterialCheckBox skipScreenCaptureCheckbox = dialogView.findViewById(R.id.skipScreenCaptureCheckbox);
         MaterialCheckBox autoBridgeCheckbox = dialogView.findViewById(R.id.autoBridgeCheckbox);
         
         rotatesWithContentCheckbox.setChecked(Pref.getRotatesWithContent());
-        skipMediaProjectionPermissionCheckbox.setChecked(Pref.getSkipMediaProjectionPermission());
+        skipScreenCaptureCheckbox.setChecked(Pref.getSkipScreenCapturePermission());
         autoBridgeCheckbox.setChecked(Pref.getAutoBridge(display.getName()));
 
         Point initialSize = new Point();
@@ -35,7 +35,7 @@ public class BridgeDialog {
                 .setView(dialogView)
                 .setPositiveButton(context.getString(R.string.ok), (dialog, which) -> {
                     Pref.setRotatesWithContent(rotatesWithContentCheckbox.isChecked());
-                    Pref.setSkipMediaProjectionPermission(skipMediaProjectionPermissionCheckbox.isChecked());
+                    Pref.setSkipScreenCapturePermission(skipScreenCaptureCheckbox.isChecked());
                     boolean autoBridge = autoBridgeCheckbox.isChecked();
                     Pref.setAutoBridge(display.getName(), autoBridge);
                     if (autoBridge) {

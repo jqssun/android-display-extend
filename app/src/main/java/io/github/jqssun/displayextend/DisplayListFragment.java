@@ -21,6 +21,13 @@ import java.util.List;
 
 public class DisplayListFragment extends Fragment {
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setExitTransition(new com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.X, true));
+        setReenterTransition(new com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.X, false));
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_display_list, container, false);
 
@@ -41,6 +48,20 @@ public class DisplayListFragment extends Fragment {
             Intent intent = new Intent();
             intent.setAction(android.provider.Settings.ACTION_CAST_SETTINGS);
             startActivity(intent);
+        });
+
+        view.findViewById(R.id.screenOffBtn).setOnClickListener(v -> {
+            if (State.lastSingleAppDisplay <= 0) {
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(getString(R.string.no_cast_title))
+                    .setMessage(getString(R.string.no_cast_message))
+                    .setPositiveButton(getString(R.string.got_it), null)
+                    .show();
+            } else {
+                Intent intent = new Intent(getActivity(), PureBlackActivity.class);
+                android.app.ActivityOptions options = android.app.ActivityOptions.makeBasic();
+                startActivity(intent, options.toBundle());
+            }
         });
 
         return view;

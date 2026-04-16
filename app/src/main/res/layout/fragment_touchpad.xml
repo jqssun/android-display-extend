@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="?android:colorBackground">
 
     <TextView
         android:id="@+id/noProjectionCard"
@@ -12,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:visibility="gone"
-        android:text="@string/no_projection_message"
+        android:text="@string/no_cast_message"
         android:textAppearance="?attr/textAppearanceBodyLarge"
         android:textColor="?colorOnSurfaceVariant" />
 

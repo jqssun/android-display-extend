@@ -1,5 +1,7 @@
 package io.github.jqssun.displayextend;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -55,6 +57,12 @@ public class DisplayDetailFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setEnterTransition(new com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.X, true));
+        setReturnTransition(new com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.X, false));
+    }
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_display_detail, container, false);
         imePolicyRow = view.findViewById(R.id.ime_policy_row);
@@ -173,26 +181,28 @@ public class DisplayDetailFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             cutout = display.getCutout();
         }
-        String cutoutInfo = getString(R.string.no_cutout);
-        if (cutout != null) {
-            StringBuilder cutoutDetails = new StringBuilder(getString(R.string.cutout_bounds));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                for (Rect rect : cutout.getBoundingRects()) {
-                    cutoutDetails.append(String.format(getString(R.string.cutout_rect_format),
-                        rect.left, rect.top, rect.right, rect.bottom));
+        String cutoutInfo = getString(R.string.none);
+        if (cutout != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            List<Rect> rects = cutout.getBoundingRects();
+            if (!rects.isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < rects.size(); i++) {
+                    Rect r = rects.get(i);
+                    if (i > 0) sb.append("\n");
+                    sb.append(String.format("{'left': %d, 'top': %d, 'right': %d, 'bottom': %d}", r.left, r.top, r.right, r.bottom));
                 }
+                cutoutInfo = sb.toString();
             }
-            cutoutInfo = cutoutDetails.toString();
         }
 
         infoTable.removeAllViews();
-        _addInfoRow(infoTable, getString(R.string.info_display_id), String.valueOf(display.getDisplayId()));
-        _addInfoRow(infoTable, getString(R.string.info_name), display.getName());
-        _addInfoRow(infoTable, getString(R.string.info_refresh_rate), String.format("%.1f Hz", display.getRefreshRate()));
-        _addInfoRow(infoTable, getString(R.string.info_state), display.getState() == Display.STATE_ON ? getString(R.string.on) : getString(R.string.off));
-        _addInfoRow(infoTable, getString(R.string.info_hdr), display.isHdr() ? getString(R.string.yes) : getString(R.string.no));
-        _addInfoRow(infoTable, getString(R.string.info_flags), _getDisplayFlags(display));
-        _addInfoRow(infoTable, getString(R.string.info_cutout), cutoutInfo);
+        InfoRow.add(ctx, infoTable, getString(R.string.info_display_id), String.valueOf(display.getDisplayId()));
+        InfoRow.add(ctx, infoTable, getString(R.string.info_name), display.getName());
+        InfoRow.add(ctx, infoTable, getString(R.string.info_refresh_rate), String.format("%.1f Hz", display.getRefreshRate()));
+        InfoRow.add(ctx, infoTable, getString(R.string.info_state), display.getState() == Display.STATE_ON ? getString(R.string.on) : getString(R.string.off));
+        InfoRow.add(ctx, infoTable, getString(R.string.info_hdr), display.isHdr() ? getString(R.string.yes) : getString(R.string.no));
+        InfoRow.add(ctx, infoTable, getString(R.string.info_flags), _getDisplayFlags(display));
+        InfoRow.add(ctx, infoTable, getString(R.string.info_cutout), cutoutInfo);
 
         _setupDisplayModes(display.getSupportedModes());
         _updateShizukuStatus();
@@ -203,26 +213,29 @@ public class DisplayDetailFragment extends Fragment {
     private void _updateShizukuStatus() {
         if (shizukuTable == null) return;
         shizukuTable.removeAllViews();
+        Context ctx = getContext();
+        if (ctx == null) return;
+        View header = getView() != null ? getView().findViewById(R.id.shizuku_header) : null;
 
-        if (!ShizukuUtils.hasShizukuStarted()) {
-            _addInfoRow(shizukuTable, getString(R.string.info_shizuku), getString(R.string.shizuku_not_started));
+        if (!ShizukuUtils.hasShizukuStarted() || !ShizukuUtils.hasPermission()) {
+            shizukuCard.setVisibility(View.GONE);
+            if (header != null) header.setVisibility(View.GONE);
             return;
         }
-        try {
-            boolean hasPermission = ShizukuUtils.hasPermission();
-            _addInfoRow(shizukuTable, getString(R.string.info_shizuku), hasPermission ? getString(R.string.shizuku_status_granted) : getString(R.string.shizuku_status_denied));
+        shizukuCard.setVisibility(View.VISIBLE);
+        if (header != null) header.setVisibility(View.VISIBLE);
 
-            if (!hasPermission) return;
+        try {
 
             IWindowManager windowManager = ServiceUtils.getWindowManager();
 
             Point baseSize = new Point();
             windowManager.getBaseDisplaySize(displayId, baseSize);
-            _addInfoRow(shizukuTable, getString(R.string.info_override_size), baseSize.x + "x" + baseSize.y);
+            InfoRow.add(ctx, shizukuTable, getString(R.string.info_override_size), baseSize.x + "x" + baseSize.y);
 
             Point initialSize = new Point();
             windowManager.getInitialDisplaySize(displayId, initialSize);
-            _addInfoRow(shizukuTable, getString(R.string.info_physical_size), initialSize.x + "x" + initialSize.y);
+            InfoRow.add(ctx, shizukuTable, getString(R.string.info_physical_size), initialSize.x + "x" + initialSize.y);
 
             try {
                 int imePolicy = windowManager.getDisplayImePolicy(displayId);
@@ -233,7 +246,7 @@ public class DisplayDetailFragment extends Fragment {
                     case 2: imePolicyStr = "HIDE"; break;
                     default: imePolicyStr = String.valueOf(imePolicy);
                 }
-                _addInfoRow(shizukuTable, getString(R.string.info_keyboard_policy), imePolicyStr);
+                InfoRow.add(ctx, shizukuTable, getString(R.string.info_keyboard_policy), imePolicyStr);
 
                 if (displayId != Display.DEFAULT_DISPLAY) {
                     imePolicyRow.setVisibility(View.VISIBLE);
@@ -263,15 +276,15 @@ public class DisplayDetailFragment extends Fragment {
             } catch (Throwable e) { /* ignore */ }
 
             DisplayInfo displayInfo = ServiceUtils.getDisplayManager().getDisplayInfo(displayId);
-            _addInfoRow(shizukuTable, getString(R.string.info_default_mode_id), String.valueOf(displayInfo.defaultModeId));
-            try { _addInfoRow(shizukuTable, getString(R.string.info_refresh_rate_override), String.format("%.1f Hz", displayInfo.refreshRateOverride)); } catch (Throwable e) { }
-            try { _addInfoRow(shizukuTable, getString(R.string.info_install_orientation), String.valueOf(displayInfo.installOrientation)); } catch (Throwable e) { }
-            try { _addInfoRow(shizukuTable, getString(R.string.info_windowing_mode), WindowingMode.getWindowingMode(displayId)); } catch (Throwable e) { }
+            InfoRow.add(ctx, shizukuTable, getString(R.string.info_default_mode_id), String.valueOf(displayInfo.defaultModeId));
+            try { InfoRow.add(ctx, shizukuTable, getString(R.string.info_refresh_rate_override), String.format("%.1f Hz", displayInfo.refreshRateOverride)); } catch (Throwable e) { }
+            try { InfoRow.add(ctx, shizukuTable, getString(R.string.info_install_orientation), String.valueOf(displayInfo.installOrientation)); } catch (Throwable e) { }
+            try { InfoRow.add(ctx, shizukuTable, getString(R.string.info_windowing_mode), WindowingMode.getWindowingMode(displayId)); } catch (Throwable e) { }
 
         } catch (Exception e) {
-            shizukuTable.removeAllViews();
-            _addInfoRow(shizukuTable, getString(R.string.info_shizuku), getString(R.string.shizuku_status_denied));
-            State.log("failed to get Shizuku permission: " + e.getMessage());
+            shizukuCard.setVisibility(View.GONE);
+            if (header != null) header.setVisibility(View.GONE);
+            State.log("failed to load advanced display info: " + e.getMessage());
         }
     }
 
@@ -289,38 +302,14 @@ public class DisplayDetailFragment extends Fragment {
 
     private void _setupDisplayModes(Display.Mode[] supportedModes) {
         modesTable.removeAllViews();
+        Context modeCtx = getContext();
+        if (modeCtx == null) return;
         for (Display.Mode mode : supportedModes) {
             String title = getString(R.string.mode_col_id) + " " + mode.getModeId();
             String value = mode.getPhysicalWidth() + "x" + mode.getPhysicalHeight()
                     + "@" + String.format("%.1f Hz", mode.getRefreshRate());
-            _addInfoRow(modesTable, title, value);
+            InfoRow.add(modeCtx, modesTable, title, value);
         }
-    }
-
-    private void _addInfoRow(LinearLayout table, String label, String value) {
-        int dp16 = (int) (16 * getResources().getDisplayMetrics().density);
-        int dp12 = (int) (12 * getResources().getDisplayMetrics().density);
-        int dp2 = (int) (2 * getResources().getDisplayMetrics().density);
-        int dp56 = (int) (56 * getResources().getDisplayMetrics().density);
-
-        LinearLayout item = new LinearLayout(getContext());
-        item.setOrientation(LinearLayout.VERTICAL);
-        item.setPadding(dp16, dp12, dp16, dp12);
-        item.setMinimumHeight(dp56);
-
-        TextView labelTv = new TextView(getContext());
-        labelTv.setText(label);
-        labelTv.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge);
-        item.addView(labelTv);
-
-        TextView valueTv = new TextView(getContext());
-        valueTv.setText(value);
-        valueTv.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium);
-        valueTv.setTextColor(getResources().getColor(android.R.color.darker_gray, null));
-        valueTv.setPadding(0, dp2, 0, 0);
-        item.addView(valueTv);
-
-        table.addView(item);
     }
 
     private void _updateRotationText(TextView rotationText) {

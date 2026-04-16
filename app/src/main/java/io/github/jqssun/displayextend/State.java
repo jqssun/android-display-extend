@@ -152,13 +152,13 @@ public class State {
         boolean started = io.github.jqssun.displayextend.shizuku.ShizukuUtils.hasShizukuStarted();
         boolean hasPerm = io.github.jqssun.displayextend.shizuku.ShizukuUtils.hasPermission();
         if (!started) {
-            state.shizukuStatus = activity.getString(R.string.shizuku_not_started);
+            state.shizukuStatus = activity.getString(R.string.status_not_started);
             state.shizukuPermissionVisible = false;
         } else if (!hasPerm) {
-            state.shizukuStatus = activity.getString(R.string.shizuku_status_denied);
+            state.shizukuStatus = activity.getString(R.string.status_started_not_authorized_server, io.github.jqssun.displayextend.shizuku.ShizukuUtils.getServerUid());
             state.shizukuPermissionVisible = true;
         } else {
-            state.shizukuStatus = activity.getString(R.string.shizuku_status_granted);
+            state.shizukuStatus = activity.getString(R.string.status_authorized_server, io.github.jqssun.displayextend.shizuku.ShizukuUtils.getServerUid());
             state.shizukuPermissionVisible = false;
         }
 

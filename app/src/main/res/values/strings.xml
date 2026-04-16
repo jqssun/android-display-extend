@@ -18,6 +18,7 @@
     <string name="no">No</string>
     <string name="none">None</string>
     <string name="unknown">Unknown</string>
+    <string name="copy">Copy</string>
     <string name="on">On</string>
     <string name="off">Off</string>
     <string name="shizuku">Shizuku</string>
@@ -30,21 +31,23 @@
     <string name="clear">Clear</string>
     <string name="open_touchpad">Open Touchpad</string>
     <string name="target_display_format">Target display: %1$d (%2$s)</string>
-    <string name="input_binding">Route input to display</string>
+    <string name="input_binding">Bind all input devices to this display</string>
 
     <!-- Home -->
-    <string name="shizuku_status_label">Shizuku:</string>
+    <string name="shizuku_permission_status">Shizuku</string>
     <string name="authorize">Authorize</string>
     <string name="screens">Displays</string>
-    <string name="screen_off">Turn display off</string>
+    <string name="screen_off">Turn main display off</string>
     <string name="screen_off_real">Turn display off (real)</string>
     <string name="touchpad">Touchpad</string>
     <string name="settings">Settings</string>
-    <string name="shizuku_not_started">Not started</string>
-    <string name="no_projection_title">No app being projected</string>
-    <string name="no_projection_message">- USB-C DisplayPort: Connect a screen, then select it from the screen list to cast an app\n\n- Wireless: Use Android\'s built-in wireless display, then find the screen in the list to cast an app</string>
+    <string name="status_not_started">Not started</string>
+    <string name="no_cast_title">No app being cast</string>
+    <string name="no_cast_message">- USB-C DisplayPort: Connect a screen, then select it from the screen list to cast an app\n\n- Wireless: Use Android\'s built-in wireless display, then find the screen in the list to cast an app</string>
     <string name="got_it">Got it</string>
     <string name="shizuku_required">Shizuku permission is required</string>
+    <string name="displays_status_format">%d display(s) connected</string>
+    <string name="touchpad_no_cast">No cast active</string>
 
     <!-- Display list -->
     <string name="display_list_header">Select a display to cast an app. The built-in screen cannot be used for casting.</string>
@@ -55,8 +58,8 @@
 
     <!-- Display detail -->
     <string name="display_config_header">Configuration</string>
-    <string name="display_info_header">Display info</string>
-    <string name="advanced_info_header">Advanced</string>
+    <string name="display_info_header">Display Info</string>
+    <string name="advanced_info_header">Advanced (Requires Shizuku)</string>
     <string name="resolution_label">Resolution</string>
     <string name="rotation_label">Rotation</string>
     <string name="actions_header">Actions</string>
@@ -75,10 +78,7 @@
     <string name="info_refresh_rate_override">Refresh rate override</string>
     <string name="info_install_orientation">Install orientation</string>
     <string name="info_windowing_mode">Windowing mode</string>
-    <string name="no_cutout">No cutout</string>
-    <string name="cutout_bounds">Cutout bounds:\n</string>
-    <string name="cutout_rect_format">Left: %1$d Top: %2$d Right: %3$d Bottom: %4$d\n</string>
-    <string name="supported_modes_header">Supported display modes</string>
+    <string name="supported_modes_header">Supported Modes</string>
     <string name="mode_col_id">Mode</string>
     <string name="cast_single_app">Cast an app</string>
     <string name="auto_open_last_app">Auto-open last app</string>
@@ -91,14 +91,17 @@
     <string name="ime_to_this_display_desc">Show the keyboard on this display instead of the main screen.</string>
     <string name="bridge_button_text">Enable rotation control</string>
     <string name="exit_bridge">Disable rotation control</string>
-    <string name="shizuku_status_granted">Granted</string>
-    <string name="shizuku_status_denied">Denied</string>
+    <string name="status_authorized_server">Authorized (UID: %d)</string>
+    <string name="status_started_not_authorized_server">Unauthorized (UID: %d)</string>
+    <string name="status_authorized">Authorized</string>
+    <string name="status_not_authorized">Unauthorized</string>
     <string name="ime_to_main_display">Show keyboard on main display</string>
     <string name="ime_to_this_display">Show keyboard on this display (requires companion app)</string>
     <string name="ime_policy_unsupported">Cannot set keyboard policy on this virtual display</string>
     <string name="android15_rotation_hint">Android 15+ supports rotation natively - this mode is not required</string>
 
     <!-- Settings -->
+    <string name="section_permissions">Permissions</string>
     <string name="section_display">Display</string>
     <string name="section_power">Power</string>
 
@@ -120,10 +123,10 @@
     <string name="stay_on_while_plugged_desc">Prevent screen from turning off when plugged in</string>
     <string name="auto_screen_off">Turn screen off automatically when display connects</string>
     <string name="auto_screen_off_desc">Automatically show a black screen on this device when an external display is detected</string>
-    <string name="section_input_routing">Input Routing When Casting an App</string>
-    <string name="auto_route_input">Move input devices to display</string>
-    <string name="auto_route_input_desc">Automatically redirect mouse, gamepad and keyboard hardware to the target display</string>
-    <string name="bind_input_devices">Route input to display</string>
+    <string name="section_input_binding">Input Binding When Casting an App</string>
+    <string name="auto_bind_input">Move input devices to display</string>
+    <string name="auto_bind_input_desc">Automatically redirect mouse, gamepad or keyboard input to the display in focus</string>
+    <string name="bind_input_devices">Bind input to display</string>
     <string name="external_input_devices">External input devices:</string>
     <string name="internal_input_devices">Internal input devices:</string>
     <string name="display_spinner_format">Display %1$d (%2$s)</string>
@@ -146,7 +149,7 @@
     <string name="edit_resolution">Change resolution</string>
     <string name="width">Width</string>
     <string name="height">Height</string>
-    <string name="resolution_warning">If content appears stretched, this device may not support the new aspect ratio. It will revert automatically after 2 seconds. Changing the aspect ratio on unsupported devices requires root.</string>
+    <string name="resolution_warning">The aspect ratio applied may not be fully supported by the display if content appears stretched. Changes will revert automatically after 2 seconds. Changing the aspect ratio on unsupported displays requires root.</string>
     <string name="edit_rotation">Change rotation (Android 15+ only)</string>
     <string name="rotation_none">Don\'t force</string>
     <string name="confirm_dpi_format">Change DPI from %1$d to %2$d?</string>
@@ -156,7 +159,7 @@
     <string name="bridge_settings">Rotation control settings</string>
     <string name="bridge_description">Creates a virtual display layer that allows you to control the rotation of apps on this screen. Also keeps apps alive if the display disconnects.</string>
     <string name="rotate_with_content">Follow app rotation</string>
-    <string name="skip_media_projection_permission">Skip screen capture permission</string>
+    <string name="skip_screen_capture_permission">Skip screen capture permission</string>
     <string name="auto_bridge_next_time">Auto-enable next time this display connects</string>
     <string name="bridge_display">Virtual display</string>
 
@@ -164,7 +167,7 @@
     <string name="cast">Cast</string>
     <string name="open_on_phone">Open on phone</string>
     <string name="search_apps_hint">Search apps</string>
-    <string name="show_all_apps">Show all apps</string>
+    <string name="show_all_apps">Show system apps</string>
     <string name="floating_button">Floating button</string>
     <string name="force_dpi">Force DPI</string>
     <string name="force_dpi_format">DPI: %d</string>
@@ -190,7 +193,15 @@
     <string name="check_download_log">Check for \'Extend.log\' in the Downloads folder</string>
 
     <!-- Input device detail -->
-    <string name="device_detail_format">Device ID: %1$d\nProduct ID: %2$d\nVendor ID: %3$d\nDescriptor: %4$s\nExternal: %5$s\nInput sources: %6$s</string>
+    <string name="device_info_header">Device Info</string>
+    <string name="bind_to_display_header">Bind to Display</string>
+    <string name="info_device_name">Name</string>
+    <string name="info_device_id">Device ID</string>
+    <string name="info_product_id">Product ID</string>
+    <string name="info_vendor_id">Vendor ID</string>
+    <string name="info_descriptor">Descriptor</string>
+    <string name="info_external">External</string>
+    <string name="info_input_sources">Input Sources</string>
     <string name="source_keyboard">Keyboard</string>
     <string name="source_gamepad">Gamepad</string>
     <string name="source_touchscreen">Touchscreen</string>

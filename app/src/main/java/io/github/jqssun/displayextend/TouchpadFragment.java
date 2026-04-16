@@ -14,6 +14,13 @@ import androidx.fragment.app.Fragment;
 public class TouchpadFragment extends Fragment {
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setEnterTransition(new com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.X, true));
+        setReturnTransition(new com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.X, false));
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_touchpad, container, false);
 
@@ -41,8 +48,8 @@ public class TouchpadFragment extends Fragment {
             int id = State.lastSingleAppDisplay;
             if (id <= 0) {
                 new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(getString(R.string.no_projection_title))
-                    .setMessage(getString(R.string.no_projection_message))
+                    .setTitle(getString(R.string.no_cast_title))
+                    .setMessage(getString(R.string.no_cast_message))
                     .setPositiveButton(getString(R.string.got_it), null)
                     .show();
             } else {

@@ -13,12 +13,12 @@ public class Pref {
     // settings keys
     public static final String KEY_USB_AUDIO_DISABLED = "usb_audio_disabled";
     public static final String KEY_USE_REAL_SCREEN_OFF = "use_real_screen_off";
-    public static final String KEY_AUTO_ROUTE_INPUT = "auto_route_input";
+    public static final String KEY_AUTO_BIND_INPUT = "auto_bind_input";
     public static final String KEY_AUTO_SCREEN_OFF = "auto_screen_off";
 
     // bridge keys
     public static final String KEY_ROTATES_WITH_CONTENT = "rotates_with_content";
-    public static final String KEY_SKIP_MEDIA_PROJECTION_PERMISSION = "skip_media_projection_permission";
+    public static final String KEY_SKIP_SCREEN_CAPTURE_PERMISSION = "skip_screen_capture_permission";
 
     // app_preferences keys
     public static final String KEY_SHOW_ALL_APPS = "show_all_apps";
@@ -52,12 +52,12 @@ public class Pref {
         _prefs().edit().putBoolean(KEY_USE_REAL_SCREEN_OFF, v).apply();
     }
 
-    public static boolean getAutoRouteInput() {
-        return _prefs().getBoolean(KEY_AUTO_ROUTE_INPUT, true);
+    public static boolean getAutoBindInput() {
+        return _prefs().getBoolean(KEY_AUTO_BIND_INPUT, true);
     }
 
-    public static void setAutoRouteInput(boolean v) {
-        _prefs().edit().putBoolean(KEY_AUTO_ROUTE_INPUT, v).apply();
+    public static void setAutoBindInput(boolean v) {
+        _prefs().edit().putBoolean(KEY_AUTO_BIND_INPUT, v).apply();
     }
 
     public static boolean getAutoScreenOff() {
@@ -78,12 +78,12 @@ public class Pref {
         _bridge().edit().putBoolean(KEY_ROTATES_WITH_CONTENT, v).apply();
     }
 
-    public static boolean getSkipMediaProjectionPermission() {
-        return _bridge().getBoolean(KEY_SKIP_MEDIA_PROJECTION_PERMISSION, false);
+    public static boolean getSkipScreenCapturePermission() {
+        return _bridge().getBoolean(KEY_SKIP_SCREEN_CAPTURE_PERMISSION, false);
     }
 
-    public static void setSkipMediaProjectionPermission(boolean v) {
-        _bridge().edit().putBoolean(KEY_SKIP_MEDIA_PROJECTION_PERMISSION, v).apply();
+    public static void setSkipScreenCapturePermission(boolean v) {
+        _bridge().edit().putBoolean(KEY_SKIP_SCREEN_CAPTURE_PERMISSION, v).apply();
     }
 
     // app prefs

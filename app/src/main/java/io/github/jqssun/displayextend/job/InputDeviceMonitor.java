@@ -15,7 +15,7 @@ public class InputDeviceMonitor {
         for (int deviceId : deviceIds) {
             android.view.InputDevice device = inputManager.getInputDevice(deviceId);
             if (device != null && device.isExternal()) {
-                State.log("initial external device: " + device.getName());
+                State.log("found external input device: " + device.getName());
             }
         }
         inputManager.registerInputDeviceListener(new InputManager.InputDeviceListener() {

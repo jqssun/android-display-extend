@@ -20,4 +20,8 @@ public class ShizukuUtils {
             return false;
         }
     }
+
+    public static int getServerUid() {
+        try { return Shizuku.getUid(); } catch (Exception e) { return -1; }
+    }
 }

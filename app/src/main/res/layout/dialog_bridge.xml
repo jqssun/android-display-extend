@@ -21,10 +21,10 @@
         android:layout_marginTop="16dp" />
 
     <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/skipMediaProjectionPermissionCheckbox"
+        android:id="@+id/skipScreenCaptureCheckbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/skip_media_projection_permission"
+        android:text="@string/skip_screen_capture_permission"
         android:layout_marginTop="8dp" />
 
     <com.google.android.material.checkbox.MaterialCheckBox

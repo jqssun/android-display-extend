@@ -5,14 +5,6 @@
         android:icon="@drawable/ic_overview"
         android:title="@string/overview" />
     <item
-        android:id="@+id/nav_screens"
-        android:icon="@drawable/ic_screens"
-        android:title="@string/screens" />
-    <item
-        android:id="@+id/nav_touchpad"
-        android:icon="@drawable/ic_touchpad"
-        android:title="@string/touchpad" />
-    <item
         android:id="@+id/nav_logs"
         android:icon="@drawable/ic_logs"
         android:title="@string/logs" />

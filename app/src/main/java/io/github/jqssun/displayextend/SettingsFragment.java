@@ -48,6 +48,13 @@ public class SettingsFragment extends Fragment {
     private MaterialSwitch stayOnWhilePluggedCheckbox;
     private View externalDeviceContainer;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setExitTransition(new com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.X, true));
+        setReenterTransition(new com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.X, false));
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -81,7 +88,7 @@ public class SettingsFragment extends Fragment {
         _setupUseRealScreenOffCheckbox();
         _setupStayOnWhilePluggedCheckbox();
         _setupAutoScreenOffCheckbox(view);
-        _setupAutoRouteInputCheckbox(view);
+        _setupAutoBindInputCheckbox(view);
         if (!granted) {
             disableScreenShareProtectionCheckbox.setEnabled(false);
             forceDesktopCheckbox.setEnabled(false);
@@ -152,10 +159,10 @@ public class SettingsFragment extends Fragment {
         cb.setOnCheckedChangeListener((b, c) -> Pref.setAutoScreenOff(c));
     }
 
-    private void _setupAutoRouteInputCheckbox(View root) {
-        com.google.android.material.materialswitch.MaterialSwitch cb = root.findViewById(R.id.autoRouteInputCheckbox);
-        cb.setChecked(Pref.getAutoRouteInput());
-        cb.setOnCheckedChangeListener((b, c) -> Pref.setAutoRouteInput(c));
+    private void _setupAutoBindInputCheckbox(View root) {
+        com.google.android.material.materialswitch.MaterialSwitch cb = root.findViewById(R.id.autoBindInputCheckbox);
+        cb.setChecked(Pref.getAutoBindInput());
+        cb.setOnCheckedChangeListener((b, c) -> Pref.setAutoBindInput(c));
     }
 
     private void _setupDeviceLists() {

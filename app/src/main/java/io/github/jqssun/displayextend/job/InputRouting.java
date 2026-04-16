@@ -91,8 +91,8 @@ public class InputRouting {
     }
 
     public static void bindAllExternalInputToDisplay(int displayId) {
-        if (!Pref.getAutoRouteInput()) {
-            State.log("skipping input routing (disabled in settings)");
+        if (!Pref.getAutoBindInput()) {
+            State.log("skipping input binding (disabled in settings)");
             return;
         }
         DisplayInfo displayInfo = ServiceUtils.getDisplayManager().getDisplayInfo(displayId);

@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="960"
     android:viewportHeight="960">
     <path
-        android:fillColor="@color/black"
-        android:pathData="M520,880q-51,0 -100,-14t-92,-42l58,-58q31,17 65,25.5t69,8.5q117,0 198.5,-81.5T800,520q0,-117 -81.5,-198.5T520,240h-6l62,62 -56,58 -160,-160 160,-160 56,58 -62,62h6q150,0 255,105t105,255q0,75 -28.5,140.5t-77,114q-48.5,48.5 -114,77T520,880ZM280,760L40,520l240,-240 240,240 -240,240ZM280,646l126,-126 -126,-126 -126,126 126,126ZM280,520Z" />
+        android:fillColor="@android:color/white"
+        android:pathData="M440,880q-50,-5 -96,-24.5T256,804l56,-58q29,21 61.5,34t66.5,18v82ZM520,880v-82q104,-15 172,-93.5T760,522q0,-117 -81.5,-198.5T480,242h-8l64,64 -56,56 -160,-160 160,-160 56,58 -62,62h6q75,0 140.5,28.5t114,77q48.5,48.5 77,114T840,522q0,137 -91,238.5T520,880ZM198,746q-32,-42 -51.5,-88T122,562h82q5,34 18,66.5t34,61.5l-58,56ZM122,482q6,-51 25,-98t51,-86l58,56q-21,29 -34,61.5T204,482h-82Z" />
 </vector>

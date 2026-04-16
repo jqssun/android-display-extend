@@ -302,24 +302,24 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
 
-        <!-- Input routing -->
+        <!-- Input binding -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/section_input_routing"
+            android:text="@string/section_input_binding"
             android:textAppearance="?attr/textAppearanceLabelLarge"
             android:textColor="?colorPrimary"
             android:paddingHorizontal="16dp"
             android:paddingTop="16dp"
             android:paddingBottom="4dp" />
 
-        <!-- Auto route input -->
+        <!-- Auto bind input -->
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:minHeight="56dp" android:paddingHorizontal="16dp" android:paddingVertical="12dp">
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:layout_marginEnd="16dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/auto_route_input" android:textAppearance="?attr/textAppearanceBodyLarge" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/auto_route_input_desc" android:textAppearance="?attr/textAppearanceBodyMedium" android:textColor="?colorOnSurfaceVariant" android:layout_marginTop="2dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/auto_bind_input" android:textAppearance="?attr/textAppearanceBodyLarge" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/auto_bind_input_desc" android:textAppearance="?attr/textAppearanceBodyMedium" android:textColor="?colorOnSurfaceVariant" android:layout_marginTop="2dp" />
             </LinearLayout>
-            <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/autoRouteInputCheckbox" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/autoBindInputCheckbox" android:layout_width="wrap_content" android:layout_height="wrap_content" />
         </LinearLayout>
 
 

@@ -10,8 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -43,6 +43,8 @@ public class InputDeviceDetailFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setEnterTransition(new com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.X, true));
+        setReturnTransition(new com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.X, false));
         if (getArguments() != null) {
             int deviceId = getArguments().getInt(ARG_DEVICE_ID);
             device = InputDevice.getDevice(deviceId);
@@ -53,29 +55,26 @@ public class InputDeviceDetailFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_input_device_detail, container, false);
-        
-        TextView tvDeviceName = view.findViewById(R.id.deviceNameText);
-        TextView tvDeviceDetails = view.findViewById(R.id.deviceDetailsText);
-        
+
+        LinearLayout infoTable = view.findViewById(R.id.infoTable);
+
         if (device != null) {
-            tvDeviceName.setText(device.getName());
-            String details = String.format(getString(R.string.device_detail_format),
-                device.getId(),
-                device.getProductId(),
-                device.getVendorId(),
-                device.getDescriptor(),
-                device.isExternal() ? getString(R.string.yes) : getString(R.string.no),
-                _getDeviceSources(device)
-            );
-            tvDeviceDetails.setText(details);
+            Context ctx = requireContext();
+            InfoRow.add(ctx, infoTable, getString(R.string.info_device_name), device.getName());
+            InfoRow.add(ctx, infoTable, getString(R.string.info_device_id), String.valueOf(device.getId()));
+            InfoRow.add(ctx, infoTable, getString(R.string.info_product_id), String.format("0x%04X", device.getProductId()));
+            InfoRow.add(ctx, infoTable, getString(R.string.info_vendor_id), String.format("0x%04X", device.getVendorId()));
+            InfoRow.add(ctx, infoTable, getString(R.string.info_descriptor), device.getDescriptor());
+            InfoRow.add(ctx, infoTable, getString(R.string.info_external), device.isExternal() ? getString(R.string.yes) : getString(R.string.no));
+            InfoRow.add(ctx, infoTable, getString(R.string.info_input_sources), _getDeviceSources(device));
         }
-        
+
         displaySpinner = view.findViewById(R.id.displaySpinner);
         bindBtn = view.findViewById(R.id.bindBtn);
-        
+
         _initDisplaySpinner();
         _setupBindButton();
-        
+
         return view;
     }
 
@@ -107,7 +106,7 @@ public class InputDeviceDetailFragment extends Fragment {
             int selectedPosition = displaySpinner.getSelectedItemPosition();
             if (selectedPosition != -1 && selectedPosition < displayList.size()) {
                 Display selectedDisplay = displayList.get(selectedPosition);
-                State.startNewJob(new BindInputToDisplay(device,selectedDisplay));
+                State.startNewJob(new BindInputToDisplay(device, selectedDisplay));
             }
         });
     }
@@ -120,7 +119,7 @@ public class InputDeviceDetailFragment extends Fragment {
         if ((device.getSources() & InputDevice.SOURCE_GAMEPAD) != 0) sources.add(getString(R.string.source_gamepad));
         if ((device.getSources() & InputDevice.SOURCE_TOUCHSCREEN) != 0) sources.add(getString(R.string.source_touchscreen));
         if ((device.getSources() & InputDevice.SOURCE_MOUSE) != 0) sources.add(getString(R.string.source_mouse));
-        
+
         return TextUtils.join(", ", sources);
     }
-} 
+}

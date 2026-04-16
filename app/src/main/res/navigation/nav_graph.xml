@@ -7,7 +7,10 @@
     <fragment
         android:id="@+id/nav_overview"
         android:name="io.github.jqssun.displayextend.HomeFragment"
-        android:label="@string/overview" />
+        android:label="@string/overview">
+        <action android:id="@+id/action_overview_to_screens" app:destination="@id/nav_screens" />
+        <action android:id="@+id/action_overview_to_touchpad" app:destination="@id/nav_touchpad" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_screens"
@@ -21,7 +24,7 @@
     <fragment
         android:id="@+id/nav_display_detail"
         android:name="io.github.jqssun.displayextend.DisplayDetailFragment"
-        android:label="@string/screen_breadcrumb">
+        android:label="Screen {display_id}">
         <argument
             android:name="display_id"
             app:argType="integer" />
