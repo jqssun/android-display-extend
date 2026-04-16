@@ -23,6 +23,7 @@ import android.view.InputDevice;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.KeyEventHidden;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.MotionEventHidden;
 import android.view.View;
@@ -51,9 +52,8 @@ import dev.rikka.tools.refine.Refine;
 public class TouchpadActivity extends AppCompatActivity {
     
     public static final int INJECT_INPUT_EVENT_MODE_ASYNC = 0;
-    public static final int INJECT_INPUT_EVENT_MODE_WAIT_FOR_RESULT = 1;
-    public static final int INJECT_INPUT_EVENT_MODE_WAIT_FOR_FINISH = 2;
     private TextView touchpadArea;
+    private View touchpadOverlay;
     private ImageView cursorView;
     private int displayId;
     private static final String TAG = "TouchpadActivity";
@@ -66,6 +66,7 @@ public class TouchpadActivity extends AppCompatActivity {
     private GestureState gestureState = new GestureState();
     private final ExecutorService ipcExecutor = Executors.newSingleThreadExecutor();
     private boolean isCursorLocked = false;
+    private float sensitivity = 1.5f;
     private Spinner modeSpinner;
     private static final int MODE_NORMAL = 0;
     private static final int MODE_CURSOR_LOCKED = 1;
@@ -152,7 +153,6 @@ public class TouchpadActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
         setContentView(R.layout.activity_touchpad);
 
         modeSpinner = findViewById(R.id.modeSpinner);
@@ -180,11 +180,9 @@ public class TouchpadActivity extends AppCompatActivity {
 
         _showMouseCursor(targetDisplay);
 
-        if (inputManager == null) {
-            _setupTouchListenerForAccessibility();
-        } else {
-            _setupTouchListenerForInputManager();
-        }
+        touchpadArea.addOnLayoutChangeListener(
+                (v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) ->
+                        _syncTouchpadOverlay());
 
         findViewById(R.id.displayOffButton).setOnClickListener(v -> _toggleDarkMode());
 
@@ -215,6 +213,7 @@ public class TouchpadActivity extends AppCompatActivity {
         });
 
         _setupScrollStrip();
+        _setupSensitivitySlider();
 
         findViewById(R.id.exitButton).setOnClickListener(v -> finish());
 
@@ -226,7 +225,7 @@ public class TouchpadActivity extends AppCompatActivity {
     }
 
     private void _setupTouchListenerForAccessibility() {
-        touchpadArea.setOnTouchListener((v, event) -> {
+        touchpadOverlay.setOnTouchListener((v, event) -> {
             if (gestureState.allMotionEvents.isEmpty()) {
                 gestureState.initialTouchX = event.getX();
                 gestureState.initialTouchY = event.getY();
@@ -283,7 +282,7 @@ public class TouchpadActivity extends AppCompatActivity {
     }
 
     private void _setupTouchListenerForInputManager() {
-        touchpadArea.setOnTouchListener((v, event) -> {
+        touchpadOverlay.setOnTouchListener((v, event) -> {
             if (gestureState.allMotionEvents.isEmpty()) {
                 gestureState.initialTouchX = event.getX();
                 gestureState.initialTouchY = event.getY();
@@ -385,7 +384,6 @@ public class TouchpadActivity extends AppCompatActivity {
         gestureState.lastReplayed = gestureState.allMotionEvents.size();
 
         ipcExecutor.execute(() -> {
-            setFocus(inputManager, displayId);
             for (MotionEvent event : toReplay) {
                 MotionEventHidden eventHidden = Refine.unsafeCast(event);
                 eventHidden.setDisplayId(displayId);
@@ -403,6 +401,61 @@ public class TouchpadActivity extends AppCompatActivity {
         KeyEventHidden eventHidden = Refine.unsafeCast(event);
         eventHidden.setDisplayId(displayId);
         inputManager.injectInputEvent(event, injectMode);
+    }
+
+    /**
+     * Creates or repositions the transparent touchpad overlay.
+     *
+     * The overlay is a TYPE_APPLICATION_OVERLAY with FLAG_NOT_FOCUSABLE, positioned
+     * exactly over the touchpadArea TextView. Because it's FLAG_NOT_FOCUSABLE, touching
+     * the overlay never steals input focus from the virtual display - this prevents the
+     * IME on the virtual display from being dismissed when the user swipes.
+     *
+     * Called from touchpadArea's OnLayoutChangeListener, so it fires once when the
+     * layout is first measured (creating the overlay) and again on rotation/resize.
+     */
+    private void _syncTouchpadOverlay() {
+        int width = touchpadArea.getWidth();
+        int height = touchpadArea.getHeight();
+        if (width == 0 || height == 0) return;
+
+        int[] loc = new int[2];
+        touchpadArea.getLocationOnScreen(loc);
+
+        if (touchpadOverlay == null) {
+            touchpadOverlay = new View(this);
+            WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                width, height,
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                    | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
+                PixelFormat.TRANSLUCENT
+            );
+            params.gravity = Gravity.TOP | Gravity.START;
+            params.x = loc[0];
+            params.y = loc[1];
+
+            WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+            wm.addView(touchpadOverlay, params);
+
+            if (inputManager == null) {
+                _setupTouchListenerForAccessibility();
+            } else {
+                _setupTouchListenerForInputManager();
+            }
+            return;
+        }
+
+        WindowManager.LayoutParams params = (WindowManager.LayoutParams) touchpadOverlay.getLayoutParams();
+        if (params.x == loc[0] && params.y == loc[1] && params.width == width && params.height == height) {
+            return;
+        }
+        params.x = loc[0];
+        params.y = loc[1];
+        params.width = width;
+        params.height = height;
+        WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        wm.updateViewLayout(touchpadOverlay, params);
     }
 
     private void _showMouseCursor(Display targetDisplay) {
@@ -434,8 +487,8 @@ public class TouchpadActivity extends AppCompatActivity {
     }
 
     private void _updateCursorPosition(float deltaX, float deltaY) {
-        cursorX += deltaX * 1.5f;
-        cursorY += deltaY * 1.5f;
+        cursorX += deltaX * sensitivity;
+        cursorY += deltaY * sensitivity;
         
         if (cursorX < -halfWidth || cursorX > halfWidth || 
             cursorY < -halfHeight || cursorY > halfHeight) {
@@ -498,6 +551,18 @@ public class TouchpadActivity extends AppCompatActivity {
                     return true;
             }
             return false;
+        });
+    }
+
+    private void _setupSensitivitySlider() {
+        sensitivity = Pref.getTouchpadSensitivity();
+        com.google.android.material.slider.Slider slider = findViewById(R.id.sensitivitySlider);
+        slider.setValue(Math.max(0.5f, Math.min(3.0f, sensitivity)));
+        slider.addOnChangeListener((s, value, fromUser) -> {
+            if (fromUser) {
+                sensitivity = value;
+                Pref.setTouchpadSensitivity(value);
+            }
         });
     }
 
@@ -570,9 +635,12 @@ public class TouchpadActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         ipcExecutor.shutdown();
+        WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        if (touchpadOverlay != null && touchpadOverlay.getWindowToken() != null) {
+            wm.removeView(touchpadOverlay);
+        }
         if (cursorView != null && cursorView.getWindowToken() != null) {
-            WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-            windowManager.removeView(cursorView);
+            wm.removeView(cursorView);
         }
     }
 
@@ -645,17 +713,15 @@ public class TouchpadActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (cursorView != null) {
-            cursorView.setVisibility(View.GONE);
-        }
+        if (touchpadOverlay != null) touchpadOverlay.setVisibility(View.GONE);
+        if (cursorView != null) cursorView.setVisibility(View.GONE);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (cursorView != null) {
-            cursorView.setVisibility(View.VISIBLE);
-        }
+        if (touchpadOverlay != null) touchpadOverlay.setVisibility(View.VISIBLE);
+        if (cursorView != null && !isCursorLocked) cursorView.setVisibility(View.VISIBLE);
     }
 
     private static final int[] ORIENTATIONS = {
@@ -680,7 +746,6 @@ public class TouchpadActivity extends AppCompatActivity {
         int nextMode = (currentMode + 1) % modeSpinner.getCount();
         modeSpinner.setSelection(nextMode);
     }
-
 
     private void _replayGestureViaAccessibility() {
         TouchpadAccessibilityService service = TouchpadAccessibilityService.getInstance();

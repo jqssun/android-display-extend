@@ -53,6 +53,14 @@
                 android:visibility="gone"
                 android:text="@string/bridge_button_text"
                 style="@style/Widget.Material3.Button.TonalButton" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/screen_off_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/screen_off"
+                style="@style/Widget.Material3.Button.TonalButton" />
         </LinearLayout>
 
         <!-- Display Settings -->
@@ -266,6 +274,16 @@
                 android:text="@string/edit" android:visibility="gone"
                 style="@style/Widget.Material3.Button.TextButton" />
         </LinearLayout>
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/dpi_slider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:visibility="gone"
+            android:valueFrom="100"
+            android:valueTo="640"
+            android:stepSize="10" />
 
         <LinearLayout
             android:layout_width="match_parent"

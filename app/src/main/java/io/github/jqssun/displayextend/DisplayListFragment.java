@@ -14,8 +14,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.button.MaterialButton;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,20 +46,6 @@ public class DisplayListFragment extends Fragment {
             Intent intent = new Intent();
             intent.setAction(android.provider.Settings.ACTION_CAST_SETTINGS);
             startActivity(intent);
-        });
-
-        view.findViewById(R.id.screenOffBtn).setOnClickListener(v -> {
-            if (State.lastSingleAppDisplay <= 0) {
-                new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(getString(R.string.no_cast_title))
-                    .setMessage(getString(R.string.no_cast_message))
-                    .setPositiveButton(getString(R.string.got_it), null)
-                    .show();
-            } else {
-                Intent intent = new Intent(getActivity(), PureBlackActivity.class);
-                android.app.ActivityOptions options = android.app.ActivityOptions.makeBasic();
-                startActivity(intent, options.toBundle());
-            }
         });
 
         return view;
@@ -104,7 +88,6 @@ public class DisplayListFragment extends Fragment {
             holder.displayName.setText(ctx.getString(R.string.display_name_format, display.getName()));
 
             holder.itemView.setOnClickListener(v -> clickListener.onDisplayClick(display));
-            holder.btnViewDetail.setOnClickListener(v -> clickListener.onDisplayClick(display));
         }
 
         @Override
@@ -115,13 +98,11 @@ public class DisplayListFragment extends Fragment {
         public static class ViewHolder extends RecyclerView.ViewHolder {
             public final TextView displayId;
             public final TextView displayName;
-            public final MaterialButton btnViewDetail;
 
             public ViewHolder(View view) {
                 super(view);
                 displayId = view.findViewById(R.id.display_id);
                 displayName = view.findViewById(R.id.display_name);
-                btnViewDetail = view.findViewById(R.id.viewDetailBtn);
             }
         }
     }

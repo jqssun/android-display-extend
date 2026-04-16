@@ -10,6 +10,7 @@
         android:label="@string/overview">
         <action android:id="@+id/action_overview_to_screens" app:destination="@id/nav_screens" />
         <action android:id="@+id/action_overview_to_touchpad" app:destination="@id/nav_touchpad" />
+        <action android:id="@+id/action_overview_to_input_binding" app:destination="@id/nav_input_binding" />
     </fragment>
 
     <fragment
@@ -24,7 +25,7 @@
     <fragment
         android:id="@+id/nav_display_detail"
         android:name="io.github.jqssun.displayextend.DisplayDetailFragment"
-        android:label="Screen {display_id}">
+        android:label="Display {display_id}">
         <argument
             android:name="display_id"
             app:argType="integer" />
@@ -36,6 +37,11 @@
         android:label="@string/touchpad" />
 
     <fragment
+        android:id="@+id/nav_input_binding"
+        android:name="io.github.jqssun.displayextend.InputBindingFragment"
+        android:label="@string/input_binding_title" />
+
+    <fragment
         android:id="@+id/nav_logs"
         android:name="io.github.jqssun.displayextend.LogsFragment"
         android:label="@string/logs" />
@@ -43,16 +49,12 @@
     <fragment
         android:id="@+id/nav_settings"
         android:name="io.github.jqssun.displayextend.SettingsFragment"
-        android:label="@string/settings">
-        <action
-            android:id="@+id/action_settings_to_device_detail"
-            app:destination="@id/nav_input_device_detail" />
-    </fragment>
+        android:label="@string/settings" />
 
     <fragment
         android:id="@+id/nav_input_device_detail"
         android:name="io.github.jqssun.displayextend.InputDeviceDetailFragment"
-        android:label="">
+        android:label="Device {device_id}">
         <argument
             android:name="device_id"
             app:argType="integer" />

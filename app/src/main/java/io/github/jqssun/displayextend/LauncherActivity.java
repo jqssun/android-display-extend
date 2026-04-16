@@ -71,11 +71,6 @@ public class LauncherActivity extends AppCompatActivity {
         adapter = new AppListAdapter(userApps, getPackageManager(), displayId);
         recyclerView.setAdapter(adapter);
 
-        findViewById(R.id.screenOffBtn).setOnClickListener(v -> {
-            Intent intent = new Intent(this, PureBlackActivity.class);
-            ActivityOptions options = ActivityOptions.makeBasic();
-            startActivity(intent, options.toBundle());
-        });
     }
 
     private List<ApplicationInfo> _getFilteredApps(boolean showAll) {

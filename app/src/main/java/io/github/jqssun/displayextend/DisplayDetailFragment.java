@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.slider.Slider;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -114,6 +115,13 @@ public class DisplayDetailFragment extends Fragment {
             bridgeButton.setOnClickListener(v -> _showBridgeDialog());
         }
 
+        MaterialButton screenOffButton = view.findViewById(R.id.screen_off_button);
+        screenOffButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), PureBlackActivity.class);
+            android.app.ActivityOptions options = android.app.ActivityOptions.makeBasic();
+            startActivity(intent, options.toBundle());
+        });
+
         // --- Display Settings (only for secondary displays) ---
         View settingsHeader = view.findViewById(R.id.settings_header);
         LinearLayout settingsSection = view.findViewById(R.id.settings_section);
@@ -161,6 +169,8 @@ public class DisplayDetailFragment extends Fragment {
         MaterialButton editDpiButton = view.findViewById(R.id.edit_dpi_button);
         MaterialButton editRotationButton = view.findViewById(R.id.edit_rotation_button);
 
+        Slider dpiSlider = view.findViewById(R.id.dpi_slider);
+
         if (ShizukuUtils.hasShizukuStarted()) {
             editResolutionButton.setVisibility(View.VISIBLE);
             editResolutionButton.setOnClickListener(v ->
@@ -169,6 +179,19 @@ public class DisplayDetailFragment extends Fragment {
             editDpiButton.setVisibility(View.VISIBLE);
             editDpiButton.setOnClickListener(v ->
                 DpiDialog.show(getContext(), displayId, metrics.densityDpi));
+
+            dpiSlider.setVisibility(View.VISIBLE);
+            dpiSlider.setValue(Math.max(100, Math.min(640, metrics.densityDpi)));
+            dpiSlider.addOnChangeListener((s, value, fromUser) -> {
+                if (fromUser) dpiText.setText(String.valueOf((int) value));
+            });
+            dpiSlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
+                @Override public void onStartTrackingTouch(Slider slider) {}
+                @Override public void onStopTrackingTouch(Slider slider) {
+                    int newDpi = (int) slider.getValue();
+                    ServiceUtils.getWindowManager().setForcedDisplayDensityForUser(displayId, newDpi, 0);
+                }
+            });
 
             if (isSecondary) {
                 editRotationButton.setVisibility(View.VISIBLE);

@@ -38,6 +38,32 @@
             style="@style/Widget.Material3.Button.TextButton" />
     </LinearLayout>
 
+    <!-- Sensitivity slider -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/touchpad_sensitivity"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            android:textColor="?colorOnSurfaceVariant" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/sensitivitySlider"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:valueFrom="0.5"
+            android:valueTo="3.0"
+            android:stepSize="0.1" />
+    </LinearLayout>
+
     <!-- Touchpad + scroll strip -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -45,7 +71,7 @@
         android:layout_weight="1"
         android:orientation="horizontal"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginVertical="16dp">
+        android:layout_marginBottom="16dp">
 
         <TextView
             android:id="@+id/touchpad_area"

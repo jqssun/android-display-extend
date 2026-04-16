@@ -132,7 +132,7 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
         ImageView appIcon;
         TextView text1;
         TextView text2;
-        ImageView btnOpenOnPhone;
+        MaterialButton btnOpenOnPhone;
         MaterialButton btnLaunch;
 
         ViewHolder(View view) {

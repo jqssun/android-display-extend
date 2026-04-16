@@ -9,18 +9,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.button.MaterialButton;
-
 import java.util.List;
 import java.util.function.Consumer;
 
 public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceViewHolder> {
-    private List<InputDevice> devices;
-    private Consumer<InputDevice> onViewClick;
+    private final List<InputDevice> devices;
+    private final Consumer<InputDevice> onClick;
 
-    public DeviceAdapter(List<InputDevice> devices, Consumer<InputDevice> onViewClick) {
+    public DeviceAdapter(List<InputDevice> devices, Consumer<InputDevice> onClick) {
         this.devices = devices;
-        this.onViewClick = onViewClick;
+        this.onClick = onClick;
     }
 
     @NonNull
@@ -34,8 +32,10 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
     @Override
     public void onBindViewHolder(@NonNull DeviceViewHolder holder, int position) {
         InputDevice device = devices.get(position);
-        holder.tvDeviceName.setText(device.getName());
-        holder.btnView.setOnClickListener(v -> onViewClick.accept(device));
+        holder.deviceId.setText(String.format("Device %d (%04X:%04X)",
+                device.getId(), device.getVendorId(), device.getProductId()));
+        holder.deviceName.setText(device.getName());
+        holder.itemView.setOnClickListener(v -> onClick.accept(device));
     }
 
     @Override
@@ -44,13 +44,13 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
     }
 
     static class DeviceViewHolder extends RecyclerView.ViewHolder {
-        TextView tvDeviceName;
-        MaterialButton btnView;
+        final TextView deviceId;
+        final TextView deviceName;
 
         DeviceViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvDeviceName = itemView.findViewById(R.id.deviceNameText);
-            btnView = itemView.findViewById(R.id.viewBtn);
+            deviceId = itemView.findViewById(R.id.deviceIdText);
+            deviceName = itemView.findViewById(R.id.deviceNameText);
         }
     }
-} 
+}

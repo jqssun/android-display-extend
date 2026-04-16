@@ -1,43 +1,27 @@
 package io.github.jqssun.displayextend;
 
 import android.content.Context;
-import android.hardware.display.DisplayManager;
-import android.hardware.input.InputManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.view.Display;
-import android.view.InputDevice;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
 
-import io.github.jqssun.displayextend.job.BindAllExternalInputToDisplay;
 import io.github.jqssun.displayextend.shizuku.PermissionManager;
-import io.github.jqssun.displayextend.shizuku.ShizukuUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class SettingsFragment extends Fragment {
-    private List<Display> displayList;
-    private Spinner displaySpinner;
-    private View bindBtn;
-    private RecyclerView externalDevicesRecycler;
-    private RecyclerView internalDevicesRecycler;
     private MaterialSwitch forceDesktopCheckbox;
     private MaterialSwitch forceResizableCheckbox;
     private MaterialSwitch enableFreeformCheckbox;
@@ -46,14 +30,6 @@ public class SettingsFragment extends Fragment {
     private MaterialSwitch disableUsbAudioCheckbox;
     private MaterialSwitch useRealScreenOffCheckbox;
     private MaterialSwitch stayOnWhilePluggedCheckbox;
-    private View externalDeviceContainer;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setExitTransition(new com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.X, true));
-        setReenterTransition(new com.google.android.material.transition.MaterialSharedAxis(com.google.android.material.transition.MaterialSharedAxis.X, false));
-    }
 
     @Nullable
     @Override
@@ -65,18 +41,9 @@ public class SettingsFragment extends Fragment {
         enableFreeformCheckbox = view.findViewById(R.id.enableFreeformCheckbox);
         enableNonResizableCheckbox = view.findViewById(R.id.enableNonResizableCheckbox);
         disableScreenShareProtectionCheckbox = view.findViewById(R.id.disableScreenShareProtectionCheckbox);
-        displaySpinner = view.findViewById(R.id.displaySpinner);
-        bindBtn = view.findViewById(R.id.bindBtn);
-        externalDevicesRecycler = view.findViewById(R.id.externalDevicesRecycler);
-        internalDevicesRecycler = view.findViewById(R.id.internalDevicesRecycler);
         disableUsbAudioCheckbox = view.findViewById(R.id.disableUsbAudioCheckbox);
         useRealScreenOffCheckbox = view.findViewById(R.id.useRealScreenOffCheckbox);
         stayOnWhilePluggedCheckbox = view.findViewById(R.id.stayOnWhilePluggedCheckbox);
-        externalDeviceContainer = view.findViewById(R.id.externalDeviceContainer);
-
-        _initDisplaySpinner();
-        _setupBindButton();
-        _setupDeviceLists();
 
         boolean granted = PermissionManager.grant("android.permission.WRITE_SECURE_SETTINGS");
         _setupDisableScreenShareProtectionCheckbox();
@@ -88,7 +55,6 @@ public class SettingsFragment extends Fragment {
         _setupUseRealScreenOffCheckbox();
         _setupStayOnWhilePluggedCheckbox();
         _setupAutoScreenOffCheckbox(view);
-        _setupAutoBindInputCheckbox(view);
         if (!granted) {
             disableScreenShareProtectionCheckbox.setEnabled(false);
             forceDesktopCheckbox.setEnabled(false);
@@ -110,7 +76,7 @@ public class SettingsFragment extends Fragment {
         }
         view.findViewById(R.id.websiteLink).setOnClickListener(v ->
             startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,
-                android.net.Uri.parse("https://github.com/jqssun/android-screen-extend"))));
+                android.net.Uri.parse("https://github.com/jqssun/android-display-extend"))));
         view.findViewById(R.id.shizukuBtn).setOnClickListener(v ->
             startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW,
                 android.net.Uri.parse("https://github.com/rikkaapps/shizuku"))));
@@ -120,85 +86,10 @@ public class SettingsFragment extends Fragment {
         return view;
     }
 
-    private void _initDisplaySpinner() {
-        DisplayManager displayManager = (DisplayManager) requireContext().getSystemService(Context.DISPLAY_SERVICE);
-        Display[] displays = displayManager.getDisplays();
-        displayList = Arrays.asList(displays);
-
-        List<String> displayNames = new ArrayList<>();
-        for (Display display : displays) {
-            displayNames.add(getString(R.string.display_spinner_format, display.getDisplayId(), display.getName()));
-        }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            displayNames
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        displaySpinner.setAdapter(adapter);
-    }
-
-    private void _setupBindButton() {
-        bindBtn.setOnClickListener(v -> {
-            if (!ShizukuUtils.hasShizukuStarted()) {
-                Toast.makeText(requireContext(), getString(R.string.shizuku_required), Toast.LENGTH_SHORT).show();
-                return;
-            }
-            int selectedPosition = displaySpinner.getSelectedItemPosition();
-            if (selectedPosition != -1 && selectedPosition < displayList.size()) {
-                Display selectedDisplay = displayList.get(selectedPosition);
-                State.startNewJob(new BindAllExternalInputToDisplay(selectedDisplay.getDisplayId()));
-            }
-        });
-    }
-
     private void _setupAutoScreenOffCheckbox(View root) {
         MaterialSwitch cb = root.findViewById(R.id.autoScreenOffCheckbox);
         cb.setChecked(Pref.getAutoScreenOff());
         cb.setOnCheckedChangeListener((b, c) -> Pref.setAutoScreenOff(c));
-    }
-
-    private void _setupAutoBindInputCheckbox(View root) {
-        com.google.android.material.materialswitch.MaterialSwitch cb = root.findViewById(R.id.autoBindInputCheckbox);
-        cb.setChecked(Pref.getAutoBindInput());
-        cb.setOnCheckedChangeListener((b, c) -> Pref.setAutoBindInput(c));
-    }
-
-    private void _setupDeviceLists() {
-        InputManager inputManager = (InputManager) requireContext().getSystemService(Context.INPUT_SERVICE);
-        int[] deviceIds = inputManager.getInputDeviceIds();
-
-        List<InputDevice> externalDevices = new ArrayList<>();
-        List<InputDevice> internalDevices = new ArrayList<>();
-
-        for (int deviceId : deviceIds) {
-            InputDevice device = InputDevice.getDevice(deviceId);
-            if (device != null) {
-                if (device.isExternal()) {
-                    externalDevices.add(device);
-                } else {
-                    internalDevices.add(device);
-                }
-            }
-        }
-
-        externalDeviceContainer.setVisibility(externalDevices.isEmpty() ? View.GONE : View.VISIBLE);
-
-        externalDevicesRecycler.setLayoutManager(new LinearLayoutManager(requireContext()));
-        internalDevicesRecycler.setLayoutManager(new LinearLayoutManager(requireContext()));
-
-        DeviceAdapter externalAdapter = new DeviceAdapter(externalDevices, this::_showDeviceDetails);
-        DeviceAdapter internalAdapter = new DeviceAdapter(internalDevices, this::_showDeviceDetails);
-
-        externalDevicesRecycler.setAdapter(externalAdapter);
-        internalDevicesRecycler.setAdapter(internalAdapter);
-    }
-
-    private void _showDeviceDetails(InputDevice device) {
-        if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).navigateToInputDeviceDetail(device.getId());
-        }
     }
 
     private void _hideRow(View v) {

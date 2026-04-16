@@ -1,19 +1,16 @@
 <resources>
     <string name="app_name">Extend</string>
     <string name="accessibility_service_description">Accessibility service for simulating touch events on secondary screens</string>
-    <string name="display_off_button">Display off</string>
-    <string name="back_button">Back button</string>
-    <string name="home_button">Home button</string>
+    <string name="display_off_button">Display Off</string>
+    <string name="back_button">Back</string>
+    <string name="home_button">Home</string>
 
     <!-- Common -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="edit">Edit</string>
-    <string name="view">View</string>
     <string name="bind">Bind</string>
     <string name="exit">Exit</string>
-    <string name="exit_vertical">Exit</string>
-    <string name="back_vertical">Back</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="none">None</string>
@@ -31,30 +28,28 @@
     <string name="clear">Clear</string>
     <string name="open_touchpad">Open Touchpad</string>
     <string name="target_display_format">Target display: %1$d (%2$s)</string>
-    <string name="input_binding">Bind all input devices to this display</string>
+    <string name="input_binding">Manually Bind All Input Devices to Display</string>
 
     <!-- Home -->
     <string name="shizuku_permission_status">Shizuku</string>
     <string name="authorize">Authorize</string>
     <string name="screens">Displays</string>
-    <string name="screen_off">Turn main display off</string>
-    <string name="screen_off_real">Turn display off (real)</string>
+    <string name="screen_off">Turn Off Built-in Screen</string>
     <string name="touchpad">Touchpad</string>
     <string name="settings">Settings</string>
     <string name="status_not_started">Not started</string>
     <string name="no_cast_title">No app being cast</string>
     <string name="no_cast_message">- USB-C DisplayPort: Connect a screen, then select it from the screen list to cast an app\n\n- Wireless: Use Android\'s built-in wireless display, then find the screen in the list to cast an app</string>
-    <string name="got_it">Got it</string>
+    <string name="got_it">Got It</string>
     <string name="shizuku_required">Shizuku permission is required</string>
     <string name="displays_status_format">%d display(s) connected</string>
     <string name="touchpad_no_cast">No cast active</string>
 
     <!-- Display list -->
-    <string name="display_list_header">Select a display to cast an app. The built-in screen cannot be used for casting.</string>
+    <string name="display_list_header">Select a display other than the built-in screen to cast an app. Virtual displays are supported too.</string>
     <string name="wireless_cast_hint">Use Android\'s wireless display</string>
-    <string name="display_id_format">Display ID: %1$d\nResolution: %2$dx%3$d</string>
-    <string name="display_name_format">Display name: %s</string>
-    <string name="screen_breadcrumb">Screen %d</string>
+    <string name="display_id_format">Display %1$d (%2$dx%3$d)</string>
+    <string name="display_name_format">%s</string>
 
     <!-- Display detail -->
     <string name="display_config_header">Configuration</string>
@@ -70,7 +65,6 @@
     <string name="info_hdr">HDR</string>
     <string name="info_flags">Flags</string>
     <string name="info_cutout">Cutout</string>
-    <string name="info_shizuku">Shizuku</string>
     <string name="info_override_size">Override size</string>
     <string name="info_physical_size">Physical size</string>
     <string name="info_keyboard_policy">Keyboard policy</string>
@@ -80,23 +74,19 @@
     <string name="info_windowing_mode">Windowing mode</string>
     <string name="supported_modes_header">Supported Modes</string>
     <string name="mode_col_id">Mode</string>
-    <string name="cast_single_app">Cast an app</string>
-    <string name="auto_open_last_app">Auto-open last app</string>
+    <string name="cast_single_app">Cast an App</string>
+    <string name="auto_open_last_app">Open last app automatically</string>
     <string name="auto_open_last_app_desc">Launch the last app when this display connects</string>
-    <string name="show_floating_back_button">Show floating back button</string>
-    <string name="hide_floating_back_button">Hide floating back button</string>
     <string name="floating_button_desc">Show a draggable back button on this display</string>
     <string name="force_landscape">Force landscape</string>
     <string name="force_landscape_desc">Force the floating button to landscape orientation</string>
-    <string name="ime_to_this_display_desc">Show the keyboard on this display instead of the main screen.</string>
-    <string name="bridge_button_text">Enable rotation control</string>
-    <string name="exit_bridge">Disable rotation control</string>
+    <string name="ime_to_this_display_desc">Show the on-screen keyboard on this display instead of the built-in screen. Requires a trusted virtual display.</string>
+    <string name="bridge_button_text">Enable Rotation Control</string>
+    <string name="exit_bridge">Disable Rotation Control</string>
     <string name="status_authorized_server">Authorized (UID: %d)</string>
     <string name="status_started_not_authorized_server">Unauthorized (UID: %d)</string>
     <string name="status_authorized">Authorized</string>
-    <string name="status_not_authorized">Unauthorized</string>
-    <string name="ime_to_main_display">Show keyboard on main display</string>
-    <string name="ime_to_this_display">Show keyboard on this display (requires companion app)</string>
+    <string name="ime_to_this_display">Show on-screen keyboard on this display</string>
     <string name="ime_policy_unsupported">Cannot set keyboard policy on this virtual display</string>
     <string name="android15_rotation_hint">Android 15+ supports rotation natively - this mode is not required</string>
 
@@ -106,7 +96,7 @@
     <string name="section_power">Power</string>
 
     <string name="disable_usb_audio">Disable USB audio routing</string>
-    <string name="disable_usb_audio_desc">Prevent audio from routing to external display</string>
+    <string name="disable_usb_audio_desc">Prevent switching audio output to USB audio devices (including external displays or USB DAC).</string>
     <string name="force_desktop_mode">Force desktop mode</string>
     <string name="force_desktop_mode_desc">May require restart on Android 14 and below</string>
     <string name="force_resizable">Force resizable activities</string>
@@ -121,42 +111,46 @@
     <string name="use_real_screen_off_desc">Turn off screen instead of simulating a black image; wake with volume keys</string>
     <string name="stay_on_while_plugged">Stay on while charging</string>
     <string name="stay_on_while_plugged_desc">Prevent screen from turning off when plugged in</string>
-    <string name="auto_screen_off">Turn screen off automatically when display connects</string>
-    <string name="auto_screen_off_desc">Automatically show a black screen on this device when an external display is detected</string>
-    <string name="section_input_binding">Input Binding When Casting an App</string>
-    <string name="auto_bind_input">Move input devices to display</string>
-    <string name="auto_bind_input_desc">Automatically redirect mouse, gamepad or keyboard input to the display in focus</string>
-    <string name="bind_input_devices">Bind input to display</string>
-    <string name="external_input_devices">External input devices:</string>
-    <string name="internal_input_devices">Internal input devices:</string>
+    <string name="auto_screen_off">Turn screen off when a display connects</string>
+    <string name="auto_screen_off_desc">Show a black screen on this device automatically when an external display is detected</string>
+    <string name="input_binding_title">Input Device Binding</string>
+    <string name="input_binding_status_auto">Auto-bind enabled</string>
+    <string name="input_binding_status_manual">Manual</string>
+    <string name="auto_bind_input">Automatically bind input devices</string>
+    <string name="auto_bind_input_desc">Bind input devices to the display currently in focus</string>
+    <string name="bind_input_devices">Bind</string>
+    <string name="external_input_devices">External Devices</string>
+    <string name="internal_input_devices">Internal Devices</string>
+    <string name="section_input">Input</string>
     <string name="display_spinner_format">Display %1$d (%2$s)</string>
 
     <!-- Touchpad -->
     <string name="switch_mode">Mode</string>
     <string name="mode_normal">Normal</string>
-    <string name="mode_cursor_locked">Locked cursor</string>
+    <string name="mode_cursor_locked">Locked Cursor</string>
+    <string name="touchpad_sensitivity">Speed</string>
     <string name="touchpad_help_cursor_locked">Cursor stays fixed, single-finger gestures only</string>
     <string name="touchpad_help_move_cursor">Move cursor</string>
-    <string name="touchpad_help_text">Touch this area to control the target screen:\n\n- Single-finger swipe: %s\n- Single-finger tap: Tap on the target screen\n- Multi-finger gesture: Sent to the target screen\n- Back button: Go back on the target screen\n- Home button: Reopen the selected app\n- Display off button: Turn off the main screen to save power\n\nIf a Bluetooth controller cannot control the display, use the display off button to turn off the main screen and shift focus.</string>
+    <string name="touchpad_help_text">Touch this area to control the target screen:\n\n- Single-finger swipe: %s\n- Single-finger tap: Tap on the target screen\n- Multi-finger gesture: Sent to the target screen\n- Back button: Go back on the target screen\n- Home button: Reopen the selected app\n- Display off button: Turn off the built-in screen to save power</string>
     <string name="show_cursor_failed">Failed to show cursor</string>
     <string name="rotate">Rotate</string>
-    <string name="rotate_cw">Rotate clockwise</string>
+    <string name="rotate_cw">Rotate Clockwise</string>
 
     <!-- Dialogs -->
     <string name="edit_dpi">Change DPI</string>
     <string name="enter_dpi_hint">Enter DPI value</string>
     <string name="invalid_number">Please enter a valid number</string>
-    <string name="edit_resolution">Change resolution</string>
+    <string name="edit_resolution">Change Resolution</string>
     <string name="width">Width</string>
     <string name="height">Height</string>
     <string name="resolution_warning">The aspect ratio applied may not be fully supported by the display if content appears stretched. Changes will revert automatically after 2 seconds. Changing the aspect ratio on unsupported displays requires root.</string>
-    <string name="edit_rotation">Change rotation (Android 15+ only)</string>
-    <string name="rotation_none">Don\'t force</string>
+    <string name="edit_rotation">Change Rotation (Android 15+ only)</string>
+    <string name="rotation_none">No change</string>
     <string name="confirm_dpi_format">Change DPI from %1$d to %2$d?</string>
     <string name="confirm_resolution_format">Change resolution from %1$dx%2$d to %3$dx%4$d?</string>
 
     <!-- Rotation control dialog -->
-    <string name="bridge_settings">Rotation control settings</string>
+    <string name="bridge_settings">Rotation Control Settings</string>
     <string name="bridge_description">Creates a virtual display layer that allows you to control the rotation of apps on this screen. Also keeps apps alive if the display disconnects.</string>
     <string name="rotate_with_content">Follow app rotation</string>
     <string name="skip_screen_capture_permission">Skip screen capture permission</string>
@@ -165,13 +159,10 @@
 
     <!-- App list / Launcher -->
     <string name="cast">Cast</string>
-    <string name="open_on_phone">Open on phone</string>
+    <string name="open_on_phone">Open on Phone</string>
     <string name="search_apps_hint">Search apps</string>
     <string name="show_all_apps">Show system apps</string>
     <string name="floating_button">Floating button</string>
-    <string name="force_dpi">Force DPI</string>
-    <string name="force_dpi_format">DPI: %d</string>
-    <string name="force_dpi_off">DPI: Auto</string>
     <string name="enter_force_dpi_hint">Enter DPI (Auto: 0)</string>
     <string name="query_apps_permission_required">QUERY_ALL_PACKAGES permission is required</string>
     <string name="cannot_get_app_list">Cannot get app list, please check permissions</string>
@@ -180,21 +171,20 @@
 
     <!-- About -->
     <string name="version_format">Version: %1$s (Android %2$s)</string>
-    <string name="version_unknown">Version: unknown</string>
-    <string name="website_label">Source: github.com/jqssun/android-screen-extend</string>
-    <string name="website_link">Source: github.com/jqssun/android-screen-extend</string>
+    <string name="version_unknown">Version: Unknown</string>
+    <string name="website_label">Source: github.com/jqssun/android-display-extend</string>
     <string name="export_log_requires_shizuku">Exporting logs requires Shizuku permission</string>
 
     <!-- Fetch log -->
     <string name="user_service_unavailable">Cannot start user service for log export</string>
     <string name="grant_file_access">Please grant file access permission</string>
     <string name="log_not_generated">Log file was not generated</string>
-    <string name="share_log">Share log file</string>
+    <string name="share_log">Share Log File</string>
     <string name="check_download_log">Check for \'Extend.log\' in the Downloads folder</string>
 
     <!-- Input device detail -->
     <string name="device_info_header">Device Info</string>
-    <string name="bind_to_display_header">Bind to Display</string>
+    <string name="bind_to_display_header">Manually Bind to Display</string>
     <string name="info_device_name">Name</string>
     <string name="info_device_id">Device ID</string>
     <string name="info_product_id">Product ID</string>

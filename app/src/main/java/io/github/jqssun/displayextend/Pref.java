@@ -25,6 +25,7 @@ public class Pref {
     public static final String KEY_LAST_PACKAGE_NAME = "LAST_PACKAGE_NAME";
     public static final String KEY_FLOATING_BUTTON_FORCE_LANDSCAPE = "FLOATING_BUTTON_FORCE_LANDSCAPE";
     public static final String KEY_FORCE_DPI = "force_dpi";
+    public static final String KEY_TOUCHPAD_SENSITIVITY = "touchpad_sensitivity";
     private static final String PREFIX_FLOATING_BUTTON = "FLOATING_BUTTON_";
     private static final String PREFIX_AUTO_BRIDGE = "AUTO_BRIDGE_";
     private static final String PREFIX_AUTO_OPEN_LAST_APP = "AUTO_OPEN_LAST_APP_";
@@ -118,6 +119,14 @@ public class Pref {
 
     public static void setForceDpi(int v) {
         _app().edit().putInt(KEY_FORCE_DPI, v).apply();
+    }
+
+    public static float getTouchpadSensitivity() {
+        return _app().getFloat(KEY_TOUCHPAD_SENSITIVITY, 1.5f);
+    }
+
+    public static void setTouchpadSensitivity(float v) {
+        _app().edit().putFloat(KEY_TOUCHPAD_SENSITIVITY, v).apply();
     }
 
     public static boolean getForceLandscape() {

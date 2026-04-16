@@ -26,6 +26,7 @@ public class HomeFragment extends Fragment {
     private MaterialButton shizukuPermissionBtn;
     private TextView displaysStatus;
     private TextView touchpadStatus;
+    private TextView inputBindingStatus;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,11 +50,14 @@ public class HomeFragment extends Fragment {
         shizukuStatus = view.findViewById(R.id.shizukuStatus);
         displaysStatus = view.findViewById(R.id.displaysStatus);
         touchpadStatus = view.findViewById(R.id.touchpadStatus);
+        inputBindingStatus = view.findViewById(R.id.inputBindingStatus);
 
         view.findViewById(R.id.displaysRow).setOnClickListener(v ->
             Navigation.findNavController(v).navigate(R.id.action_overview_to_screens));
         view.findViewById(R.id.touchpadRow).setOnClickListener(v ->
             Navigation.findNavController(v).navigate(R.id.action_overview_to_touchpad));
+        view.findViewById(R.id.inputBindingRow).setOnClickListener(v ->
+            Navigation.findNavController(v).navigate(R.id.action_overview_to_input_binding));
 
         State.uiState.observe(getViewLifecycleOwner(), this::_updateUI);
 
@@ -66,6 +70,7 @@ public class HomeFragment extends Fragment {
         State.refreshUI();
         _updateDisplaysStatus();
         _updateTouchpadStatus();
+        _updateInputBindingStatus();
     }
 
     private void _updateUI(ExtendUiState state) {
@@ -78,6 +83,7 @@ public class HomeFragment extends Fragment {
 
         _updateDisplaysStatus();
         _updateTouchpadStatus();
+        _updateInputBindingStatus();
     }
 
     private void _updateDisplaysStatus() {
@@ -104,5 +110,12 @@ public class HomeFragment extends Fragment {
             String name = display != null ? display.getName() : String.valueOf(displayId);
             touchpadStatus.setText(getString(R.string.target_display_format, displayId, name));
         }
+    }
+
+    private void _updateInputBindingStatus() {
+        if (inputBindingStatus == null) return;
+        inputBindingStatus.setText(Pref.getAutoBindInput()
+                ? R.string.input_binding_status_auto
+                : R.string.input_binding_status_manual);
     }
 }

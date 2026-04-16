@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingHorizontal="16dp"
-    android:paddingVertical="8dp"
+    android:paddingVertical="12dp"
     android:orientation="horizontal"
     android:gravity="center_vertical"
     android:background="?selectableItemBackground">
@@ -14,7 +14,7 @@
         android:id="@+id/app_icon"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginEnd="12dp" />
+        android:layout_marginEnd="16dp" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -26,7 +26,7 @@
             android:id="@+id/text1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
             android:textColor="?colorOnSurface"
             android:ellipsize="end"
             android:maxLines="1" />
@@ -35,7 +35,7 @@
             android:id="@+id/text2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
             android:textColor="?colorOnSurfaceVariant"
             android:ellipsize="end"
             android:maxLines="1" />
@@ -45,18 +45,17 @@
         android:id="@+id/launchBtn"
         style="@style/Widget.Material3.Button.TonalButton"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_marginStart="4dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:text="@string/cast" />
 
-    <ImageView
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/openOnPhoneBtn"
+        style="@style/Widget.Material3.Button.IconButton"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:padding="12dp"
-        android:src="@drawable/ic_phone"
-        app:tint="?colorOnSurfaceVariant"
-        android:background="?selectableItemBackgroundBorderless"
+        app:icon="@drawable/ic_phone"
+        app:iconTint="?colorOnSurfaceVariant"
         android:contentDescription="@string/open_on_phone" />
 
 </LinearLayout>
