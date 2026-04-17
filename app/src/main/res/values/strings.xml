@@ -176,6 +176,8 @@
     <string name="open_on_phone">Open on Phone</string>
     <string name="search_apps_hint">Search apps</string>
     <string name="show_all_apps">Show system apps</string>
+    <string name="running_tasks_header">Running Tasks</string>
+    <string name="installed_apps_header">All Apps</string>
     <string name="floating_button">Floating back button</string>
     <string name="enter_force_dpi_hint">Enter DPI (Auto: 0)</string>
     <string name="query_apps_permission_required">QUERY_ALL_PACKAGES permission is required</string>

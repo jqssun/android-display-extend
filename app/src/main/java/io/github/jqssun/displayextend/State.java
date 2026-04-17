@@ -1,8 +1,13 @@
 package io.github.jqssun.displayextend;
 
 import android.app.Activity;
+import android.app.ActivityTaskManager;
+import android.app.WindowConfiguration;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.ServiceConnection;
+import android.hardware.display.DisplayManager;
+import android.view.Display;
 import android.hardware.display.VirtualDisplay;
 import android.media.projection.MediaProjection;
 import android.os.IBinder;
@@ -12,16 +17,36 @@ import androidx.lifecycle.MutableLiveData;
 
 import io.github.jqssun.displayextend.job.Job;
 import io.github.jqssun.displayextend.job.YieldException;
+import io.github.jqssun.displayextend.shizuku.ServiceUtils;
+import io.github.jqssun.displayextend.shizuku.ShizukuUtils;
 import io.github.jqssun.displayextend.shizuku.IUserService;
 import io.github.jqssun.displayextend.shizuku.UserService;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import rikka.shizuku.Shizuku;
 
 public class State {
+    public static final class RunningTaskEntry {
+        public final int taskId;
+        public final int displayId;
+        public final String packageName;
+        public final long lastActiveTime;
+        public final int visibilityScore;
+
+        public RunningTaskEntry(int taskId, int displayId, String packageName,
+                                long lastActiveTime, int visibilityScore) {
+            this.taskId = taskId;
+            this.displayId = displayId;
+            this.packageName = packageName;
+            this.lastActiveTime = lastActiveTime;
+            this.visibilityScore = visibilityScore;
+        }
+    }
+
     public static WeakReference<Activity> currentActivity = new WeakReference<>(null);
     private static Job currentJob;
     private static final int MAX_LOGS = 1000;
@@ -192,5 +217,117 @@ public class State {
     public static int getMirrorVirtualDisplayId() {
         if (mirrorVirtualDisplay == null) return -1;
         return mirrorVirtualDisplay.getDisplay().getDisplayId();
+    }
+
+    public static void reconcileLastSingleAppDisplay(Context context) {
+        if (context == null || !ShizukuUtils.hasPermission()) {
+            return;
+        }
+        int resolvedDisplayId = 0;
+        long bestLastActiveTime = Long.MIN_VALUE;
+        int bestScore = Integer.MIN_VALUE;
+        DisplayManager displayManager = (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
+        if (displayManager == null) {
+            return;
+        }
+        for (Display display : displayManager.getDisplays()) {
+            int displayId = display.getDisplayId();
+            if (displayId == Display.DEFAULT_DISPLAY) {
+                continue;
+            }
+            for (RunningTaskEntry task : getRunningTasksOnDisplay(context, displayId)) {
+                if (task.visibilityScore > bestScore
+                        || (task.visibilityScore == bestScore
+                        && task.lastActiveTime > bestLastActiveTime)) {
+                    bestScore = task.visibilityScore;
+                    bestLastActiveTime = task.lastActiveTime;
+                    resolvedDisplayId = displayId;
+                }
+            }
+        }
+
+        if (lastSingleAppDisplay != resolvedDisplayId) {
+            State.log("reconciled cast display from " + lastSingleAppDisplay + " to " + resolvedDisplayId);
+            lastSingleAppDisplay = resolvedDisplayId;
+        }
+    }
+
+    public static List<RunningTaskEntry> getRunningTasksOnDisplay(Context context, int displayId) {
+        if (context == null || displayId == Display.DEFAULT_DISPLAY || !ShizukuUtils.hasPermission()) {
+            return Collections.emptyList();
+        }
+        List<RunningTaskEntry> tasks = new ArrayList<>();
+        try {
+            List<ActivityTaskManager.RootTaskInfo> taskInfos =
+                    ServiceUtils.getActivityTaskManager().getAllRootTaskInfosOnDisplay(displayId);
+            for (ActivityTaskManager.RootTaskInfo taskInfo : taskInfos) {
+                if (!_isRunningTaskCandidate(taskInfo, context.getPackageName())) {
+                    continue;
+                }
+                String packageName = _taskPackageName(taskInfo);
+                if (packageName == null) {
+                    continue;
+                }
+                tasks.add(new RunningTaskEntry(
+                        TaskInfoCompat.getTaskId(taskInfo),
+                        TaskInfoCompat.getDisplayId(taskInfo),
+                        packageName,
+                        TaskInfoCompat.getLastActiveTime(taskInfo),
+                        _taskVisibilityScore(taskInfo)
+                ));
+            }
+        } catch (Throwable e) {
+            State.log("failed to inspect display " + displayId + " tasks: " + e.getMessage());
+        }
+        tasks.sort((left, right) -> {
+            int scoreCompare = Integer.compare(right.visibilityScore, left.visibilityScore);
+            if (scoreCompare != 0) {
+                return scoreCompare;
+            }
+            int timeCompare = Long.compare(right.lastActiveTime, left.lastActiveTime);
+            if (timeCompare != 0) {
+                return timeCompare;
+            }
+            return left.packageName.compareToIgnoreCase(right.packageName);
+        });
+        return tasks;
+    }
+
+    private static boolean _isRunningTaskCandidate(ActivityTaskManager.RootTaskInfo taskInfo,
+                                                   String ownPackageName) {
+        if (taskInfo == null || !TaskInfoCompat.isRunning(taskInfo)) {
+            return false;
+        }
+        if (TaskInfoCompat.getDisplayId(taskInfo) == Display.DEFAULT_DISPLAY) {
+            return false;
+        }
+        if (TaskInfoCompat.getActivityType(taskInfo) != WindowConfiguration.ACTIVITY_TYPE_STANDARD) {
+            return false;
+        }
+        if (!(TaskInfoCompat.isFocused(taskInfo)
+                || TaskInfoCompat.isVisible(taskInfo)
+                || TaskInfoCompat.isVisibleRequested(taskInfo))) {
+            return false;
+        }
+        String packageName = _taskPackageName(taskInfo);
+        return packageName != null && !ownPackageName.equals(packageName);
+    }
+
+    private static int _taskVisibilityScore(ActivityTaskManager.RootTaskInfo taskInfo) {
+        int score = 0;
+        if (TaskInfoCompat.isVisibleRequested(taskInfo)) {
+            score += 1;
+        }
+        if (TaskInfoCompat.isVisible(taskInfo)) {
+            score += 2;
+        }
+        if (TaskInfoCompat.isFocused(taskInfo)) {
+            score += 4;
+        }
+        return score;
+    }
+
+    private static String _taskPackageName(ActivityTaskManager.RootTaskInfo taskInfo) {
+        return TaskInfoCompat.getPackageName(taskInfo);
     }
 }

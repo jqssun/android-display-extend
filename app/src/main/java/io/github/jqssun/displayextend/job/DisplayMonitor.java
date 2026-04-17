@@ -49,6 +49,11 @@ public class DisplayMonitor {
                 if (State.floatingButtonService != null) {
                     State.floatingButtonService.onDisplayRemoved(displayId);
                 }
+                Context context = State.currentActivity.get();
+                if (context != null) {
+                    State.reconcileLastSingleAppDisplay(context);
+                    State.refreshUI();
+                }
             }
 
             @Override

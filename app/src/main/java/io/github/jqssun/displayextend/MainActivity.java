@@ -117,6 +117,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         State.currentActivity = new WeakReference<>(this);
+        State.reconcileLastSingleAppDisplay(this);
+        State.refreshUI();
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
@@ -166,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         State.currentActivity = new WeakReference<>(this);
+        State.reconcileLastSingleAppDisplay(this);
         State.resumeJob();
     }
 
