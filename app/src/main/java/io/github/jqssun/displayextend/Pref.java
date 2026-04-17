@@ -166,6 +166,13 @@ public class Pref {
         _floating().edit().putInt(KEY_BUTTON_X, x).putInt(KEY_BUTTON_Y, y).apply();
     }
 
+    public static void clearAll() {
+        _prefs().edit().clear().apply();
+        _app().edit().clear().apply();
+        _managedVirtualDisplay().edit().clear().apply();
+        _floating().edit().clear().apply();
+    }
+
     // internal
 
     private static SharedPreferences _prefs() {

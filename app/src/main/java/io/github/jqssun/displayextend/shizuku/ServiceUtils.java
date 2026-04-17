@@ -28,6 +28,7 @@ import io.github.jqssun.displayextend.R;
 import io.github.jqssun.displayextend.State;
 import io.github.jqssun.displayextend.job.BindAllExternalInputToDisplay;
 
+import java.lang.reflect.Method;
 import dev.rikka.tools.refine.Refine;
 import rikka.shizuku.ShizukuBinderWrapper;
 import rikka.shizuku.SystemServiceHelper;
@@ -45,6 +46,7 @@ public class ServiceUtils {
     private static IPermissionManager permissionManager;
     private static IPackageManager packageManager;
     private static IAudioService audioManager;
+    private static java.lang.reflect.Constructor<?> displayModeConstructor;
 
     private static void initWithShizuku() {
         if (!ShizukuUtils.hasPermission()) {
@@ -229,6 +231,57 @@ public class ServiceUtils {
             initWithShizuku();
         }
         return displayManager;
+    }
+
+    public static boolean canSetUserPreferredDisplayMode() {
+        return ShizukuUtils.hasPermission();
+    }
+
+    public static void setUserPreferredDisplayMode(int displayId, Display.Mode mode, boolean storeMode) {
+        try {
+            // Match the framework API contract: pass only width/height/refresh and let the
+            // display stack resolve the concrete hardware mode.
+            Display.Mode preferredMode = (Display.Mode) getDisplayModeConstructor().newInstance(
+                    mode.getPhysicalWidth(),
+                    mode.getPhysicalHeight(),
+                    mode.getRefreshRate());
+            getDisplayManager().setUserPreferredDisplayMode(displayId, preferredMode, storeMode);
+        } catch (Throwable e) {
+            throw new RuntimeException("failed to set display mode", e);
+        }
+    }
+
+    public static void resetUserPreferredDisplayMode(int displayId) {
+        try {
+            getDisplayManager().resetUserPreferredDisplayMode(displayId);
+        } catch (Throwable e) {
+            throw new RuntimeException("failed to reset preferred display mode", e);
+        }
+    }
+
+    public static int getRefreshRateSwitchingType() {
+        try {
+            return getDisplayManager().getRefreshRateSwitchingType();
+        } catch (Throwable e) {
+            throw new RuntimeException("failed to get refresh rate switching type", e);
+        }
+    }
+
+    public static void setRefreshRateSwitchingType(int switchingType) {
+        try {
+            getDisplayManager().setRefreshRateSwitchingType(switchingType);
+        } catch (Throwable e) {
+            throw new RuntimeException("failed to set refresh rate switching type", e);
+        }
+    }
+
+    private static java.lang.reflect.Constructor<?> getDisplayModeConstructor()
+            throws NoSuchMethodException {
+        if (displayModeConstructor == null) {
+            displayModeConstructor = Display.Mode.class
+                    .getConstructor(int.class, int.class, float.class);
+        }
+        return displayModeConstructor;
     }
 
     public static IInputManager getInputManager() {

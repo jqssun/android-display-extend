@@ -34,6 +34,12 @@ public class ResetDisplayConfig implements Job {
         }
 
         try {
+            ServiceUtils.resetUserPreferredDisplayMode(displayId);
+        } catch (Throwable e) {
+            State.log("failed to reset preferred display mode: " + e.getMessage());
+        }
+
+        try {
             wm.setIgnoreOrientationRequest(displayId, false);
         } catch (Throwable e) {
             State.log("failed to setIgnoreOrientationRequest: " + e.getMessage());

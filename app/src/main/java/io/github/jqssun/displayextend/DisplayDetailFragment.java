@@ -23,11 +23,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.slider.Slider;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -37,6 +37,7 @@ import io.github.jqssun.displayextend.dialog.DpiDialog;
 import io.github.jqssun.displayextend.dialog.ResolutionDialog;
 import io.github.jqssun.displayextend.dialog.RotationDialog;
 import io.github.jqssun.displayextend.dialog.ScaleDialog;
+import io.github.jqssun.displayextend.job.ApplyDisplayMode;
 import io.github.jqssun.displayextend.job.ResetDisplayConfig;
 import io.github.jqssun.displayextend.shizuku.ServiceUtils;
 import io.github.jqssun.displayextend.shizuku.ShizukuUtils;
@@ -63,7 +64,14 @@ public class DisplayDetailFragment extends Fragment {
 
     private final DisplayManager.DisplayListener displayListener = new DisplayManager.DisplayListener() {
         @Override public void onDisplayAdded(int id) {}
-        @Override public void onDisplayRemoved(int id) {}
+        @Override public void onDisplayRemoved(int id) {
+            if (id == displayId) {
+                _handleCurrentDisplayRemoved();
+            } else if (id == State.getManagedVirtualDisplayId()
+                    || id == State.managedVirtualDisplayHostDisplayId) {
+                _refreshDisplayState();
+            }
+        }
         @Override public void onDisplayChanged(int id) {
             if (id == displayId) _refreshDisplayState();
         }
@@ -157,9 +165,17 @@ public class DisplayDetailFragment extends Fragment {
             managedVirtualDisplayButton.setVisibility(View.VISIBLE);
             managedVirtualDisplayButton.setText(getString(R.string.disable_managed_virtual_display_mode));
             managedVirtualDisplayButton.setOnClickListener(v -> {
+                int managedDisplayId = State.getManagedVirtualDisplayId();
+                int managedHostDisplayId = State.managedVirtualDisplayHostDisplayId;
                 ManagedVirtualDisplayActivity.stopVirtualDisplay();
                 if (ManagedVirtualDisplayActivity.getInstance() != null) {
                     ManagedVirtualDisplayActivity.getInstance().finish();
+                }
+                State.refreshUI();
+                if (displayId == managedDisplayId) {
+                    _handleCurrentDisplayRemoved();
+                } else if (displayId == managedHostDisplayId) {
+                    _refreshDisplayState();
                 }
             });
         } else if (isSecondary && ShizukuUtils.hasShizukuStarted()) {
@@ -305,11 +321,31 @@ public class DisplayDetailFragment extends Fragment {
         }
     }
 
+    private void _handleCurrentDisplayRemoved() {
+        Activity activity = getActivity();
+        if (activity == null || !isAdded()) {
+            return;
+        }
+        activity.runOnUiThread(() -> {
+            activity.onBackPressed();
+        });
+    }
+
     private int _currentScalePercent() {
         if (nativeWidth <= 0) return 100;
         Display d = _currentDisplay();
         if (d == null || d.getWidth() <= 0) return 100;
         return Math.round(nativeWidth * 100f / d.getWidth());
+    }
+
+    private float _snapSliderValue(Slider slider, float value) {
+        float clamped = Math.max(slider.getValueFrom(), Math.min(slider.getValueTo(), value));
+        float stepSize = slider.getStepSize();
+        if (stepSize <= 0f) return clamped;
+
+        float steps = Math.round((clamped - slider.getValueFrom()) / stepSize);
+        float snapped = slider.getValueFrom() + steps * stepSize;
+        return Math.max(slider.getValueFrom(), Math.min(slider.getValueTo(), snapped));
     }
 
     private void _refreshDisplayState() {
@@ -323,21 +359,22 @@ public class DisplayDetailFragment extends Fragment {
         if (resolutionText != null) resolutionText.setText(d.getWidth() + " x " + d.getHeight());
         if (dpiText != null) dpiText.setText(String.valueOf(metrics.densityDpi));
         if (dpiSlider != null && dpiSlider.getVisibility() == View.VISIBLE) {
-            float clamped = Math.max(100, Math.min(640, metrics.densityDpi));
-            if (dpiSlider.getValue() != clamped) dpiSlider.setValue(clamped);
+            float snapped = _snapSliderValue(dpiSlider, metrics.densityDpi);
+            if (dpiSlider.getValue() != snapped) dpiSlider.setValue(snapped);
         }
         if (scaleText != null && scaleRow != null && scaleRow.getVisibility() == View.VISIBLE) {
             int percent = _currentScalePercent();
             scaleText.setText(getString(R.string.scale_format, percent));
             if (scaleSlider != null) {
-                float clamped = Math.max(scaleSlider.getValueFrom(), Math.min(scaleSlider.getValueTo(), percent));
-                if (scaleSlider.getValue() != clamped) scaleSlider.setValue(clamped);
+                float snapped = _snapSliderValue(scaleSlider, percent);
+                if (scaleSlider.getValue() != snapped) scaleSlider.setValue(snapped);
             }
         }
         if (rotationText != null) _updateRotationText(rotationText);
 
         _populateInfoTable(d, ctx);
-        _setupDisplayModes(d.getSupportedModes());
+        Display.Mode currentMode = d.getMode();
+        _setupDisplayModes(d.getSupportedModes(), currentMode != null ? currentMode.getModeId() : -1);
         _updateShizukuStatus();
     }
 
@@ -428,15 +465,34 @@ public class DisplayDetailFragment extends Fragment {
         return flagsStr.length() > 0 ? flagsStr.toString() : getString(R.string.none);
     }
 
-    private void _setupDisplayModes(Display.Mode[] supportedModes) {
+    private void _setupDisplayModes(Display.Mode[] supportedModes, int currentModeId) {
         modesTable.removeAllViews();
         Context modeCtx = getContext();
         if (modeCtx == null) return;
+        boolean canApplyModes = ServiceUtils.canSetUserPreferredDisplayMode();
         for (Display.Mode mode : supportedModes) {
+            View row = LayoutInflater.from(modeCtx).inflate(R.layout.item_display_mode, modesTable, false);
+            TextView labelView = row.findViewById(R.id.mode_label);
+            TextView valueView = row.findViewById(R.id.mode_value);
+            MaterialButton applyButton = row.findViewById(R.id.mode_apply_button);
+
             String title = getString(R.string.mode_col_id) + " " + mode.getModeId();
             String value = mode.getPhysicalWidth() + "x" + mode.getPhysicalHeight()
                     + "@" + String.format("%.1f Hz", mode.getRefreshRate());
-            InfoRow.add(modeCtx, modesTable, title, value);
+            boolean isCurrentMode = mode.getModeId() == currentModeId;
+
+            labelView.setText(title);
+            valueView.setText(value);
+
+            if (!canApplyModes) {
+                applyButton.setVisibility(View.GONE);
+            } else {
+                applyButton.setEnabled(!isCurrentMode);
+                applyButton.setText(isCurrentMode ? R.string.current : R.string.apply);
+                applyButton.setOnClickListener(v -> State.startNewJob(new ApplyDisplayMode(displayId, mode)));
+            }
+
+            modesTable.addView(row);
         }
     }
 

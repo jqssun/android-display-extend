@@ -20,8 +20,6 @@ import io.github.jqssun.displayextend.State;
 import io.github.jqssun.displayextend.shizuku.ServiceUtils;
 import io.github.jqssun.displayextend.shizuku.ShizukuUtils;
 
-import java.lang.reflect.Constructor;
-
 import dev.rikka.tools.refine.Refine;
 
 public class CreateVirtualDisplay {
@@ -72,12 +70,8 @@ public class CreateVirtualDisplay {
         int virtualDisplayWidth = virtualDisplayArgs.width;
         IDisplayManager displayManager = ServiceUtils.getDisplayManager();
         int flags = getFlags(virtualDisplayArgs, ownContentOnly);
-        VirtualDisplayConfig config = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            config = buildVirtualDisplayConfigApi34(virtualDisplayArgs, surface, flags, virtualDisplayWidth);
-        } else {
-            // config = null
-        }
+        VirtualDisplayConfig config = buildVirtualDisplayConfig(
+                virtualDisplayArgs, surface, flags, virtualDisplayWidth);
         IVirtualDisplayCallback callback = new VirtualDisplayCallback();
         IMediaProjection projection = null;
         if (State.getMediaProjection() != null) {
@@ -92,30 +86,10 @@ public class CreateVirtualDisplay {
         }
         DisplayInfo displayInfo = ServiceUtils.getDisplayManager().getDisplayInfo(displayId);
         State.log("virtual display created, displayId: " + displayId + ", uniqueId: " + displayInfo.uniqueId);
-        VirtualDisplay virtualDisplay = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            virtualDisplay = DisplayManagerGlobal.getInstance().createVirtualDisplayWrapper(config, callback, displayId);
-        } else {
-            try {
-                DisplayManagerGlobal displayManagerGlobal = DisplayManagerGlobal.getInstance();
-                Class<?> virtualDisplayClass = VirtualDisplay.class;
-                Constructor<?> constructor = virtualDisplayClass.getDeclaredConstructor(
-                        DisplayManagerGlobal.class,
-                        Display.class,
-                        IVirtualDisplayCallback.class,
-                        Surface.class
-                );
-                constructor.setAccessible(true);
-                Display display = displayManagerGlobal.getRealDisplay(displayId);
-                virtualDisplay = (VirtualDisplay) constructor.newInstance(
-                        displayManagerGlobal,
-                        display,
-                        callback,
-                        surface
-                );
-            } catch(Throwable e) {
-                throw new RuntimeException(e);
-            }
+        VirtualDisplay virtualDisplay = DisplayManagerGlobal.getInstance()
+                .createVirtualDisplayWrapper(config, callback, displayId);
+        if (virtualDisplay == null) {
+            throw new RuntimeException("failed to create virtual display wrapper");
         }
         State.setMediaProjection(null);
         return virtualDisplay;
@@ -154,15 +128,16 @@ public class CreateVirtualDisplay {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    private static VirtualDisplayConfig buildVirtualDisplayConfigApi34(
+    private static VirtualDisplayConfig buildVirtualDisplayConfig(
             VirtualDisplayArgs virtualDisplayArgs, Surface surface, int flags, int width) {
-        return new VirtualDisplayConfig.Builder(
+        VirtualDisplayConfig.Builder builder = new VirtualDisplayConfig.Builder(
                 virtualDisplayArgs.virtualDisplayName,
                 width, virtualDisplayArgs.height, virtualDisplayArgs.dpi)
                 .setSurface(surface)
-                .setFlags(flags)
-                .setRequestedRefreshRate(virtualDisplayArgs.refreshRate)
-                .build();
+                .setFlags(flags);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            builder.setRequestedRefreshRate(virtualDisplayArgs.refreshRate);
+        }
+        return builder.build();
     }
 }

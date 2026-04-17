@@ -1,9 +1,15 @@
 package io.github.jqssun.displayextend;
 
 import android.content.Context;
+import android.content.Intent;
+import android.hardware.display.DisplayManager;
+import android.hardware.display.DisplayManagerHidden;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.provider.Settings;
+import android.view.Display;
+import android.view.IWindowManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,16 +19,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.slider.Slider;
 
+import io.github.jqssun.displayextend.shizuku.ServiceUtils;
 import io.github.jqssun.displayextend.shizuku.PermissionManager;
+import io.github.jqssun.displayextend.shizuku.ShizukuUtils;
+import io.github.jqssun.displayextend.shizuku.SurfaceControl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import dev.rikka.tools.refine.Refine;
+
 public class SettingsFragment extends Fragment {
+    private static final String MATCH_CONTENT_FRAME_RATE_KEY = "match_content_frame_rate";
+
     private MaterialSwitch forceDesktopCheckbox;
     private MaterialSwitch forceResizableCheckbox;
     private MaterialSwitch enableFreeformCheckbox;
@@ -31,6 +45,9 @@ public class SettingsFragment extends Fragment {
     private MaterialSwitch disableUsbAudioCheckbox;
     private MaterialSwitch useRealScreenOffCheckbox;
     private MaterialSwitch stayOnWhilePluggedCheckbox;
+    private MaterialSwitch autoScreenOffCheckbox;
+    private View matchContentFrameRateRow;
+    private TextView matchContentFrameRateValueText;
     private Slider trackingSpeedSlider;
 
     @Nullable
@@ -46,6 +63,9 @@ public class SettingsFragment extends Fragment {
         disableUsbAudioCheckbox = view.findViewById(R.id.disableUsbAudioCheckbox);
         useRealScreenOffCheckbox = view.findViewById(R.id.useRealScreenOffCheckbox);
         stayOnWhilePluggedCheckbox = view.findViewById(R.id.stayOnWhilePluggedCheckbox);
+        autoScreenOffCheckbox = view.findViewById(R.id.autoScreenOffCheckbox);
+        matchContentFrameRateRow = view.findViewById(R.id.matchContentFrameRateRow);
+        matchContentFrameRateValueText = view.findViewById(R.id.matchContentFrameRateValueText);
         trackingSpeedSlider = view.findViewById(R.id.trackingSpeedSlider);
 
         boolean granted = PermissionManager.grant("android.permission.WRITE_SECURE_SETTINGS");
@@ -55,10 +75,12 @@ public class SettingsFragment extends Fragment {
         _setupEnableFreeformCheckbox();
         _setupEnableNonResizableCheckbox();
         _setupDisableUsbAudioCheckbox();
+        _setupMatchContentFrameRateRow();
         _setupUseRealScreenOffCheckbox();
         _setupStayOnWhilePluggedCheckbox();
-        _setupAutoScreenOffCheckbox(view);
+        _setupAutoScreenOffCheckbox();
         _setupTrackingSpeedSlider();
+        _setupResetAllButton(view);
         if (!granted) {
             disableScreenShareProtectionCheckbox.setEnabled(false);
             forceDesktopCheckbox.setEnabled(false);
@@ -67,6 +89,8 @@ public class SettingsFragment extends Fragment {
             enableNonResizableCheckbox.setEnabled(false);
             disableUsbAudioCheckbox.setEnabled(false);
             stayOnWhilePluggedCheckbox.setEnabled(false);
+            matchContentFrameRateRow.setEnabled(false);
+            matchContentFrameRateRow.setAlpha(0.5f);
         }
 
         // About
@@ -90,10 +114,9 @@ public class SettingsFragment extends Fragment {
         return view;
     }
 
-    private void _setupAutoScreenOffCheckbox(View root) {
-        MaterialSwitch cb = root.findViewById(R.id.autoScreenOffCheckbox);
-        cb.setChecked(Pref.getAutoScreenOff());
-        cb.setOnCheckedChangeListener((b, c) -> Pref.setAutoScreenOff(c));
+    private void _setupAutoScreenOffCheckbox() {
+        autoScreenOffCheckbox.setChecked(Pref.getAutoScreenOff());
+        autoScreenOffCheckbox.setOnCheckedChangeListener((b, c) -> Pref.setAutoScreenOff(c));
     }
 
     private void _setupTrackingSpeedSlider() {
@@ -160,6 +183,28 @@ public class SettingsFragment extends Fragment {
         });
     }
 
+    private void _setupMatchContentFrameRateRow() {
+        _updateMatchContentFrameRateSummary(_getMatchContentFrameRateValue());
+        matchContentFrameRateRow.setOnClickListener(v -> {
+            int currentValue = _getMatchContentFrameRateValue();
+            CharSequence[] options = new CharSequence[] {
+                    getString(R.string.match_content_frame_rate_never),
+                    getString(R.string.match_content_frame_rate_seamless),
+                    getString(R.string.match_content_frame_rate_always)
+            };
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.match_content_frame_rate)
+                    .setSingleChoiceItems(options, _coerceMatchContentFrameRateValue(currentValue),
+                            (dialog, which) -> {
+                                _setMatchContentFrameRateValue(which);
+                                _updateMatchContentFrameRateSummary(which);
+                                dialog.dismiss();
+                            })
+                    .setNegativeButton(R.string.cancel, null)
+                    .show();
+        });
+    }
+
     private void _setupUseRealScreenOffCheckbox() {
         useRealScreenOffCheckbox.setChecked(Pref.getUseRealScreenOff());
 
@@ -181,5 +226,231 @@ public class SettingsFragment extends Fragment {
                 State.log("failed: " + e);
             }
         });
+    }
+
+    private void _setupResetAllButton(View root) {
+        root.findViewById(R.id.resetAllBtn).setOnClickListener(v ->
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(R.string.reset_all_settings)
+                        .setMessage(R.string.reset_all_settings_confirm)
+                        .setPositiveButton(R.string.reset, (dialog, which) -> _resetAllToStock())
+                        .setNegativeButton(R.string.cancel, null)
+                        .show());
+    }
+
+    private void _resetAllToStock() {
+        Context context = requireContext();
+
+        _putGlobalInt("force_desktop_mode_on_external_displays", 0);
+        _putGlobalInt("force_resizable_activities", 0);
+        _putGlobalInt("enable_freeform_support", 0);
+        _putGlobalInt("enable_non_resizable_multi_window", 0);
+        _putGlobalInt("disable_screen_share_protections_for_apps_and_notifications", 0);
+        _putGlobalInt("stay_on_while_plugged_in", 0);
+        _setMatchContentFrameRateValue(0);
+        _putSecureInt("usb_audio_automatic_routing_disabled", 0);
+
+        Pref.clearAll();
+        _stopActiveFeatures(context);
+        _resetConnectedDisplayConfigs(context);
+        _refreshControlsFromState();
+        State.refreshUI();
+        State.log("reset app settings and connected display overrides to stock state");
+    }
+
+    private void _stopActiveFeatures(Context context) {
+        if (State.mediaProjectionInUse != null) {
+            State.mediaProjectionInUse.stop();
+            State.mediaProjectionInUse = null;
+        }
+        State.setMediaProjection(null);
+        MediaProjectionService.isStarting = false;
+        context.stopService(new Intent(context, MediaProjectionService.class));
+        context.stopService(new Intent(context, FloatingButtonService.class));
+
+        Intent touchpadIntent = new Intent(context, TouchpadAccessibilityService.class);
+        touchpadIntent.setAction(TouchpadAccessibilityService.class.getName());
+        context.stopService(touchpadIntent);
+
+        if (ManagedVirtualDisplayActivity.getInstance() != null) {
+            ManagedVirtualDisplayActivity.getInstance().finish();
+        }
+        ManagedVirtualDisplayActivity.stopVirtualDisplay();
+        if (State.mirrorVirtualDisplay != null) {
+            State.mirrorVirtualDisplay.release();
+            State.mirrorVirtualDisplay = null;
+        }
+        State.managedVirtualDisplayHostDisplayId = -1;
+        State.mirrorDisplayId = -1;
+        State.lastSingleAppDisplay = 0;
+
+        if (State.isInPureBlackActivity != null) {
+            State.isInPureBlackActivity.finish();
+        }
+        if (State.userService != null) {
+            try {
+                State.userService.stopListenVolumeKey();
+                State.userService.setScreenPower(SurfaceControl.POWER_MODE_NORMAL);
+            } catch (RemoteException e) {
+                State.log("failed to restore screen power: " + e.getMessage());
+            }
+        }
+    }
+
+    private void _resetConnectedDisplayConfigs(Context context) {
+        if (!ShizukuUtils.hasPermission()) {
+            return;
+        }
+        DisplayManager displayManager = context.getSystemService(DisplayManager.class);
+        if (displayManager == null) {
+            return;
+        }
+        IWindowManager windowManager = ServiceUtils.getWindowManager();
+        for (Display display : displayManager.getDisplays()) {
+            int displayId = display.getDisplayId();
+            if (displayId == Display.DEFAULT_DISPLAY) {
+                continue;
+            }
+
+            try {
+                windowManager.clearForcedDisplaySize(displayId);
+            } catch (Throwable e) {
+                State.log("failed to clear size for display " + displayId + ": " + e.getMessage());
+            }
+
+            try {
+                windowManager.clearForcedDisplayDensityForUser(displayId, 0);
+            } catch (Throwable e) {
+                State.log("failed to clear density for display " + displayId + ": " + e.getMessage());
+            }
+
+            try {
+                ServiceUtils.resetUserPreferredDisplayMode(displayId);
+            } catch (Throwable e) {
+                State.log("failed to clear preferred mode for display " + displayId + ": " + e.getMessage());
+            }
+
+            try {
+                windowManager.setIgnoreOrientationRequest(displayId, false);
+            } catch (Throwable e) {
+                State.log("failed to clear orientation request for display " + displayId + ": " + e.getMessage());
+            }
+
+            try {
+                windowManager.setFixedToUserRotation(displayId, 0);
+            } catch (Throwable e) {
+                State.log("failed to reset fixed rotation for display " + displayId + ": " + e.getMessage());
+            }
+
+            try {
+                windowManager.thawDisplayRotation(displayId, "WindowManagerShellCommand#free");
+            } catch (Throwable e) {
+                try {
+                    windowManager.thawDisplayRotation(displayId);
+                } catch (Throwable e2) {
+                    State.log("failed to thaw rotation for display " + displayId + ": " + e2.getMessage());
+                }
+            }
+        }
+    }
+
+    private void _refreshControlsFromState() {
+        forceDesktopCheckbox.setOnCheckedChangeListener(null);
+        forceResizableCheckbox.setOnCheckedChangeListener(null);
+        enableFreeformCheckbox.setOnCheckedChangeListener(null);
+        enableNonResizableCheckbox.setOnCheckedChangeListener(null);
+        disableScreenShareProtectionCheckbox.setOnCheckedChangeListener(null);
+        disableUsbAudioCheckbox.setOnCheckedChangeListener(null);
+        useRealScreenOffCheckbox.setOnCheckedChangeListener(null);
+        stayOnWhilePluggedCheckbox.setOnCheckedChangeListener(null);
+        autoScreenOffCheckbox.setOnCheckedChangeListener(null);
+        trackingSpeedSlider.clearOnChangeListeners();
+
+        _setupDisableScreenShareProtectionCheckbox();
+        _setupForceDesktopCheckbox();
+        _setupForceResizableCheckbox();
+        _setupEnableFreeformCheckbox();
+        _setupEnableNonResizableCheckbox();
+        _setupDisableUsbAudioCheckbox();
+        _setupMatchContentFrameRateRow();
+        _setupUseRealScreenOffCheckbox();
+        _setupStayOnWhilePluggedCheckbox();
+        _setupAutoScreenOffCheckbox();
+        _setupTrackingSpeedSlider();
+    }
+
+    private int _getMatchContentFrameRateValue() {
+        if (ShizukuUtils.hasPermission()) {
+            try {
+                return ServiceUtils.getRefreshRateSwitchingType();
+            } catch (Throwable e) {
+                State.log("failed to read match content frame rate preference via Shizuku: "
+                        + e.getMessage());
+            }
+        }
+        DisplayManager displayManager = requireContext().getSystemService(DisplayManager.class);
+        if (displayManager == null) {
+            return 1;
+        }
+        try {
+            DisplayManagerHidden displayManagerHidden = Refine.unsafeCast(displayManager);
+            return displayManagerHidden.getMatchContentFrameRateUserPreference();
+        } catch (Throwable e) {
+            State.log("failed to read match content frame rate preference: " + e.getMessage());
+        }
+        return 1;
+    }
+
+    private void _setMatchContentFrameRateValue(int value) {
+        if (ShizukuUtils.hasPermission()) {
+            try {
+                ServiceUtils.setRefreshRateSwitchingType(value);
+                return;
+            } catch (Throwable e) {
+                State.log("failed to set match content frame rate preference via Shizuku: "
+                        + e.getMessage());
+            }
+        }
+        _putSecureInt(MATCH_CONTENT_FRAME_RATE_KEY, value);
+    }
+
+    private int _coerceMatchContentFrameRateValue(int value) {
+        if (value < 0 || value > 2) {
+            return 1;
+        }
+        return value;
+    }
+
+    private void _updateMatchContentFrameRateSummary(int value) {
+        int labelRes;
+        switch (_coerceMatchContentFrameRateValue(value)) {
+            case 0:
+                labelRes = R.string.match_content_frame_rate_never;
+                break;
+            case 2:
+                labelRes = R.string.match_content_frame_rate_always;
+                break;
+            case 1:
+            default:
+                labelRes = R.string.match_content_frame_rate_seamless;
+                break;
+        }
+        matchContentFrameRateValueText.setText(labelRes);
+    }
+
+    private void _putGlobalInt(String key, int value) {
+        try {
+            Settings.Global.putInt(requireContext().getContentResolver(), key, value);
+        } catch (SecurityException e) {
+            State.log("failed to reset global setting " + key + ": " + e.getMessage());
+        }
+    }
+
+    private void _putSecureInt(String key, int value) {
+        try {
+            Settings.Secure.putInt(requireContext().getContentResolver(), key, value);
+        } catch (SecurityException e) {
+            State.log("failed to reset secure setting " + key + ": " + e.getMessage());
+        }
     }
 }

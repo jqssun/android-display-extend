@@ -15,7 +15,19 @@ public interface IDisplayManager extends IInterface {
             throw new RuntimeException("Stub!");
         }
     }
-    void setUserPreferredDisplayMode(int displayId, Display.Mode mode);
+
+    void setUserPreferredDisplayMode(int displayId, Display.Mode mode, boolean storeMode);
+
+    void resetUserPreferredDisplayMode(int displayId);
+
+    Display.Mode getUserPreferredDisplayMode(int displayId);
+
+    Display.Mode getSystemPreferredDisplayMode(int displayId);
+
+    void setRefreshRateSwitchingType(int newValue);
+
+    int getRefreshRateSwitchingType();
+
     DisplayInfo getDisplayInfo(int displayId);
     int createVirtualDisplay(VirtualDisplayConfig config, IVirtualDisplayCallback callback, IMediaProjection mediaProjection, String packageName);
     int createVirtualDisplay(IVirtualDisplayCallback callback,

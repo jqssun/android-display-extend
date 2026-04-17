@@ -38,7 +38,7 @@
     <string name="shizuku_required">Shizuku permission is required</string>
 
     <!-- Display list -->
-    <string name="display_list_header">Select a physical or virtual display to cast an app to.</string>
+    <string name="display_list_header">Select a physical or virtual display to cast applications to.</string>
     <string name="wireless_cast_hint">Use Android\'s wireless display</string>
     <string name="display_id_format">Display %1$d (%2$dx%3$d)</string>
     <string name="display_name_format">%s</string>
@@ -70,10 +70,14 @@
     <string name="info_windowing_mode">Windowing mode</string>
     <string name="supported_modes_header">Supported Modes</string>
     <string name="mode_col_id">Mode</string>
-    <string name="cast_single_app">Cast an App</string>
+    <string name="apply">Apply</string>
+    <string name="current">Current</string>
+    <string name="cast_single_app">Cast Applications</string>
     <string name="reset_display_config">Reset Display Configuration</string>
     <string name="reset_display_config_confirm">Clear forced resolution, DPI, and rotation for this display?</string>
     <string name="reset">Reset</string>
+    <string name="reset_all_settings">Reset All</string>
+    <string name="reset_all_settings_confirm">Restore the app and connected displays to their default state? This clears app preferences, stops active display tools, restores the USB audio routing and match content frame rate toggles, and resets overrides on connected external displays.</string>
     <string name="auto_open_last_app">Open last app automatically</string>
     <string name="auto_open_last_app_desc">Launch the last app when this display connects</string>
     <string name="floating_button_desc">Show a draggable back button on this display</string>
@@ -84,7 +88,7 @@
     <string name="disable_managed_virtual_display_mode">Disable Managed Virtual Display Mode</string>
     <string name="status_authorized_server">Authorized (UID: %d)</string>
     <string name="status_started_not_authorized_server">Unauthorized (UID: %d)</string>
-    <string name="ime_to_this_display">On-screen keyboard location</string>
+    <string name="ime_to_this_display">On-screen keyboard location (Beta)</string>
     <string name="ime_policy_unsupported">Cannot set keyboard policy on this virtual display</string>
     <string name="ime_policy_local">This display</string>
     <string name="ime_policy_fallback_display">Built-in screen</string>
@@ -98,6 +102,11 @@
 
     <string name="disable_usb_audio">Disable USB audio routing</string>
     <string name="disable_usb_audio_desc">Prevent switching audio output to USB audio devices (including external displays or USB DAC).</string>
+    <string name="match_content_frame_rate">Match content frame rate</string>
+    <string name="match_content_frame_rate_desc">Controls Android\'s global refresh-rate switching policy for app-requested frame rates.</string>
+    <string name="match_content_frame_rate_never">Never</string>
+    <string name="match_content_frame_rate_seamless">Seamless only</string>
+    <string name="match_content_frame_rate_always">Always</string>
     <string name="force_desktop_mode">Force desktop mode</string>
     <string name="force_desktop_mode_desc">May require restart on Android 14 and below</string>
     <string name="force_resizable">Force resizable activities</string>

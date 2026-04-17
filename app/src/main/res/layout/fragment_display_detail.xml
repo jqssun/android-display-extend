@@ -42,8 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:visibility="gone"
-                android:text="@string/touchpad"
-                style="@style/Widget.Material3.Button.TonalButton" />
+                android:text="@string/touchpad" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/managed_virtual_display_button"
