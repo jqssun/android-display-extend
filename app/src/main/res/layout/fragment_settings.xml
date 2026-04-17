@@ -14,12 +14,31 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/section_display"
+            android:text="@string/section_displays"
             android:textAppearance="?attr/textAppearanceLabelLarge"
             android:textColor="?colorPrimary"
             android:paddingHorizontal="16dp"
             android:paddingTop="16dp"
             android:paddingBottom="4dp" />
+
+        <TextView
+            android:id="@+id/trackingSpeedLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="4dp"
+            android:text="@string/tracking_speed"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/trackingSpeedSlider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:valueFrom="0.5"
+            android:valueTo="3.0"
+            android:stepSize="0.1" />
 
         <!-- Disable USB audio -->
         <LinearLayout

@@ -19,7 +19,10 @@ import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
@@ -200,6 +203,10 @@ public class DisplayDetailFragment extends Fragment {
             MaterialSwitch landscapeSwitch = view.findViewById(R.id.floating_button_force_landscape_switch);
             landscapeSwitch.setChecked(Pref.getFloatingButtonForceLandscape());
             landscapeSwitch.setOnCheckedChangeListener((b, checked) -> Pref.setFloatingButtonForceLandscape(checked));
+
+            View imePolicyRow = view.findViewById(R.id.ime_policy_row);
+            Spinner imePolicySpinner = view.findViewById(R.id.ime_policy_spinner);
+            _setupImePolicy(imePolicyRow, imePolicySpinner);
         }
 
         // --- Display Configuration ---
@@ -452,6 +459,82 @@ public class DisplayDetailFragment extends Fragment {
             Toast.makeText(getContext(), getString(R.string.android15_rotation_hint), Toast.LENGTH_SHORT).show();
         }
         ManagedVirtualDisplayDialog.show(getContext(), display, displayId);
+    }
+
+    private void _setupImePolicy(View row, Spinner spinner) {
+        if (row == null || spinner == null) {
+            return;
+        }
+        if (!ShizukuUtils.hasPermission()) {
+            row.setVisibility(View.GONE);
+            return;
+        }
+        try {
+            IWindowManager wm = ServiceUtils.getWindowManager();
+            row.setVisibility(View.VISIBLE);
+            _syncImePolicySpinner(wm, spinner, displayId);
+        } catch (Throwable e) {
+            row.setVisibility(View.GONE);
+        }
+    }
+
+    private void _setupImePolicySpinner(Spinner spinner) {
+        Context context = spinner.getContext();
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                context,
+                android.R.layout.simple_spinner_item,
+                DisplayImePolicyCompat.labels(context)
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+    }
+
+    private void _syncImePolicySpinner(IWindowManager wm, Spinner spinner, int targetDisplayId) throws Throwable {
+        _setupImePolicySpinner(spinner);
+        int currentPolicy = wm.getDisplayImePolicy(targetDisplayId);
+        spinner.setOnItemSelectedListener(null);
+        spinner.setSelection(DisplayImePolicyCompat.indexOf(currentPolicy), false);
+        final boolean[] initialized = {false};
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (!initialized[0]) {
+                    initialized[0] = true;
+                    return;
+                }
+                _applyImePolicySelection(wm, spinner, targetDisplayId,
+                        DisplayImePolicyCompat.values()[position]);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // no-op
+            }
+        });
+    }
+
+    private void _applyImePolicySelection(IWindowManager wm, Spinner spinner,
+                                          int targetDisplayId, int requestedPolicy) {
+        try {
+            int currentPolicy = wm.getDisplayImePolicy(targetDisplayId);
+            if (currentPolicy == requestedPolicy) {
+                return;
+            }
+
+            wm.setDisplayImePolicy(Display.DEFAULT_DISPLAY, DisplayImePolicyCompat.LOCAL);
+            wm.setDisplayImePolicy(targetDisplayId, requestedPolicy);
+            State.refreshUI();
+        } catch (Throwable e) {
+            try {
+                _syncImePolicySpinner(wm, spinner, targetDisplayId);
+            } catch (Throwable ignored) {
+                spinner.setOnItemSelectedListener(null);
+            }
+            State.log("failed to set IME policy: " + e);
+            if (getContext() != null) {
+                Toast.makeText(getContext(), R.string.ime_policy_unsupported, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
 }

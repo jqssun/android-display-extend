@@ -1,6 +1,7 @@
 package io.github.jqssun.displayextend.job;
 
 import io.github.jqssun.displayextend.R;
+import io.github.jqssun.displayextend.PlatformCompat;
 import io.github.jqssun.displayextend.State;
 import io.github.jqssun.displayextend.shizuku.ServiceUtils;
 import io.github.jqssun.displayextend.shizuku.ShizukuUtils;
@@ -45,7 +46,7 @@ public class InputRouting {
     }
 
     public static void bindInputToDisplay(DisplayInfo displayInfo, InputDevice inputDevice, IInputManager inputManager, Map<String, String> inputDeviceDescriptorToPortMap) {
-        if (!inputDevice.isExternal()) {
+        if (!PlatformCompat.isExternalInputDevice(inputDevice)) {
             return;
         }
         State.log("binding device " + inputDevice.getId());
@@ -82,7 +83,7 @@ public class InputRouting {
     public static InputDevice findInputDevice(InputManager inputManager, UsbDevice usbDevice) {
         for(int inputDeviceId : inputManager.getInputDeviceIds()) {
             InputDevice inputDevice = inputManager.getInputDevice(inputDeviceId);
-            if (inputDevice.isExternal() && inputDevice.getVendorId() == usbDevice.getVendorId() && inputDevice.getProductId() == usbDevice.getProductId()) {
+            if (PlatformCompat.isExternalInputDevice(inputDevice) && inputDevice.getVendorId() == usbDevice.getVendorId() && inputDevice.getProductId() == usbDevice.getProductId()) {
                 return inputDevice;
             }
         }

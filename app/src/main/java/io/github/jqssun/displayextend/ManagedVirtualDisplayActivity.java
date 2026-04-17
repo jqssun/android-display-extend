@@ -3,6 +3,7 @@ package io.github.jqssun.displayextend;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PixelFormat;
 import android.media.ImageReader;
 import android.os.Build;
 import android.os.Bundle;
@@ -127,7 +128,7 @@ public class ManagedVirtualDisplayActivity extends AppCompatActivity {
             public void surfaceDestroyed(SurfaceHolder holder) {
                 if (State.managedVirtualDisplay != null) {
                     if (keepAliveReader != null) keepAliveReader.close();
-                    keepAliveReader = ImageReader.newInstance(args.width, args.height, 1, 2);
+                    keepAliveReader = ImageReader.newInstance(args.width, args.height, PixelFormat.RGBA_8888, 2);
                     State.managedVirtualDisplay.setSurface(keepAliveReader.getSurface());
                 }
             }

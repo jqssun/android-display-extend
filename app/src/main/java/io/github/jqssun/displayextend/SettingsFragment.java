@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.slider.Slider;
 
 import io.github.jqssun.displayextend.shizuku.PermissionManager;
 
@@ -30,6 +31,7 @@ public class SettingsFragment extends Fragment {
     private MaterialSwitch disableUsbAudioCheckbox;
     private MaterialSwitch useRealScreenOffCheckbox;
     private MaterialSwitch stayOnWhilePluggedCheckbox;
+    private Slider trackingSpeedSlider;
 
     @Nullable
     @Override
@@ -44,6 +46,7 @@ public class SettingsFragment extends Fragment {
         disableUsbAudioCheckbox = view.findViewById(R.id.disableUsbAudioCheckbox);
         useRealScreenOffCheckbox = view.findViewById(R.id.useRealScreenOffCheckbox);
         stayOnWhilePluggedCheckbox = view.findViewById(R.id.stayOnWhilePluggedCheckbox);
+        trackingSpeedSlider = view.findViewById(R.id.trackingSpeedSlider);
 
         boolean granted = PermissionManager.grant("android.permission.WRITE_SECURE_SETTINGS");
         _setupDisableScreenShareProtectionCheckbox();
@@ -55,6 +58,7 @@ public class SettingsFragment extends Fragment {
         _setupUseRealScreenOffCheckbox();
         _setupStayOnWhilePluggedCheckbox();
         _setupAutoScreenOffCheckbox(view);
+        _setupTrackingSpeedSlider();
         if (!granted) {
             disableScreenShareProtectionCheckbox.setEnabled(false);
             forceDesktopCheckbox.setEnabled(false);
@@ -90,6 +94,15 @@ public class SettingsFragment extends Fragment {
         MaterialSwitch cb = root.findViewById(R.id.autoScreenOffCheckbox);
         cb.setChecked(Pref.getAutoScreenOff());
         cb.setOnCheckedChangeListener((b, c) -> Pref.setAutoScreenOff(c));
+    }
+
+    private void _setupTrackingSpeedSlider() {
+        trackingSpeedSlider.setValue(Math.max(0.5f, Math.min(3.0f, Pref.getTouchpadSensitivity())));
+        trackingSpeedSlider.addOnChangeListener((slider, value, fromUser) -> {
+            if (fromUser) {
+                Pref.setTouchpadSensitivity(value);
+            }
+        });
     }
 
     private void _hideRow(View v) {

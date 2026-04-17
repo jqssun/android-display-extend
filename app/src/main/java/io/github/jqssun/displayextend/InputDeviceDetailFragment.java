@@ -65,7 +65,7 @@ public class InputDeviceDetailFragment extends Fragment {
             InfoRow.add(ctx, infoTable, getString(R.string.info_product_id), String.format("0x%04X", device.getProductId()));
             InfoRow.add(ctx, infoTable, getString(R.string.info_vendor_id), String.format("0x%04X", device.getVendorId()));
             InfoRow.add(ctx, infoTable, getString(R.string.info_descriptor), device.getDescriptor());
-            InfoRow.add(ctx, infoTable, getString(R.string.info_external), device.isExternal() ? getString(R.string.yes) : getString(R.string.no));
+            InfoRow.add(ctx, infoTable, getString(R.string.info_external), PlatformCompat.isExternalInputDevice(device) ? getString(R.string.yes) : getString(R.string.no));
             InfoRow.add(ctx, infoTable, getString(R.string.info_input_sources), _getDeviceSources(device));
         }
 

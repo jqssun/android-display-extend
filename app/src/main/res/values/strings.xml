@@ -26,27 +26,19 @@
     <string name="logs">Logs</string>
     <string name="export">Export</string>
     <string name="clear">Clear</string>
-    <string name="open_touchpad">Open Touchpad</string>
-    <string name="target_display_format">Target display: %1$d (%2$s)</string>
     <string name="input_binding">Manually Bind All Input Devices to Display</string>
 
     <!-- Home -->
     <string name="shizuku_permission_status">Shizuku</string>
     <string name="authorize">Authorize</string>
-    <string name="screens">Displays</string>
     <string name="screen_off">Turn Off Built-in Screen</string>
     <string name="touchpad">Touchpad</string>
-    <string name="touchpad_nav_label">On-Screen Keyboard &amp; Touchpad</string>
     <string name="settings">Settings</string>
     <string name="status_not_started">Not started</string>
-    <string name="touchpad_no_cast_message">Cast an app from the Displays list first. Touchpad will send gestures to the display which the app was cast to.</string>
-    <string name="got_it">Got It</string>
     <string name="shizuku_required">Shizuku permission is required</string>
-    <string name="displays_status_format">%d display(s) connected</string>
-    <string name="touchpad_no_cast">No app being cast</string>
 
     <!-- Display list -->
-    <string name="display_list_header">Select a display other than the built-in screen to cast an app. Virtual displays are supported too.</string>
+    <string name="display_list_header">Select a physical or virtual display to cast an app to.</string>
     <string name="wireless_cast_hint">Use Android\'s wireless display</string>
     <string name="display_id_format">Display %1$d (%2$dx%3$d)</string>
     <string name="display_name_format">%s</string>
@@ -92,7 +84,6 @@
     <string name="disable_managed_virtual_display_mode">Disable Managed Virtual Display Mode</string>
     <string name="status_authorized_server">Authorized (UID: %d)</string>
     <string name="status_started_not_authorized_server">Unauthorized (UID: %d)</string>
-    <string name="status_authorized">Authorized</string>
     <string name="ime_to_this_display">On-screen keyboard location</string>
     <string name="ime_policy_unsupported">Cannot set keyboard policy on this virtual display</string>
     <string name="ime_policy_local">This display</string>
@@ -102,7 +93,7 @@
 
     <!-- Settings -->
     <string name="section_permissions">Permissions</string>
-    <string name="section_display">Display</string>
+    <string name="section_displays">Displays</string>
     <string name="section_power">Power</string>
 
     <string name="disable_usb_audio">Disable USB audio routing</string>
@@ -124,8 +115,8 @@
     <string name="auto_screen_off">Turn screen off when a display connects</string>
     <string name="auto_screen_off_desc">Show a black screen on this device automatically when an external display is detected</string>
     <string name="input_binding_title">Input Device Binding</string>
-    <string name="input_binding_status_auto">Auto-bind enabled</string>
-    <string name="input_binding_status_manual">Manual</string>
+    <string name="input_binding_status_auto">Automatic Binding</string>
+    <string name="input_binding_status_manual">Manual Binding</string>
     <string name="auto_bind_input">Automatically bind input devices</string>
     <string name="auto_bind_input_desc">Bind input devices to the display that is in focus</string>
     <string name="bind_input_devices">Bind</string>
@@ -138,7 +129,7 @@
     <string name="switch_mode">Mode</string>
     <string name="mode_normal">Normal</string>
     <string name="mode_cursor_locked">Locked Cursor</string>
-    <string name="touchpad_sensitivity">Tracking speed</string>
+    <string name="tracking_speed">Tracking speed</string>
     <string name="touchpad_help_normal">Only multi-touch gestures are relayed to display:\n1. Tap to click\n2. Swipe with one finger\n3. Scroll, pinch and rotate with two fingers\n4. Alternatively, scroll with scroll strip</string>
     <string name="touchpad_help_cursor_locked">All gestures are relayed to display</string>
     <string name="touchpad_hint_back">Go back on target display</string>
@@ -179,7 +170,6 @@
     <string name="running_tasks_header">Running Tasks</string>
     <string name="installed_apps_header">All Apps</string>
     <string name="floating_button">Floating back button</string>
-    <string name="enter_force_dpi_hint">Enter DPI (Auto: 0)</string>
     <string name="query_apps_permission_required">QUERY_ALL_PACKAGES permission is required</string>
     <string name="cannot_get_app_list">Cannot get app list, please check permissions</string>
     <string name="first_launch_hint">Opened on phone first to grant permissions. Tap again to cast.</string>

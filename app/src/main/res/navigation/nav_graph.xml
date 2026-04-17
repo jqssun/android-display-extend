@@ -8,18 +8,8 @@
         android:id="@+id/nav_overview"
         android:name="io.github.jqssun.displayextend.HomeFragment"
         android:label="@string/overview">
-        <action android:id="@+id/action_overview_to_screens" app:destination="@id/nav_screens" />
-        <action android:id="@+id/action_overview_to_touchpad" app:destination="@id/nav_touchpad" />
+        <action android:id="@+id/action_overview_to_display_detail" app:destination="@id/nav_display_detail" />
         <action android:id="@+id/action_overview_to_input_binding" app:destination="@id/nav_input_binding" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/nav_screens"
-        android:name="io.github.jqssun.displayextend.DisplayListFragment"
-        android:label="@string/screens">
-        <action
-            android:id="@+id/action_screens_to_detail"
-            app:destination="@id/nav_display_detail" />
     </fragment>
 
     <fragment
@@ -30,11 +20,6 @@
             android:name="display_id"
             app:argType="integer" />
     </fragment>
-
-    <fragment
-        android:id="@+id/nav_touchpad"
-        android:name="io.github.jqssun.displayextend.TouchpadFragment"
-        android:label="@string/touchpad_nav_label" />
 
     <fragment
         android:id="@+id/nav_input_binding"

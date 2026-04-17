@@ -141,7 +141,7 @@ public class TouchpadAccessibilityService extends AccessibilityService {
                 if (window.getType() != AccessibilityWindowInfo.TYPE_APPLICATION) {
                     continue;
                 }
-                if (window.getDisplayId() == displayId) {
+                if (PlatformCompat.windowMatchesDisplay(window, displayId)) {
                     if (window.getLayer() > topLayer) {
                         topLayer = window.getLayer();
                         topWindow = window;

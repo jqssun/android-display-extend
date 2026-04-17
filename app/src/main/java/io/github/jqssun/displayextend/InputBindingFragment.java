@@ -107,8 +107,8 @@ public class InputBindingFragment extends Fragment {
 
         for (int id : ids) {
             InputDevice device = InputDevice.getDevice(id);
-            if (device != null) {
-                if (device.isExternal()) external.add(device);
+                if (device != null) {
+                if (PlatformCompat.isExternalInputDevice(device)) external.add(device);
                 else internal.add(device);
             }
         }

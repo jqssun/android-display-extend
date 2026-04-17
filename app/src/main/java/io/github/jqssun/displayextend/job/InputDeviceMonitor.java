@@ -7,6 +7,7 @@ import android.hardware.input.InputManager;
 import android.view.Display;
 import android.view.InputDevice;
 
+import io.github.jqssun.displayextend.PlatformCompat;
 import io.github.jqssun.displayextend.State;
 
 public class InputDeviceMonitor {
@@ -14,7 +15,7 @@ public class InputDeviceMonitor {
         int[] deviceIds = inputManager.getInputDeviceIds();
         for (int deviceId : deviceIds) {
             android.view.InputDevice device = inputManager.getInputDevice(deviceId);
-            if (device != null && device.isExternal()) {
+            if (PlatformCompat.isExternalInputDevice(device)) {
                 State.log("found external input device: " + device.getName());
             }
         }

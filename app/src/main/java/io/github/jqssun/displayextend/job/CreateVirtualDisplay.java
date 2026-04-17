@@ -14,6 +14,7 @@ import android.view.DisplayInfo;
 import android.view.Surface;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import io.github.jqssun.displayextend.State;
 import io.github.jqssun.displayextend.shizuku.ServiceUtils;
@@ -73,20 +74,7 @@ public class CreateVirtualDisplay {
         int flags = getFlags(virtualDisplayArgs, ownContentOnly);
         VirtualDisplayConfig config = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            config = new VirtualDisplayConfig.Builder(
-                    virtualDisplayArgs.virtualDisplayName,
-                    virtualDisplayWidth, virtualDisplayArgs.height, virtualDisplayArgs.dpi)
-                    .setSurface(surface)
-                    .setFlags(flags)
-                    .setRequestedRefreshRate(virtualDisplayArgs.refreshRate)
-                    .build();
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            config = new VirtualDisplayConfig.Builder(
-                    virtualDisplayArgs.virtualDisplayName,
-                    virtualDisplayWidth, virtualDisplayArgs.height, virtualDisplayArgs.dpi)
-                    .setSurface(surface)
-                    .setFlags(flags)
-                    .build();
+            config = buildVirtualDisplayConfigApi34(virtualDisplayArgs, surface, flags, virtualDisplayWidth);
         } else {
             // config = null
         }
@@ -97,7 +85,7 @@ public class CreateVirtualDisplay {
             projection = mediaProjectionHidden.getProjection();
         }
         int displayId = -1;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             displayId = displayManager.createVirtualDisplay(config, callback, projection, "com.android.shell");
         } else {
             displayId = displayManager.createVirtualDisplay(callback, projection, "com.android.shell", virtualDisplayArgs.virtualDisplayName, virtualDisplayWidth, virtualDisplayArgs.height, virtualDisplayArgs.dpi, surface, flags, virtualDisplayArgs.virtualDisplayName);
@@ -107,8 +95,6 @@ public class CreateVirtualDisplay {
         VirtualDisplay virtualDisplay = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             virtualDisplay = DisplayManagerGlobal.getInstance().createVirtualDisplayWrapper(config, callback, displayId);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            virtualDisplay = DisplayManagerGlobal.getInstance().createVirtualDisplayWrapper(config, null, callback, displayId);
         } else {
             try {
                 DisplayManagerGlobal displayManagerGlobal = DisplayManagerGlobal.getInstance();
@@ -166,5 +152,17 @@ public class CreateVirtualDisplay {
         }
         public void onStopped() {
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    private static VirtualDisplayConfig buildVirtualDisplayConfigApi34(
+            VirtualDisplayArgs virtualDisplayArgs, Surface surface, int flags, int width) {
+        return new VirtualDisplayConfig.Builder(
+                virtualDisplayArgs.virtualDisplayName,
+                width, virtualDisplayArgs.height, virtualDisplayArgs.dpi)
+                .setSurface(surface)
+                .setFlags(flags)
+                .setRequestedRefreshRate(virtualDisplayArgs.refreshRate)
+                .build();
     }
 }

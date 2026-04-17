@@ -70,61 +70,43 @@
             android:paddingHorizontal="16dp"
             android:paddingTop="16dp"
             android:paddingBottom="4dp"
-            android:text="@string/section_display"
+            android:text="@string/section_displays"
             android:textAppearance="?attr/textAppearanceLabelLarge"
             android:textColor="?colorPrimary" />
 
-        <!-- Displays -->
         <LinearLayout
-            android:id="@+id/displaysRow"
+            android:id="@+id/displaysContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="56dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
+            android:orientation="vertical" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/openCastBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/wireless_cast_hint"
+            style="@style/Widget.Material3.Button.TonalButton" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/screen_off_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/screen_off"
+            style="@style/Widget.Material3.Button.TonalButton" />
+
+        <TextView
+            android:id="@+id/headerText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:paddingHorizontal="16dp"
-            android:paddingVertical="12dp"
-            android:background="?selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_screens"
-                android:contentDescription="@null"
-                app:tint="?colorOnSurfaceVariant" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/screens"
-                    android:textAppearance="?attr/textAppearanceBodyLarge" />
-
-                <TextView
-                    android:id="@+id/displaysStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="?colorOnSurfaceVariant" />
-            </LinearLayout>
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="8dp"
-                android:src="@drawable/ic_chevron_right"
-                android:contentDescription="@null"
-                app:tint="?colorOnSurfaceVariant" />
-        </LinearLayout>
+            android:paddingTop="16dp"
+            android:text="@string/display_list_header"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?colorOnSurfaceVariant" />
 
         <!-- Input -->
         <TextView
@@ -136,58 +118,6 @@
             android:text="@string/section_input"
             android:textAppearance="?attr/textAppearanceLabelLarge"
             android:textColor="?colorPrimary" />
-
-        <!-- Touchpad -->
-        <LinearLayout
-            android:id="@+id/touchpadRow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="56dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="12dp"
-            android:background="?selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_touchpad"
-                android:contentDescription="@null"
-                app:tint="?colorOnSurfaceVariant" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/touchpad_nav_label"
-                    android:textAppearance="?attr/textAppearanceBodyLarge" />
-
-                <TextView
-                    android:id="@+id/touchpadStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="?colorOnSurfaceVariant" />
-            </LinearLayout>
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="8dp"
-                android:src="@drawable/ic_chevron_right"
-                android:contentDescription="@null"
-                app:tint="?colorOnSurfaceVariant" />
-        </LinearLayout>
 
         <!-- Input Binding -->
         <LinearLayout

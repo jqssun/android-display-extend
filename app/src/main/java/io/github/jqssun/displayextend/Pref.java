@@ -24,7 +24,6 @@ public class Pref {
     public static final String KEY_SHOW_ALL_APPS = "show_all_apps";
     public static final String KEY_LAST_PACKAGE_NAME = "LAST_PACKAGE_NAME";
     public static final String KEY_FLOATING_BUTTON_FORCE_LANDSCAPE = "FLOATING_BUTTON_FORCE_LANDSCAPE";
-    public static final String KEY_FORCE_DPI = "force_dpi";
     public static final String KEY_TOUCHPAD_SENSITIVITY = "touchpad_sensitivity";
     private static final String PREFIX_FLOATING_BUTTON = "FLOATING_BUTTON_";
     private static final String PREFIX_AUTO_MANAGED_VIRTUAL_DISPLAY = "AUTO_BRIDGE_";
@@ -111,14 +110,6 @@ public class Pref {
 
     public static void setFloatingButton(String displayName, boolean v) {
         _app().edit().putBoolean(PREFIX_FLOATING_BUTTON + displayName, v).apply();
-    }
-
-    public static int getForceDpi() {
-        return _app().getInt(KEY_FORCE_DPI, 0);
-    }
-
-    public static void setForceDpi(int v) {
-        _app().edit().putInt(KEY_FORCE_DPI, v).apply();
     }
 
     public static float getTouchpadSensitivity() {

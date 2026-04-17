@@ -15,6 +15,7 @@ import android.view.Display;
 import android.content.Intent;
 
 import io.github.jqssun.displayextend.Pref;
+import io.github.jqssun.displayextend.PlatformCompat;
 import io.github.jqssun.displayextend.PureBlackActivity;
 import io.github.jqssun.displayextend.R;
 import io.github.jqssun.displayextend.State;
@@ -111,14 +112,14 @@ public class DisplayMonitor {
             for (AudioDeviceInfo device : audioManager2.getDevices(AudioManager.GET_DEVICES_OUTPUTS)) {
                 if (device.getType() == AudioDeviceInfo.TYPE_HDMI) {
                     try {
-                        audioManager.setWiredDeviceConnectionState(device.getType(), 0, device.getAddress(), "", "com.android.shell");
+                        audioManager.setWiredDeviceConnectionState(device.getType(), 0, PlatformCompat.getAudioDeviceAddress(device), "", "com.android.shell");
                         State.log("disabled audio output: " + device.getType() + ", " + device.getProductName());
                     } catch(Throwable e) {
                         State.log("failed to disable audio output: " + e);
                     }
                 } else if (device.getType() == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
                     try {
-                        audioManager.setWiredDeviceConnectionState(device.getType(), 1, device.getAddress(), "", "com.android.shell");
+                        audioManager.setWiredDeviceConnectionState(device.getType(), 1, PlatformCompat.getAudioDeviceAddress(device), "", "com.android.shell");
                         State.log("enabled audio output: " + device.getType() + ", " + device.getProductName());
                     } catch(Throwable e) {
                         State.log("failed to enable audio output: " + e);

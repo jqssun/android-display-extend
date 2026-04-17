@@ -193,7 +193,7 @@ public class PureBlackActivity extends AppCompatActivity {
         }
         InputDevice device = InputDevice.getDevice(deviceId);
         if (device != null) {
-            if (device.isExternal()) {
+            if (PlatformCompat.isExternalInputDevice(device)) {
                 externalDeviceIds.add(deviceId);
                 return true;
             }

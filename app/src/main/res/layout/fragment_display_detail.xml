@@ -174,6 +174,43 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
+            <!-- On-screen keyboard location -->
+            <LinearLayout
+                android:id="@+id/ime_policy_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:minHeight="56dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
+                android:visibility="gone">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginEnd="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ime_to_this_display"
+                        android:textAppearance="?attr/textAppearanceBodyLarge" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ime_to_this_display_desc"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:textColor="?colorOnSurfaceVariant"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+                <Spinner
+                    android:id="@+id/ime_policy_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="160dp" />
+            </LinearLayout>
+
         </LinearLayout>
 
         <!-- Display Configuration -->

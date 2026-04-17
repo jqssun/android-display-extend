@@ -12,6 +12,15 @@
     android:clickable="true"
     android:focusable="true">
 
+    <ImageView
+        android:id="@+id/display_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_screens"
+        app:tint="?colorOnSurfaceVariant" />
+
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
