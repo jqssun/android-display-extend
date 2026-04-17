@@ -15,6 +15,7 @@ public class Pref {
     public static final String KEY_USE_REAL_SCREEN_OFF = "use_real_screen_off";
     public static final String KEY_AUTO_BIND_INPUT = "auto_bind_input";
     public static final String KEY_AUTO_SCREEN_OFF = "auto_screen_off";
+    public static final String KEY_SHOW_SYSTEM_SETTING_NAMES = "show_system_setting_names";
 
     // managed virtual display keys
     public static final String KEY_FOLLOW_APP_ROTATION = "rotates_with_content";
@@ -66,6 +67,14 @@ public class Pref {
 
     public static void setAutoScreenOff(boolean v) {
         _prefs().edit().putBoolean(KEY_AUTO_SCREEN_OFF, v).apply();
+    }
+
+    public static boolean getShowSystemSettingNames() {
+        return _prefs().getBoolean(KEY_SHOW_SYSTEM_SETTING_NAMES, false);
+    }
+
+    public static void setShowSystemSettingNames(boolean v) {
+        _prefs().edit().putBoolean(KEY_SHOW_SYSTEM_SETTING_NAMES, v).apply();
     }
 
     // managed virtual display prefs

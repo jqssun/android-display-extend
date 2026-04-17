@@ -11,23 +11,6 @@
         android:orientation="vertical"
         android:paddingVertical="8dp">
 
-        <!-- Device Info -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/device_info_header"
-            android:textAppearance="?attr/textAppearanceLabelLarge"
-            android:textColor="?colorPrimary"
-            android:paddingHorizontal="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="4dp" />
-
-        <LinearLayout
-            android:id="@+id/infoTable"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-
         <!-- Bind to Display -->
         <TextView
             android:layout_width="match_parent"
@@ -61,6 +44,23 @@
                 android:layout_marginStart="8dp"
                 style="@style/Widget.Material3.Button.TonalButton" />
         </LinearLayout>
+
+        <!-- Device Info -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/device_info_header"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            android:textColor="?colorPrimary"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="4dp" />
+
+        <LinearLayout
+            android:id="@+id/infoTable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
 
     </LinearLayout>
 </ScrollView>

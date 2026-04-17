@@ -404,6 +404,7 @@
 
         <!-- Supported display modes -->
         <TextView
+            android:id="@+id/supported_modes_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/supported_modes_header"

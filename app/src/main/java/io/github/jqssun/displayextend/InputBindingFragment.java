@@ -117,8 +117,14 @@ public class InputBindingFragment extends Fragment {
 
         externalDevicesRecycler.setLayoutManager(new LinearLayoutManager(requireContext()));
         internalDevicesRecycler.setLayoutManager(new LinearLayoutManager(requireContext()));
-        externalDevicesRecycler.setAdapter(new DeviceAdapter(external, this::_showDeviceDetails));
-        internalDevicesRecycler.setAdapter(new DeviceAdapter(internal, this::_showDeviceDetails));
+        externalDevicesRecycler.setAdapter(new DeviceAdapter(
+                external,
+                this::_showDeviceDetails,
+                R.drawable.ic_external_input_device));
+        internalDevicesRecycler.setAdapter(new DeviceAdapter(
+                internal,
+                this::_showDeviceDetails,
+                R.drawable.ic_phone));
     }
 
     private void _showDeviceDetails(InputDevice device) {

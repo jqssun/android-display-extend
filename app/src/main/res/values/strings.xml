@@ -39,7 +39,7 @@
 
     <!-- Display list -->
     <string name="display_list_header">Select a physical or virtual display to cast applications to.</string>
-    <string name="wireless_cast_hint">Use Android\'s wireless display</string>
+    <string name="wireless_cast_hint">Use Android Wireless Display</string>
     <string name="display_id_format">Display %1$d (%2$dx%3$d)</string>
     <string name="display_name_format">%s</string>
 
@@ -77,7 +77,7 @@
     <string name="reset_display_config_confirm">Clear forced resolution, DPI, and rotation for this display?</string>
     <string name="reset">Reset</string>
     <string name="reset_all_settings">Reset All</string>
-    <string name="reset_all_settings_confirm">Restore the app and connected displays to their default state? This clears app preferences, stops active display tools, restores the USB audio routing and match content frame rate toggles, and resets overrides on connected external displays.</string>
+    <string name="reset_all_settings_confirm">This clears app preferences and display services, restores system USB audio routing and match content frame rate settings, and resets overrides on connected external displays.</string>
     <string name="auto_open_last_app">Open last app automatically</string>
     <string name="auto_open_last_app_desc">Launch the last app when this display connects</string>
     <string name="floating_button_desc">Show a draggable back button on this display</string>
@@ -88,7 +88,7 @@
     <string name="disable_managed_virtual_display_mode">Disable Managed Virtual Display Mode</string>
     <string name="status_authorized_server">Authorized (UID: %d)</string>
     <string name="status_started_not_authorized_server">Unauthorized (UID: %d)</string>
-    <string name="ime_to_this_display">On-screen keyboard location (Beta)</string>
+    <string name="ime_to_this_display">Keyboard location (Beta)</string>
     <string name="ime_policy_unsupported">Cannot set keyboard policy on this virtual display</string>
     <string name="ime_policy_local">This display</string>
     <string name="ime_policy_fallback_display">Built-in screen</string>
@@ -97,13 +97,16 @@
 
     <!-- Settings -->
     <string name="section_permissions">Permissions</string>
+    <string name="section_application">Application</string>
     <string name="section_displays">Displays</string>
     <string name="section_power">Power</string>
 
     <string name="disable_usb_audio">Disable USB audio routing</string>
-    <string name="disable_usb_audio_desc">Prevent switching audio output to USB audio devices (including external displays or USB DAC).</string>
+    <string name="disable_usb_audio_desc">Prevent switching audio output to USB audio devices (including external displays or USB DAC)</string>
+    <string name="show_system_setting_names">Show raw Android setting keys</string>
+    <string name="show_system_setting_names_desc">Replace friendly titles with their Settings.Global and Settings.Secure names</string>
     <string name="match_content_frame_rate">Match content frame rate</string>
-    <string name="match_content_frame_rate_desc">Controls Android\'s global refresh-rate switching policy for app-requested frame rates.</string>
+    <string name="match_content_frame_rate_desc">Controls Android global refresh-rate switching policy for app-requested frame rates</string>
     <string name="match_content_frame_rate_never">Never</string>
     <string name="match_content_frame_rate_seamless">Seamless only</string>
     <string name="match_content_frame_rate_always">Always</string>
@@ -138,7 +141,7 @@
     <string name="switch_mode">Mode</string>
     <string name="mode_normal">Normal</string>
     <string name="mode_cursor_locked">Locked Cursor</string>
-    <string name="tracking_speed">Tracking speed</string>
+    <string name="tracking_speed">On-screen touchpad tracking speed</string>
     <string name="touchpad_help_normal">Only multi-touch gestures are relayed to display:\n1. Tap to click\n2. Swipe with one finger\n3. Scroll, pinch and rotate with two fingers\n4. Alternatively, scroll with scroll strip</string>
     <string name="touchpad_help_cursor_locked">All gestures are relayed to display</string>
     <string name="touchpad_hint_back">Go back on target display</string>
@@ -208,6 +211,7 @@
     <string name="info_external">External</string>
     <string name="info_input_sources">Input Sources</string>
     <string name="source_keyboard">Keyboard</string>
+    <string name="source_dpad">D-pad</string>
     <string name="source_gamepad">Gamepad</string>
     <string name="source_touchscreen">Touchscreen</string>
     <string name="source_mouse">Mouse</string>

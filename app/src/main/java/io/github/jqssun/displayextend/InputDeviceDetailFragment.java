@@ -114,11 +114,11 @@ public class InputDeviceDetailFragment extends Fragment {
     private String _getDeviceSources(InputDevice device) {
         List<String> sources = new ArrayList<>();
 
-        if ((device.getSources() & InputDevice.SOURCE_KEYBOARD) != 0) sources.add(getString(R.string.source_keyboard));
-        if ((device.getSources() & InputDevice.SOURCE_DPAD) != 0) sources.add("D-pad");
-        if ((device.getSources() & InputDevice.SOURCE_GAMEPAD) != 0) sources.add(getString(R.string.source_gamepad));
-        if ((device.getSources() & InputDevice.SOURCE_TOUCHSCREEN) != 0) sources.add(getString(R.string.source_touchscreen));
-        if ((device.getSources() & InputDevice.SOURCE_MOUSE) != 0) sources.add(getString(R.string.source_mouse));
+        if (device.supportsSource(InputDevice.SOURCE_KEYBOARD)) sources.add(getString(R.string.source_keyboard));
+        if (device.supportsSource(InputDevice.SOURCE_DPAD)) sources.add(getString(R.string.source_dpad));
+        if (device.supportsSource(InputDevice.SOURCE_GAMEPAD)) sources.add(getString(R.string.source_gamepad));
+        if (device.supportsSource(InputDevice.SOURCE_TOUCHSCREEN)) sources.add(getString(R.string.source_touchscreen));
+        if (device.supportsSource(InputDevice.SOURCE_MOUSE)) sources.add(getString(R.string.source_mouse));
 
         return TextUtils.join(", ", sources);
     }

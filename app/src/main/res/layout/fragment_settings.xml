@@ -10,11 +10,11 @@
         android:orientation="vertical"
         android:paddingVertical="8dp">
 
-        <!-- Display category -->
+        <!-- Application category -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/section_displays"
+            android:text="@string/section_application"
             android:textAppearance="?attr/textAppearanceLabelLarge"
             android:textColor="?colorPrimary"
             android:paddingHorizontal="16dp"
@@ -40,6 +40,50 @@
             android:valueTo="3.0"
             android:stepSize="0.1" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:minHeight="56dp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="16dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/show_system_setting_names"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/show_system_setting_names_desc"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?colorOnSurfaceVariant"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/showSystemSettingNamesSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <!-- Display category -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/section_displays"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            android:textColor="?colorPrimary"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="4dp" />
+
         <!-- Disable USB audio -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -55,7 +99,10 @@
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:layout_marginEnd="16dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                <TextView
+                    android:id="@+id/disableUsbAudioTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="@string/disable_usb_audio"
                     android:textAppearance="?attr/textAppearanceBodyLarge" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -79,10 +126,7 @@
             android:gravity="center_vertical"
             android:minHeight="56dp"
             android:paddingHorizontal="16dp"
-            android:paddingVertical="12dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground">
+            android:paddingVertical="12dp">
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -90,6 +134,7 @@
                 android:orientation="vertical"
                 android:layout_marginEnd="16dp">
                 <TextView
+                    android:id="@+id/matchContentFrameRateTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/match_content_frame_rate"
@@ -102,12 +147,11 @@
                     android:textColor="?colorOnSurfaceVariant"
                     android:layout_marginTop="2dp" />
             </LinearLayout>
-            <TextView
-                android:id="@+id/matchContentFrameRateValueText"
+            <Spinner
+                android:id="@+id/matchContentFrameRateSpinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceLabelLarge"
-                android:textColor="?colorPrimary" />
+                android:minWidth="160dp" />
         </LinearLayout>
 
         <!-- Force desktop mode -->
@@ -125,7 +169,10 @@
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:layout_marginEnd="16dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                <TextView
+                    android:id="@+id/forceDesktopTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="@string/force_desktop_mode"
                     android:textAppearance="?attr/textAppearanceBodyLarge" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -155,7 +202,10 @@
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:layout_marginEnd="16dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                <TextView
+                    android:id="@+id/forceResizableTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="@string/force_resizable"
                     android:textAppearance="?attr/textAppearanceBodyLarge" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -185,7 +235,10 @@
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:layout_marginEnd="16dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                <TextView
+                    android:id="@+id/enableFreeformTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="@string/enable_freeform"
                     android:textAppearance="?attr/textAppearanceBodyLarge" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -215,7 +268,10 @@
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:layout_marginEnd="16dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                <TextView
+                    android:id="@+id/enableNonResizableTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="@string/enable_non_resizable_multiwindow"
                     android:textAppearance="?attr/textAppearanceBodyLarge" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -245,7 +301,10 @@
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:layout_marginEnd="16dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                <TextView
+                    android:id="@+id/disableScreenShareProtectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="@string/disable_screen_share_protection"
                     android:textAppearance="?attr/textAppearanceBodyLarge" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -270,6 +329,39 @@
             android:paddingHorizontal="16dp"
             android:paddingTop="16dp"
             android:paddingBottom="4dp" />
+
+        <!-- Stay on while plugged -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:minHeight="56dp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="16dp">
+                <TextView
+                    android:id="@+id/stayOnWhilePluggedTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stay_on_while_plugged"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/stay_on_while_plugged_desc"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?colorOnSurfaceVariant"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/stayOnWhilePluggedCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
         <!-- Real screen off -->
         <LinearLayout
@@ -297,36 +389,6 @@
             </LinearLayout>
             <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/useRealScreenOffCheckbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <!-- Stay on while plugged -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:minHeight="56dp"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="12dp">
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_marginEnd="16dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="@string/stay_on_while_plugged"
-                    android:textAppearance="?attr/textAppearanceBodyLarge" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="@string/stay_on_while_plugged_desc"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="?colorOnSurfaceVariant"
-                    android:layout_marginTop="2dp" />
-            </LinearLayout>
-            <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/stayOnWhilePluggedCheckbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>

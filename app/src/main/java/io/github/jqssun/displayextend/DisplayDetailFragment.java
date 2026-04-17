@@ -49,6 +49,7 @@ public class DisplayDetailFragment extends Fragment {
     private LinearLayout infoTable;
     private LinearLayout shizukuTable;
     private LinearLayout shizukuCard;
+    private View supportedModesHeader;
     private int displayId;
     private Display display;
     private LinearLayout modesTable;
@@ -115,6 +116,7 @@ public class DisplayDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_display_detail, container, false);
         modesTable = view.findViewById(R.id.modes_table);
+        supportedModesHeader = view.findViewById(R.id.supported_modes_header);
         infoTable = view.findViewById(R.id.info_table);
         shizukuTable = view.findViewById(R.id.shizuku_table);
         shizukuCard = view.findViewById(R.id.shizuku_card);
@@ -466,6 +468,16 @@ public class DisplayDetailFragment extends Fragment {
     }
 
     private void _setupDisplayModes(Display.Mode[] supportedModes, int currentModeId) {
+        if (supportedModesHeader != null) {
+            boolean hasModes = supportedModes != null && supportedModes.length > 0;
+            supportedModesHeader.setVisibility(hasModes ? View.VISIBLE : View.GONE);
+            modesTable.setVisibility(hasModes ? View.VISIBLE : View.GONE);
+            if (!hasModes) {
+                modesTable.removeAllViews();
+                return;
+            }
+        }
+
         modesTable.removeAllViews();
         Context modeCtx = getContext();
         if (modeCtx == null) return;

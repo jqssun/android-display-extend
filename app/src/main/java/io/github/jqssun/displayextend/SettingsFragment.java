@@ -8,6 +8,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.provider.Settings;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.view.Display;
 import android.view.IWindowManager;
 import android.view.LayoutInflater;
@@ -36,6 +39,17 @@ import dev.rikka.tools.refine.Refine;
 
 public class SettingsFragment extends Fragment {
     private static final String MATCH_CONTENT_FRAME_RATE_KEY = "match_content_frame_rate";
+    private static final String USB_AUDIO_AUTOMATIC_ROUTING_DISABLED_KEY =
+            "usb_audio_automatic_routing_disabled";
+    private static final String FORCE_DESKTOP_MODE_ON_EXTERNAL_DISPLAYS_KEY =
+            "force_desktop_mode_on_external_displays";
+    private static final String FORCE_RESIZABLE_ACTIVITIES_KEY = "force_resizable_activities";
+    private static final String ENABLE_FREEFORM_SUPPORT_KEY = "enable_freeform_support";
+    private static final String ENABLE_NON_RESIZABLE_MULTI_WINDOW_KEY =
+            "enable_non_resizable_multi_window";
+    private static final String DISABLE_SCREEN_SHARE_PROTECTIONS_KEY =
+            "disable_screen_share_protections_for_apps_and_notifications";
+    private static final String STAY_ON_WHILE_PLUGGED_IN_KEY = "stay_on_while_plugged_in";
 
     private MaterialSwitch forceDesktopCheckbox;
     private MaterialSwitch forceResizableCheckbox;
@@ -46,9 +60,18 @@ public class SettingsFragment extends Fragment {
     private MaterialSwitch useRealScreenOffCheckbox;
     private MaterialSwitch stayOnWhilePluggedCheckbox;
     private MaterialSwitch autoScreenOffCheckbox;
+    private MaterialSwitch showSystemSettingNamesSwitch;
     private View matchContentFrameRateRow;
-    private TextView matchContentFrameRateValueText;
+    private Spinner matchContentFrameRateSpinner;
     private Slider trackingSpeedSlider;
+    private TextView disableUsbAudioTitle;
+    private TextView matchContentFrameRateTitle;
+    private TextView forceDesktopTitle;
+    private TextView forceResizableTitle;
+    private TextView enableFreeformTitle;
+    private TextView enableNonResizableTitle;
+    private TextView disableScreenShareProtectionTitle;
+    private TextView stayOnWhilePluggedTitle;
 
     @Nullable
     @Override
@@ -64,9 +87,18 @@ public class SettingsFragment extends Fragment {
         useRealScreenOffCheckbox = view.findViewById(R.id.useRealScreenOffCheckbox);
         stayOnWhilePluggedCheckbox = view.findViewById(R.id.stayOnWhilePluggedCheckbox);
         autoScreenOffCheckbox = view.findViewById(R.id.autoScreenOffCheckbox);
+        showSystemSettingNamesSwitch = view.findViewById(R.id.showSystemSettingNamesSwitch);
         matchContentFrameRateRow = view.findViewById(R.id.matchContentFrameRateRow);
-        matchContentFrameRateValueText = view.findViewById(R.id.matchContentFrameRateValueText);
+        matchContentFrameRateSpinner = view.findViewById(R.id.matchContentFrameRateSpinner);
         trackingSpeedSlider = view.findViewById(R.id.trackingSpeedSlider);
+        disableUsbAudioTitle = view.findViewById(R.id.disableUsbAudioTitle);
+        matchContentFrameRateTitle = view.findViewById(R.id.matchContentFrameRateTitle);
+        forceDesktopTitle = view.findViewById(R.id.forceDesktopTitle);
+        forceResizableTitle = view.findViewById(R.id.forceResizableTitle);
+        enableFreeformTitle = view.findViewById(R.id.enableFreeformTitle);
+        enableNonResizableTitle = view.findViewById(R.id.enableNonResizableTitle);
+        disableScreenShareProtectionTitle = view.findViewById(R.id.disableScreenShareProtectionTitle);
+        stayOnWhilePluggedTitle = view.findViewById(R.id.stayOnWhilePluggedTitle);
 
         boolean granted = PermissionManager.grant("android.permission.WRITE_SECURE_SETTINGS");
         _setupDisableScreenShareProtectionCheckbox();
@@ -80,6 +112,7 @@ public class SettingsFragment extends Fragment {
         _setupStayOnWhilePluggedCheckbox();
         _setupAutoScreenOffCheckbox();
         _setupTrackingSpeedSlider();
+        _setupShowSystemSettingNamesSwitch();
         _setupResetAllButton(view);
         if (!granted) {
             disableScreenShareProtectionCheckbox.setEnabled(false);
@@ -89,7 +122,7 @@ public class SettingsFragment extends Fragment {
             enableNonResizableCheckbox.setEnabled(false);
             disableUsbAudioCheckbox.setEnabled(false);
             stayOnWhilePluggedCheckbox.setEnabled(false);
-            matchContentFrameRateRow.setEnabled(false);
+            matchContentFrameRateSpinner.setEnabled(false);
             matchContentFrameRateRow.setAlpha(0.5f);
         }
 
@@ -128,6 +161,15 @@ public class SettingsFragment extends Fragment {
         });
     }
 
+    private void _setupShowSystemSettingNamesSwitch() {
+        showSystemSettingNamesSwitch.setChecked(Pref.getShowSystemSettingNames());
+        showSystemSettingNamesSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            Pref.setShowSystemSettingNames(isChecked);
+            _updateSystemSettingTitleLabels();
+        });
+        _updateSystemSettingTitleLabels();
+    }
+
     private void _hideRow(View v) {
         ((View) v.getParent()).setVisibility(View.GONE);
     }
@@ -144,7 +186,7 @@ public class SettingsFragment extends Fragment {
     }
 
     private void _setupForceDesktopCheckbox() {
-        _bindGlobalSetting(forceDesktopCheckbox, "force_desktop_mode_on_external_displays");
+        _bindGlobalSetting(forceDesktopCheckbox, FORCE_DESKTOP_MODE_ON_EXTERNAL_DISPLAYS_KEY);
         boolean isHuawei = Build.MANUFACTURER.toLowerCase().contains("huawei") ||
                           Build.BRAND.toLowerCase().contains("huawei") ||
                           Build.DEVICE.toLowerCase().contains("huawei");
@@ -154,19 +196,19 @@ public class SettingsFragment extends Fragment {
     }
 
     private void _setupForceResizableCheckbox() {
-        _bindGlobalSetting(forceResizableCheckbox, "force_resizable_activities");
+        _bindGlobalSetting(forceResizableCheckbox, FORCE_RESIZABLE_ACTIVITIES_KEY);
     }
 
     private void _setupEnableFreeformCheckbox() {
-        _bindGlobalSetting(enableFreeformCheckbox, "enable_freeform_support");
+        _bindGlobalSetting(enableFreeformCheckbox, ENABLE_FREEFORM_SUPPORT_KEY);
     }
 
     private void _setupEnableNonResizableCheckbox() {
-        _bindGlobalSetting(enableNonResizableCheckbox, "enable_non_resizable_multi_window");
+        _bindGlobalSetting(enableNonResizableCheckbox, ENABLE_NON_RESIZABLE_MULTI_WINDOW_KEY);
     }
 
     private void _setupDisableScreenShareProtectionCheckbox() {
-        _bindGlobalSetting(disableScreenShareProtectionCheckbox, "disable_screen_share_protections_for_apps_and_notifications");
+        _bindGlobalSetting(disableScreenShareProtectionCheckbox, DISABLE_SCREEN_SHARE_PROTECTIONS_KEY);
     }
 
     private void _setupDisableUsbAudioCheckbox() {
@@ -175,7 +217,7 @@ public class SettingsFragment extends Fragment {
         disableUsbAudioCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             try {
                 Settings.Secure.putInt(requireContext().getContentResolver(),
-                        "usb_audio_automatic_routing_disabled", isChecked ? 1 : 0);
+                        USB_AUDIO_AUTOMATIC_ROUTING_DISABLED_KEY, isChecked ? 1 : 0);
                 Pref.setUsbAudioDisabled(isChecked);
             } catch (SecurityException e) {
                 State.log("failed: " + e);
@@ -184,24 +226,39 @@ public class SettingsFragment extends Fragment {
     }
 
     private void _setupMatchContentFrameRateRow() {
-        _updateMatchContentFrameRateSummary(_getMatchContentFrameRateValue());
-        matchContentFrameRateRow.setOnClickListener(v -> {
-            int currentValue = _getMatchContentFrameRateValue();
-            CharSequence[] options = new CharSequence[] {
-                    getString(R.string.match_content_frame_rate_never),
-                    getString(R.string.match_content_frame_rate_seamless),
-                    getString(R.string.match_content_frame_rate_always)
-            };
-            new MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.match_content_frame_rate)
-                    .setSingleChoiceItems(options, _coerceMatchContentFrameRateValue(currentValue),
-                            (dialog, which) -> {
-                                _setMatchContentFrameRateValue(which);
-                                _updateMatchContentFrameRateSummary(which);
-                                dialog.dismiss();
-                            })
-                    .setNegativeButton(R.string.cancel, null)
-                    .show();
+        Context context = requireContext();
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                context,
+                android.R.layout.simple_spinner_item,
+                new String[] {
+                        getString(R.string.match_content_frame_rate_never),
+                        getString(R.string.match_content_frame_rate_seamless),
+                        getString(R.string.match_content_frame_rate_always)
+                }
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        matchContentFrameRateSpinner.setAdapter(adapter);
+        matchContentFrameRateSpinner.setOnItemSelectedListener(null);
+        matchContentFrameRateSpinner.setSelection(
+                _coerceMatchContentFrameRateValue(_getMatchContentFrameRateValue()),
+                false
+        );
+
+        final boolean[] initialized = {false};
+        matchContentFrameRateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (!initialized[0]) {
+                    initialized[0] = true;
+                    return;
+                }
+                _setMatchContentFrameRateValue(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // no-op
+            }
         });
     }
 
@@ -215,17 +272,51 @@ public class SettingsFragment extends Fragment {
 
     private void _setupStayOnWhilePluggedCheckbox() {
         boolean isStayOnWhilePlugged = Settings.Global.getInt(requireContext().getContentResolver(),
-                "stay_on_while_plugged_in", 0) != 0;
+                STAY_ON_WHILE_PLUGGED_IN_KEY, 0) != 0;
         stayOnWhilePluggedCheckbox.setChecked(isStayOnWhilePlugged);
 
         stayOnWhilePluggedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             try {
                 Settings.Global.putInt(requireContext().getContentResolver(),
-                        "stay_on_while_plugged_in", isChecked ? 7 : 0);
+                        STAY_ON_WHILE_PLUGGED_IN_KEY, isChecked ? 7 : 0);
             } catch (SecurityException e) {
                 State.log("failed: " + e);
             }
         });
+    }
+
+    private void _updateSystemSettingTitleLabels() {
+        boolean showRaw = Pref.getShowSystemSettingNames();
+        _setSystemSettingTitle(disableUsbAudioTitle, R.string.disable_usb_audio, showRaw,
+                _secureSettingTitle(USB_AUDIO_AUTOMATIC_ROUTING_DISABLED_KEY));
+        _setSystemSettingTitle(matchContentFrameRateTitle, R.string.match_content_frame_rate,
+                showRaw, _secureSettingTitle(MATCH_CONTENT_FRAME_RATE_KEY));
+        _setSystemSettingTitle(forceDesktopTitle, R.string.force_desktop_mode, showRaw,
+                _globalSettingTitle(FORCE_DESKTOP_MODE_ON_EXTERNAL_DISPLAYS_KEY));
+        _setSystemSettingTitle(forceResizableTitle, R.string.force_resizable, showRaw,
+                _globalSettingTitle(FORCE_RESIZABLE_ACTIVITIES_KEY));
+        _setSystemSettingTitle(enableFreeformTitle, R.string.enable_freeform, showRaw,
+                _globalSettingTitle(ENABLE_FREEFORM_SUPPORT_KEY));
+        _setSystemSettingTitle(enableNonResizableTitle, R.string.enable_non_resizable_multiwindow,
+                showRaw, _globalSettingTitle(ENABLE_NON_RESIZABLE_MULTI_WINDOW_KEY));
+        _setSystemSettingTitle(disableScreenShareProtectionTitle,
+                R.string.disable_screen_share_protection, showRaw,
+                _globalSettingTitle(DISABLE_SCREEN_SHARE_PROTECTIONS_KEY));
+        _setSystemSettingTitle(stayOnWhilePluggedTitle, R.string.stay_on_while_plugged, showRaw,
+                _globalSettingTitle(STAY_ON_WHILE_PLUGGED_IN_KEY));
+    }
+
+    private void _setSystemSettingTitle(TextView textView, int friendlyResId, boolean showRaw,
+                                        String rawTitle) {
+        textView.setText(showRaw ? rawTitle : getString(friendlyResId));
+    }
+
+    private String _secureSettingTitle(String key) {
+        return "Settings.Secure." + key;
+    }
+
+    private String _globalSettingTitle(String key) {
+        return "Settings.Global." + key;
     }
 
     private void _setupResetAllButton(View root) {
@@ -241,14 +332,14 @@ public class SettingsFragment extends Fragment {
     private void _resetAllToStock() {
         Context context = requireContext();
 
-        _putGlobalInt("force_desktop_mode_on_external_displays", 0);
-        _putGlobalInt("force_resizable_activities", 0);
-        _putGlobalInt("enable_freeform_support", 0);
-        _putGlobalInt("enable_non_resizable_multi_window", 0);
-        _putGlobalInt("disable_screen_share_protections_for_apps_and_notifications", 0);
-        _putGlobalInt("stay_on_while_plugged_in", 0);
+        _putGlobalInt(FORCE_DESKTOP_MODE_ON_EXTERNAL_DISPLAYS_KEY, 0);
+        _putGlobalInt(FORCE_RESIZABLE_ACTIVITIES_KEY, 0);
+        _putGlobalInt(ENABLE_FREEFORM_SUPPORT_KEY, 0);
+        _putGlobalInt(ENABLE_NON_RESIZABLE_MULTI_WINDOW_KEY, 0);
+        _putGlobalInt(DISABLE_SCREEN_SHARE_PROTECTIONS_KEY, 0);
+        _putGlobalInt(STAY_ON_WHILE_PLUGGED_IN_KEY, 0);
         _setMatchContentFrameRateValue(0);
-        _putSecureInt("usb_audio_automatic_routing_disabled", 0);
+        _putSecureInt(USB_AUDIO_AUTOMATIC_ROUTING_DISABLED_KEY, 0);
 
         Pref.clearAll();
         _stopActiveFeatures(context);
@@ -364,6 +455,8 @@ public class SettingsFragment extends Fragment {
         useRealScreenOffCheckbox.setOnCheckedChangeListener(null);
         stayOnWhilePluggedCheckbox.setOnCheckedChangeListener(null);
         autoScreenOffCheckbox.setOnCheckedChangeListener(null);
+        showSystemSettingNamesSwitch.setOnCheckedChangeListener(null);
+        matchContentFrameRateSpinner.setOnItemSelectedListener(null);
         trackingSpeedSlider.clearOnChangeListeners();
 
         _setupDisableScreenShareProtectionCheckbox();
@@ -377,6 +470,7 @@ public class SettingsFragment extends Fragment {
         _setupStayOnWhilePluggedCheckbox();
         _setupAutoScreenOffCheckbox();
         _setupTrackingSpeedSlider();
+        _setupShowSystemSettingNamesSwitch();
     }
 
     private int _getMatchContentFrameRateValue() {
@@ -419,23 +513,6 @@ public class SettingsFragment extends Fragment {
             return 1;
         }
         return value;
-    }
-
-    private void _updateMatchContentFrameRateSummary(int value) {
-        int labelRes;
-        switch (_coerceMatchContentFrameRateValue(value)) {
-            case 0:
-                labelRes = R.string.match_content_frame_rate_never;
-                break;
-            case 2:
-                labelRes = R.string.match_content_frame_rate_always;
-                break;
-            case 1:
-            default:
-                labelRes = R.string.match_content_frame_rate_seamless;
-                break;
-        }
-        matchContentFrameRateValueText.setText(labelRes);
     }
 
     private void _putGlobalInt(String key, int value) {

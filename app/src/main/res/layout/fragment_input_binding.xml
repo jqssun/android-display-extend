@@ -105,8 +105,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
-                android:layout_marginTop="4dp"
-                android:paddingHorizontal="8dp" />
+                android:layout_marginTop="4dp" />
         </LinearLayout>
 
         <!-- Internal devices (hidden by default) -->
