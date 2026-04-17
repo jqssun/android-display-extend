@@ -1,6 +1,5 @@
 package io.github.jqssun.displayextend.job;
 
-import io.github.jqssun.displayextend.Pref;
 import io.github.jqssun.displayextend.R;
 import io.github.jqssun.displayextend.State;
 import io.github.jqssun.displayextend.shizuku.ServiceUtils;
@@ -91,10 +90,6 @@ public class InputRouting {
     }
 
     public static void bindAllExternalInputToDisplay(int displayId) {
-        if (!Pref.getAutoBindInput()) {
-            State.log("skipping input binding (disabled in settings)");
-            return;
-        }
         DisplayInfo displayInfo = ServiceUtils.getDisplayManager().getDisplayInfo(displayId);
         IInputManager inputManager = ServiceUtils.getInputManager();
         Map<String, String> inputDeviceDescriptorToPortMap = InputRouting.getInputDeviceDescriptorToPortMap();

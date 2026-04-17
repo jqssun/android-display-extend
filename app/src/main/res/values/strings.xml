@@ -19,7 +19,7 @@
     <string name="on">On</string>
     <string name="off">Off</string>
     <string name="shizuku">Shizuku</string>
-    <string name="dpi_label">DPI</string>
+    <string name="dpi_label">DPI (density-aware UI scaling)</string>
 
     <!-- Navigation -->
     <string name="overview">Overview</string>
@@ -36,14 +36,14 @@
     <string name="screens">Displays</string>
     <string name="screen_off">Turn Off Built-in Screen</string>
     <string name="touchpad">Touchpad</string>
+    <string name="touchpad_nav_label">On-Screen Keyboard &amp; Touchpad</string>
     <string name="settings">Settings</string>
     <string name="status_not_started">Not started</string>
-    <string name="no_cast_title">No app being cast</string>
-    <string name="no_cast_message">- USB-C DisplayPort: Connect a screen, then select it from the screen list to cast an app\n\n- Wireless: Use Android\'s built-in wireless display, then find the screen in the list to cast an app</string>
+    <string name="touchpad_no_cast_message">Cast an app from the Displays list first. Touchpad will send gestures to the display which the app was cast to.</string>
     <string name="got_it">Got It</string>
     <string name="shizuku_required">Shizuku permission is required</string>
     <string name="displays_status_format">%d display(s) connected</string>
-    <string name="touchpad_no_cast">No cast active</string>
+    <string name="touchpad_no_cast">No app being cast</string>
 
     <!-- Display list -->
     <string name="display_list_header">Select a display other than the built-in screen to cast an app. Virtual displays are supported too.</string>
@@ -56,6 +56,10 @@
     <string name="display_info_header">Display Info</string>
     <string name="advanced_info_header">Advanced (Requires Shizuku)</string>
     <string name="resolution_label">Resolution</string>
+    <string name="scale_label">Scale (entire display scaling)</string>
+    <string name="scale_format">%d%%</string>
+    <string name="edit_scale">Change Scale</string>
+    <string name="enter_scale_hint">Enter scale percentage</string>
     <string name="rotation_label">Rotation</string>
     <string name="actions_header">Actions</string>
     <string name="info_display_id">Display ID</string>
@@ -75,12 +79,15 @@
     <string name="supported_modes_header">Supported Modes</string>
     <string name="mode_col_id">Mode</string>
     <string name="cast_single_app">Cast an App</string>
+    <string name="reset_display_config">Reset Display Configuration</string>
+    <string name="reset_display_config_confirm">Clear forced resolution, DPI, and rotation for this display?</string>
+    <string name="reset">Reset</string>
     <string name="auto_open_last_app">Open last app automatically</string>
     <string name="auto_open_last_app_desc">Launch the last app when this display connects</string>
     <string name="floating_button_desc">Show a draggable back button on this display</string>
-    <string name="force_landscape">Force landscape</string>
-    <string name="force_landscape_desc">Force the floating button to landscape orientation</string>
-    <string name="ime_to_this_display_desc">Show the on-screen keyboard on this display instead of the built-in screen. Requires a trusted virtual display.</string>
+    <string name="floating_button_force_landscape">Force landscape for the floating back button</string>
+    <string name="floating_button_force_landscape_desc">Keep the floating button in landscape orientation</string>
+    <string name="ime_to_this_display_desc">Show keyboard on this display instead of the built-in screen. Requires a trusted virtual display.</string>
     <string name="bridge_button_text">Enable Rotation Control</string>
     <string name="exit_bridge">Disable Rotation Control</string>
     <string name="status_authorized_server">Authorized (UID: %d)</string>
@@ -109,7 +116,7 @@
     <string name="disable_screen_share_protection_desc">Remove DRM restrictions when sharing screen</string>
     <string name="use_real_screen_off">Use real screen off</string>
     <string name="use_real_screen_off_desc">Turn off screen instead of simulating a black image; wake with volume keys</string>
-    <string name="stay_on_while_plugged">Stay on while charging</string>
+    <string name="stay_on_while_plugged">Keep screen on while charging</string>
     <string name="stay_on_while_plugged_desc">Prevent screen from turning off when plugged in</string>
     <string name="auto_screen_off">Turn screen off when a display connects</string>
     <string name="auto_screen_off_desc">Show a black screen on this device automatically when an external display is detected</string>
@@ -117,7 +124,7 @@
     <string name="input_binding_status_auto">Auto-bind enabled</string>
     <string name="input_binding_status_manual">Manual</string>
     <string name="auto_bind_input">Automatically bind input devices</string>
-    <string name="auto_bind_input_desc">Bind input devices to the display currently in focus</string>
+    <string name="auto_bind_input_desc">Bind input devices to the display that is in focus</string>
     <string name="bind_input_devices">Bind</string>
     <string name="external_input_devices">External Devices</string>
     <string name="internal_input_devices">Internal Devices</string>
@@ -128,10 +135,14 @@
     <string name="switch_mode">Mode</string>
     <string name="mode_normal">Normal</string>
     <string name="mode_cursor_locked">Locked Cursor</string>
-    <string name="touchpad_sensitivity">Speed</string>
-    <string name="touchpad_help_cursor_locked">Cursor stays fixed, single-finger gestures only</string>
-    <string name="touchpad_help_move_cursor">Move cursor</string>
-    <string name="touchpad_help_text">Touch this area to control the target screen:\n\n- Single-finger swipe: %s\n- Single-finger tap: Tap on the target screen\n- Multi-finger gesture: Sent to the target screen\n- Back button: Go back on the target screen\n- Home button: Reopen the selected app\n- Display off button: Turn off the built-in screen to save power</string>
+    <string name="touchpad_sensitivity">Tracking speed</string>
+    <string name="touchpad_help_normal">Only multi-touch gestures are relayed to display:\n1. Tap to click\n2. Swipe with one finger\n3. Scroll, pinch and rotate with two fingers\n4. Alternatively, scroll with scroll strip</string>
+    <string name="touchpad_help_cursor_locked">All gestures are relayed to display</string>
+    <string name="touchpad_hint_back">Go back on target display</string>
+    <string name="touchpad_hint_home">Reopen last casted app</string>
+    <string name="touchpad_hint_screen_off">Turn off built-in screen</string>
+    <string name="touchpad_hint_rotate_cw">Rotate screen clockwise</string>
+    <string name="touchpad_hint_rotate_ccw">Rotate screen counter-clockwise</string>
     <string name="show_cursor_failed">Failed to show cursor</string>
     <string name="rotate">Rotate</string>
     <string name="rotate_cw">Rotate Clockwise</string>
@@ -162,7 +173,7 @@
     <string name="open_on_phone">Open on Phone</string>
     <string name="search_apps_hint">Search apps</string>
     <string name="show_all_apps">Show system apps</string>
-    <string name="floating_button">Floating button</string>
+    <string name="floating_button">Floating back button</string>
     <string name="enter_force_dpi_hint">Enter DPI (Auto: 0)</string>
     <string name="query_apps_permission_required">QUERY_ALL_PACKAGES permission is required</string>
     <string name="cannot_get_app_list">Cannot get app list, please check permissions</string>

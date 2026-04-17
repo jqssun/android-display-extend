@@ -34,7 +34,7 @@
     <fragment
         android:id="@+id/nav_touchpad"
         android:name="io.github.jqssun.displayextend.TouchpadFragment"
-        android:label="@string/touchpad" />
+        android:label="@string/touchpad_nav_label" />
 
     <fragment
         android:id="@+id/nav_input_binding"

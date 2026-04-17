@@ -27,6 +27,15 @@
             android:text="@string/wireless_cast_hint"
             style="@style/Widget.Material3.Button.TonalButton" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/screen_off_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/screen_off"
+            style="@style/Widget.Material3.Button.TonalButton" />
+
         <TextView
             android:id="@+id/headerText"
             android:layout_width="match_parent"

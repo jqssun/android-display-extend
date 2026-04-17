@@ -1,35 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
     android:background="?android:colorBackground">
 
-    <TextView
-        android:id="@+id/noProjectionCard"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:visibility="gone"
-        android:text="@string/no_cast_message"
-        android:textAppearance="?attr/textAppearanceBodyLarge"
-        android:textColor="?colorOnSurfaceVariant" />
+        android:orientation="vertical"
+        android:paddingVertical="8dp">
 
-    <TextView
-        android:id="@+id/targetDisplayText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceTitleMedium"
-        android:layout_marginBottom="16dp" />
+        <!-- Status card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/statusCard"
+            style="@style/Widget.Material3.CardView.Elevated"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            app:cardBackgroundColor="?attr/colorPrimaryContainer">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/startTouchpadBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/open_touchpad"
-        app:icon="@drawable/ic_touchpad"
-        app:iconGravity="start" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp">
 
-</LinearLayout>
+                <ImageView
+                    android:id="@+id/statusIcon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/ic_error"
+                    android:contentDescription="@null"
+                    app:tint="?attr/colorOnPrimaryContainer" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/statusTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="?attr/colorOnPrimaryContainer" />
+
+                    <TextView
+                        android:id="@+id/statusDetail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:textColor="?attr/colorOnPrimaryContainer" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- On-screen keyboard -->
+        <LinearLayout
+            android:id="@+id/ime_policy_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:minHeight="56dp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:layout_marginTop="8dp"
+            android:visibility="gone">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="16dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/ime_to_this_display"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/ime_to_this_display_desc"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?colorOnSurfaceVariant"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/ime_policy_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <!-- Tracking speed -->
+        <TextView
+            android:id="@+id/sensitivityLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="4dp"
+            android:text="@string/touchpad_sensitivity"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            android:textColor="?colorPrimary" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/sensitivitySlider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:valueFrom="0.5"
+            android:valueTo="3.0"
+            android:stepSize="0.1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/startTouchpadBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/open_touchpad"
+            app:icon="@drawable/ic_touchpad"
+            app:iconGravity="start" />
+
+    </LinearLayout>
+</ScrollView>

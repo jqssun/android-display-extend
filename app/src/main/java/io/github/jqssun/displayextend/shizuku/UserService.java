@@ -73,12 +73,6 @@ public class UserService extends IUserService.Stub  {
         return _exec("dumpsys input");
     }
 
-    @Override
-    public void disablePhantomProcessMonitoring() throws RemoteException {
-        _exec("/system/bin/device_config set_sync_disabled_for_tests persistent");
-        _exec("/system/bin/device_config put activity_manager max_phantom_processes 2147483647");
-    }
-
     private String _exec(String command) throws RemoteException {
         try {
             Process process = Runtime.getRuntime().exec(command);

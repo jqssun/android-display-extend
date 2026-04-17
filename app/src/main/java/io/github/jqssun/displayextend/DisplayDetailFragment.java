@@ -33,6 +33,8 @@ import io.github.jqssun.displayextend.dialog.BridgeDialog;
 import io.github.jqssun.displayextend.dialog.DpiDialog;
 import io.github.jqssun.displayextend.dialog.ResolutionDialog;
 import io.github.jqssun.displayextend.dialog.RotationDialog;
+import io.github.jqssun.displayextend.dialog.ScaleDialog;
+import io.github.jqssun.displayextend.job.ResetDisplayConfig;
 import io.github.jqssun.displayextend.shizuku.ServiceUtils;
 import io.github.jqssun.displayextend.shizuku.ShizukuUtils;
 import io.github.jqssun.displayextend.shizuku.WindowingMode;
@@ -46,8 +48,43 @@ public class DisplayDetailFragment extends Fragment {
     private int displayId;
     private Display display;
     private LinearLayout modesTable;
-    private View imePolicyRow;
-    private MaterialSwitch imePolicySwitch;
+    private TextView rotationText;
+    private TextView resolutionText;
+    private TextView dpiText;
+    private Slider dpiSlider;
+    private TextView scaleText;
+    private Slider scaleSlider;
+    private View scaleRow;
+    private int nativeWidth;
+    private int nativeHeight;
+
+    private final DisplayManager.DisplayListener displayListener = new DisplayManager.DisplayListener() {
+        @Override public void onDisplayAdded(int id) {}
+        @Override public void onDisplayRemoved(int id) {}
+        @Override public void onDisplayChanged(int id) {
+            if (id == displayId) _refreshDisplayState();
+        }
+    };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Context ctx = getContext();
+        if (ctx != null) {
+            ((DisplayManager) ctx.getSystemService(Context.DISPLAY_SERVICE))
+                    .registerDisplayListener(displayListener, null);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Context ctx = getContext();
+        if (ctx != null) {
+            ((DisplayManager) ctx.getSystemService(Context.DISPLAY_SERVICE))
+                    .unregisterDisplayListener(displayListener);
+        }
+    }
 
     public static DisplayDetailFragment newInstance(int displayId) {
         DisplayDetailFragment fragment = new DisplayDetailFragment();
@@ -66,8 +103,6 @@ public class DisplayDetailFragment extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_display_detail, container, false);
-        imePolicyRow = view.findViewById(R.id.ime_policy_row);
-        imePolicySwitch = view.findViewById(R.id.ime_policy_switch);
         modesTable = view.findViewById(R.id.modes_table);
         infoTable = view.findViewById(R.id.info_table);
         shizukuTable = view.findViewById(R.id.shizuku_table);
@@ -102,6 +137,17 @@ public class DisplayDetailFragment extends Fragment {
         }
         touchpadButton.setOnClickListener(v -> TouchpadActivity.startTouchpad(getContext(), displayId, false));
 
+        MaterialButton resetConfigButton = view.findViewById(R.id.reset_config_button);
+        if (isSecondary && ShizukuUtils.hasShizukuStarted()) {
+            resetConfigButton.setVisibility(View.VISIBLE);
+            resetConfigButton.setOnClickListener(v -> new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.reset_display_config)
+                    .setMessage(R.string.reset_display_config_confirm)
+                    .setPositiveButton(R.string.reset, (d, w) -> State.startNewJob(new ResetDisplayConfig(displayId)))
+                    .setNegativeButton(R.string.cancel, null)
+                    .show());
+        }
+
         MaterialButton bridgeButton = view.findViewById(R.id.bridge_button);
         if (displayId == State.getBridgeVirtualDisplayId() || displayId == State.bridgeDisplayId) {
             bridgeButton.setVisibility(View.VISIBLE);
@@ -114,13 +160,6 @@ public class DisplayDetailFragment extends Fragment {
             bridgeButton.setVisibility(View.VISIBLE);
             bridgeButton.setOnClickListener(v -> _showBridgeDialog());
         }
-
-        MaterialButton screenOffButton = view.findViewById(R.id.screen_off_button);
-        screenOffButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), PureBlackActivity.class);
-            android.app.ActivityOptions options = android.app.ActivityOptions.makeBasic();
-            startActivity(intent, options.toBundle());
-        });
 
         // --- Display Settings (only for secondary displays) ---
         View settingsHeader = view.findViewById(R.id.settings_header);
@@ -147,41 +186,44 @@ public class DisplayDetailFragment extends Fragment {
                 Pref.setFloatingButton(display.getName(), checked);
             });
 
-            MaterialSwitch landscapeSwitch = view.findViewById(R.id.force_landscape_switch);
-            landscapeSwitch.setChecked(Pref.getForceLandscape());
-            landscapeSwitch.setOnCheckedChangeListener((b, checked) -> Pref.setForceLandscape(checked));
+            MaterialSwitch landscapeSwitch = view.findViewById(R.id.floating_button_force_landscape_switch);
+            landscapeSwitch.setChecked(Pref.getFloatingButtonForceLandscape());
+            landscapeSwitch.setOnCheckedChangeListener((b, checked) -> Pref.setFloatingButtonForceLandscape(checked));
         }
 
         // --- Display Configuration ---
-        DisplayMetrics metrics = new DisplayMetrics();
-        display.getMetrics(metrics);
-
-        TextView resolutionText = view.findViewById(R.id.resolution_text);
-        resolutionText.setText(display.getWidth() + " x " + display.getHeight());
-
-        TextView dpiText = view.findViewById(R.id.dpi_text);
-        dpiText.setText(String.valueOf(metrics.densityDpi));
-
-        TextView rotationText = view.findViewById(R.id.user_rotation_text);
-        _updateRotationText(rotationText);
+        resolutionText = view.findViewById(R.id.resolution_text);
+        dpiText = view.findViewById(R.id.dpi_text);
+        rotationText = view.findViewById(R.id.user_rotation_text);
+        dpiSlider = view.findViewById(R.id.dpi_slider);
+        scaleText = view.findViewById(R.id.scale_text);
+        scaleSlider = view.findViewById(R.id.scale_slider);
+        scaleRow = view.findViewById(R.id.scale_row);
 
         MaterialButton editResolutionButton = view.findViewById(R.id.edit_resolution_button);
         MaterialButton editDpiButton = view.findViewById(R.id.edit_dpi_button);
         MaterialButton editRotationButton = view.findViewById(R.id.edit_rotation_button);
-
-        Slider dpiSlider = view.findViewById(R.id.dpi_slider);
+        MaterialButton editScaleButton = view.findViewById(R.id.edit_scale_button);
 
         if (ShizukuUtils.hasShizukuStarted()) {
+            _readNativeSize();
+
             editResolutionButton.setVisibility(View.VISIBLE);
-            editResolutionButton.setOnClickListener(v ->
-                ResolutionDialog.show(getContext(), displayId, display.getWidth(), display.getHeight()));
+            editResolutionButton.setOnClickListener(v -> {
+                Display d = _currentDisplay();
+                if (d != null) ResolutionDialog.show(getContext(), displayId, d.getWidth(), d.getHeight());
+            });
 
             editDpiButton.setVisibility(View.VISIBLE);
-            editDpiButton.setOnClickListener(v ->
-                DpiDialog.show(getContext(), displayId, metrics.densityDpi));
+            editDpiButton.setOnClickListener(v -> {
+                Display d = _currentDisplay();
+                if (d == null) return;
+                DisplayMetrics m = new DisplayMetrics();
+                d.getMetrics(m);
+                DpiDialog.show(getContext(), displayId, m.densityDpi);
+            });
 
             dpiSlider.setVisibility(View.VISIBLE);
-            dpiSlider.setValue(Math.max(100, Math.min(640, metrics.densityDpi)));
             dpiSlider.addOnChangeListener((s, value, fromUser) -> {
                 if (fromUser) dpiText.setText(String.valueOf((int) value));
             });
@@ -193,16 +235,100 @@ public class DisplayDetailFragment extends Fragment {
                 }
             });
 
+            if (nativeWidth > 0 && nativeHeight > 0) {
+                scaleRow.setVisibility(View.VISIBLE);
+                scaleSlider.setVisibility(View.VISIBLE);
+
+                editScaleButton.setOnClickListener(v ->
+                        ScaleDialog.show(getContext(), displayId, nativeWidth, nativeHeight, _currentScalePercent()));
+
+                scaleSlider.addOnChangeListener((s, value, fromUser) -> {
+                    if (fromUser) scaleText.setText(getString(R.string.scale_format, (int) value));
+                });
+                scaleSlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
+                    @Override public void onStartTrackingTouch(Slider slider) {}
+                    @Override public void onStopTrackingTouch(Slider slider) {
+                        int percent = (int) slider.getValue();
+                        if (percent <= 0) return;
+                        int w = Math.round(nativeWidth * 100f / percent);
+                        int h = Math.round(nativeHeight * 100f / percent);
+                        ServiceUtils.getWindowManager().setForcedDisplaySize(displayId, w, h);
+                    }
+                });
+            }
+
             if (isSecondary) {
                 editRotationButton.setVisibility(View.VISIBLE);
                 editRotationButton.setOnClickListener(v -> RotationDialog.show(getContext(), displayId));
             }
         }
 
-        // --- Display Info ---
+        _refreshDisplayState();
+
+        return view;
+    }
+
+    private Display _currentDisplay() {
+        Context ctx = getContext();
+        if (ctx == null) return null;
+        return ((DisplayManager) ctx.getSystemService(Context.DISPLAY_SERVICE)).getDisplay(displayId);
+    }
+
+    private void _readNativeSize() {
+        try {
+            Point p = new Point();
+            ServiceUtils.getWindowManager().getInitialDisplaySize(displayId, p);
+            nativeWidth = p.x;
+            nativeHeight = p.y;
+        } catch (Throwable e) {
+            State.log("failed to read initial display size: " + e.getMessage());
+            nativeWidth = 0;
+            nativeHeight = 0;
+        }
+    }
+
+    private int _currentScalePercent() {
+        if (nativeWidth <= 0) return 100;
+        Display d = _currentDisplay();
+        if (d == null || d.getWidth() <= 0) return 100;
+        return Math.round(nativeWidth * 100f / d.getWidth());
+    }
+
+    private void _refreshDisplayState() {
+        Context ctx = getContext();
+        if (ctx == null) return;
+        Display d = _currentDisplay();
+        if (d == null) return;
+        DisplayMetrics metrics = new DisplayMetrics();
+        d.getMetrics(metrics);
+
+        if (resolutionText != null) resolutionText.setText(d.getWidth() + " x " + d.getHeight());
+        if (dpiText != null) dpiText.setText(String.valueOf(metrics.densityDpi));
+        if (dpiSlider != null && dpiSlider.getVisibility() == View.VISIBLE) {
+            float clamped = Math.max(100, Math.min(640, metrics.densityDpi));
+            if (dpiSlider.getValue() != clamped) dpiSlider.setValue(clamped);
+        }
+        if (scaleText != null && scaleRow != null && scaleRow.getVisibility() == View.VISIBLE) {
+            int percent = _currentScalePercent();
+            scaleText.setText(getString(R.string.scale_format, percent));
+            if (scaleSlider != null) {
+                float clamped = Math.max(scaleSlider.getValueFrom(), Math.min(scaleSlider.getValueTo(), percent));
+                if (scaleSlider.getValue() != clamped) scaleSlider.setValue(clamped);
+            }
+        }
+        if (rotationText != null) _updateRotationText(rotationText);
+
+        _populateInfoTable(d, ctx);
+        _setupDisplayModes(d.getSupportedModes());
+        _updateShizukuStatus();
+    }
+
+    private void _populateInfoTable(Display d, Context ctx) {
+        if (infoTable == null) return;
+        infoTable.removeAllViews();
         DisplayCutout cutout = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            cutout = display.getCutout();
+            cutout = d.getCutout();
         }
         String cutoutInfo = getString(R.string.none);
         if (cutout != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -217,20 +343,13 @@ public class DisplayDetailFragment extends Fragment {
                 cutoutInfo = sb.toString();
             }
         }
-
-        infoTable.removeAllViews();
-        InfoRow.add(ctx, infoTable, getString(R.string.info_display_id), String.valueOf(display.getDisplayId()));
-        InfoRow.add(ctx, infoTable, getString(R.string.info_name), display.getName());
-        InfoRow.add(ctx, infoTable, getString(R.string.info_refresh_rate), String.format("%.1f Hz", display.getRefreshRate()));
-        InfoRow.add(ctx, infoTable, getString(R.string.info_state), display.getState() == Display.STATE_ON ? getString(R.string.on) : getString(R.string.off));
-        InfoRow.add(ctx, infoTable, getString(R.string.info_hdr), display.isHdr() ? getString(R.string.yes) : getString(R.string.no));
-        InfoRow.add(ctx, infoTable, getString(R.string.info_flags), _getDisplayFlags(display));
+        InfoRow.add(ctx, infoTable, getString(R.string.info_display_id), String.valueOf(d.getDisplayId()));
+        InfoRow.add(ctx, infoTable, getString(R.string.info_name), d.getName());
+        InfoRow.add(ctx, infoTable, getString(R.string.info_refresh_rate), String.format("%.1f Hz", d.getRefreshRate()));
+        InfoRow.add(ctx, infoTable, getString(R.string.info_state), d.getState() == Display.STATE_ON ? getString(R.string.on) : getString(R.string.off));
+        InfoRow.add(ctx, infoTable, getString(R.string.info_hdr), d.isHdr() ? getString(R.string.yes) : getString(R.string.no));
+        InfoRow.add(ctx, infoTable, getString(R.string.info_flags), _getDisplayFlags(d));
         InfoRow.add(ctx, infoTable, getString(R.string.info_cutout), cutoutInfo);
-
-        _setupDisplayModes(display.getSupportedModes());
-        _updateShizukuStatus();
-
-        return view;
     }
 
     private void _updateShizukuStatus() {
@@ -270,32 +389,6 @@ public class DisplayDetailFragment extends Fragment {
                     default: imePolicyStr = String.valueOf(imePolicy);
                 }
                 InfoRow.add(ctx, shizukuTable, getString(R.string.info_keyboard_policy), imePolicyStr);
-
-                if (displayId != Display.DEFAULT_DISPLAY) {
-                    imePolicyRow.setVisibility(View.VISIBLE);
-                    imePolicySwitch.setOnCheckedChangeListener(null);
-                    imePolicySwitch.setChecked(imePolicy == 0);
-                    imePolicySwitch.setOnCheckedChangeListener((b, checked) -> {
-                        if (checked) {
-                            windowManager.setDisplayImePolicy(Display.DEFAULT_DISPLAY, 1);
-                            try {
-                                windowManager.setDisplayImePolicy(displayId, 0);
-                                State.refreshUI();
-                            } catch (Throwable e) {
-                                windowManager.setDisplayImePolicy(Display.DEFAULT_DISPLAY, 0);
-                                imePolicySwitch.setChecked(false);
-                                State.log("failed to set IME policy: " + e);
-                                if (getContext() != null) {
-                                    Toast.makeText(getContext(), R.string.ime_policy_unsupported, Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        } else {
-                            windowManager.setDisplayImePolicy(Display.DEFAULT_DISPLAY, 0);
-                            windowManager.setDisplayImePolicy(displayId, 1);
-                            try { State.refreshUI(); } catch (Throwable e) { State.log("failed: " + e); }
-                        }
-                    });
-                }
             } catch (Throwable e) { /* ignore */ }
 
             DisplayInfo displayInfo = ServiceUtils.getDisplayManager().getDisplayInfo(displayId);
@@ -336,7 +429,10 @@ public class DisplayDetailFragment extends Fragment {
     }
 
     private void _updateRotationText(TextView rotationText) {
-        int rotation = display.getRotation();
+        Context ctx = getContext();
+        if (ctx == null) return;
+        Display fresh = ((DisplayManager) ctx.getSystemService(Context.DISPLAY_SERVICE)).getDisplay(displayId);
+        int rotation = fresh != null ? fresh.getRotation() : -1;
         switch (rotation) {
             case Surface.ROTATION_0: rotationText.setText("0°"); break;
             case Surface.ROTATION_90: rotationText.setText("90°"); break;

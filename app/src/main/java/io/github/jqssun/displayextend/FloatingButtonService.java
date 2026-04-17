@@ -131,7 +131,7 @@ public class FloatingButtonService extends Service {
         );
         params.gravity = Gravity.TOP | Gravity.START;
         
-        if (Pref.getForceLandscape()) {
+        if (Pref.getFloatingButtonForceLandscape()) {
             params.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
         }
         params.x = Pref.getButtonX();

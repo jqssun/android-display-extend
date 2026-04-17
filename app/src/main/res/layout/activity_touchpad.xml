@@ -38,32 +38,6 @@
             style="@style/Widget.Material3.Button.TextButton" />
     </LinearLayout>
 
-    <!-- Sensitivity slider -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="16dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/touchpad_sensitivity"
-            android:textAppearance="?attr/textAppearanceLabelMedium"
-            android:textColor="?colorOnSurfaceVariant" />
-
-        <com.google.android.material.slider.Slider
-            android:id="@+id/sensitivitySlider"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:valueFrom="0.5"
-            android:valueTo="3.0"
-            android:stepSize="0.1" />
-    </LinearLayout>
-
     <!-- Touchpad + scroll strip -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -73,18 +47,64 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginBottom="16dp">
 
-        <TextView
+        <LinearLayout
             android:id="@+id/touchpad_area"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:padding="32dp"
+            android:padding="24dp"
             android:background="@drawable/touchpad_background"
-            android:clickable="true"
-            android:focusable="true"
-            android:textColor="?colorOnSurfaceVariant"
-            android:lineSpacingExtra="8dp"
-            android:gravity="top" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/touchpad_gesture_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?colorOnSurfaceVariant" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:id="@+id/touchpad_button_hints"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="bottom">
+
+                <include layout="@layout/touchpad_hint_row"
+                    android:id="@+id/hint_back"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp" />
+
+                <include layout="@layout/touchpad_hint_row"
+                    android:id="@+id/hint_home"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp" />
+
+                <include layout="@layout/touchpad_hint_row"
+                    android:id="@+id/hint_screen_off"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp" />
+
+                <include layout="@layout/touchpad_hint_row"
+                    android:id="@+id/hint_rotate_ccw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp" />
+
+                <include layout="@layout/touchpad_hint_row"
+                    android:id="@+id/hint_rotate_cw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
 
         <View
             android:id="@+id/scrollStrip"
@@ -138,7 +158,7 @@
             style="@style/Widget.Material3.Button.IconButton.Filled.Tonal" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/rotateButton"
+            android:id="@+id/rotateCcwButton"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_margin="8dp"

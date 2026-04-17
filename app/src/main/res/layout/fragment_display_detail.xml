@@ -55,11 +55,12 @@
                 style="@style/Widget.Material3.Button.TonalButton" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/screen_off_button"
+                android:id="@+id/reset_config_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@string/screen_off"
+                android:visibility="gone"
+                android:text="@string/reset_display_config"
                 style="@style/Widget.Material3.Button.TonalButton" />
         </LinearLayout>
 
@@ -143,7 +144,7 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
-            <!-- Force landscape -->
+            <!-- Floating button: force landscape -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -159,51 +160,20 @@
                     android:orientation="vertical"
                     android:layout_marginEnd="16dp">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/force_landscape"
+                        android:text="@string/floating_button_force_landscape"
                         android:textAppearance="?attr/textAppearanceBodyLarge" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/force_landscape_desc"
+                        android:text="@string/floating_button_force_landscape_desc"
                         android:textAppearance="?attr/textAppearanceBodyMedium"
                         android:textColor="?colorOnSurfaceVariant"
                         android:layout_marginTop="2dp" />
                 </LinearLayout>
                 <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/force_landscape_switch"
+                    android:id="@+id/floating_button_force_landscape_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
-            <!-- IME policy -->
-            <LinearLayout
-                android:id="@+id/ime_policy_row"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:minHeight="56dp"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="12dp"
-                android:visibility="gone">
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginEnd="16dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/ime_to_this_display"
-                        android:textAppearance="?attr/textAppearanceBodyLarge" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="@string/ime_to_this_display_desc"
-                        android:textAppearance="?attr/textAppearanceBodyMedium"
-                        android:textColor="?colorOnSurfaceVariant"
-                        android:layout_marginTop="2dp" />
-                </LinearLayout>
-                <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/ime_policy_switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
         </LinearLayout>
 
         <!-- Display Configuration -->
@@ -245,6 +215,47 @@
                 android:text="@string/edit" android:visibility="gone"
                 style="@style/Widget.Material3.Button.TextButton" />
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/scale_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:minHeight="56dp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:visibility="gone"
+            android:background="?selectableItemBackground">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/scale_label"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+                <TextView android:id="@+id/scale_text"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?colorOnSurfaceVariant" />
+            </LinearLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/edit_scale_button"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/edit"
+                style="@style/Widget.Material3.Button.TextButton" />
+        </LinearLayout>
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/scale_slider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:visibility="gone"
+            android:valueFrom="50"
+            android:valueTo="400"
+            android:stepSize="5" />
 
         <LinearLayout
             android:layout_width="match_parent"

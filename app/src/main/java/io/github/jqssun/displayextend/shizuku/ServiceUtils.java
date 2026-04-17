@@ -23,6 +23,7 @@ import android.view.IWindowManager;
 import android.widget.Toast;
 
 import io.github.jqssun.displayextend.FloatingButtonService;
+import io.github.jqssun.displayextend.Pref;
 import io.github.jqssun.displayextend.R;
 import io.github.jqssun.displayextend.State;
 import io.github.jqssun.displayextend.job.BindAllExternalInputToDisplay;
@@ -161,7 +162,9 @@ public class ServiceUtils {
             ActivityOptions options = ActivityOptions.makeBasic();
             options.setLaunchDisplayId(targetDisplayId);
             context.startActivity(launchIntent, options.toBundle());
-            State.startNewJob(new BindAllExternalInputToDisplay(targetDisplayId));
+            if (Pref.getAutoBindInput()) {
+                State.startNewJob(new BindAllExternalInputToDisplay(targetDisplayId));
+            }
         }
     }
 
@@ -185,7 +188,9 @@ public class ServiceUtils {
             } else {
                 State.log("Shizuku launch app success: " + packageName);
             }
-            State.startNewJob(new BindAllExternalInputToDisplay(targetDisplayId));
+            if (Pref.getAutoBindInput()) {
+                State.startNewJob(new BindAllExternalInputToDisplay(targetDisplayId));
+            }
         } catch (Exception e) {
             Toast.makeText(context, context.getString(R.string.shizuku_launch_failed), Toast.LENGTH_SHORT).show();
             State.log("Shizuku launch app failed: " + e.getMessage());

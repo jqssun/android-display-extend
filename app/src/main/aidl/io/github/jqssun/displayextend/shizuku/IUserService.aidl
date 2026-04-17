@@ -15,6 +15,4 @@ interface IUserService {
     void startListenVolumeKey() = 5;
 
     void stopListenVolumeKey() = 6;
-
-    void disablePhantomProcessMonitoring() = 7;
 }

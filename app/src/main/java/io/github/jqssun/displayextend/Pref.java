@@ -129,11 +129,11 @@ public class Pref {
         _app().edit().putFloat(KEY_TOUCHPAD_SENSITIVITY, v).apply();
     }
 
-    public static boolean getForceLandscape() {
+    public static boolean getFloatingButtonForceLandscape() {
         return _app().getBoolean(KEY_FLOATING_BUTTON_FORCE_LANDSCAPE, false);
     }
 
-    public static void setForceLandscape(boolean v) {
+    public static void setFloatingButtonForceLandscape(boolean v) {
         _app().edit().putBoolean(KEY_FLOATING_BUTTON_FORCE_LANDSCAPE, v).apply();
     }
 

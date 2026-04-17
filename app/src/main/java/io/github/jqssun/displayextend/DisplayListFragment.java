@@ -48,6 +48,11 @@ public class DisplayListFragment extends Fragment {
             startActivity(intent);
         });
 
+        view.findViewById(R.id.screen_off_button).setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), PureBlackActivity.class);
+            startActivity(intent);
+        });
+
         return view;
     }
 

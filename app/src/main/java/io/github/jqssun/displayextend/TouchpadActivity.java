@@ -52,7 +52,8 @@ import dev.rikka.tools.refine.Refine;
 public class TouchpadActivity extends AppCompatActivity {
     
     public static final int INJECT_INPUT_EVENT_MODE_ASYNC = 0;
-    private TextView touchpadArea;
+    private View touchpadArea;
+    private TextView gestureHint;
     private View touchpadOverlay;
     private ImageView cursorView;
     private int displayId;
@@ -157,7 +158,13 @@ public class TouchpadActivity extends AppCompatActivity {
 
         modeSpinner = findViewById(R.id.modeSpinner);
         touchpadArea = findViewById(R.id.touchpad_area);
+        gestureHint = findViewById(R.id.touchpad_gesture_hint);
         _updateHelp();
+        _bindHintRow(R.id.hint_back, R.drawable.ic_back, R.string.touchpad_hint_back);
+        _bindHintRow(R.id.hint_home, R.drawable.ic_home, R.string.touchpad_hint_home);
+        _bindHintRow(R.id.hint_screen_off, R.drawable.ic_screen_off, R.string.touchpad_hint_screen_off);
+        _bindHintRow(R.id.hint_rotate_ccw, R.drawable.ic_rotate, R.string.touchpad_hint_rotate_ccw);
+        _bindHintRow(R.id.hint_rotate_cw, R.drawable.ic_rotate_cw, R.string.touchpad_hint_rotate_cw);
 
         if (savedInstanceState != null) {
             rotation = savedInstanceState.getInt("rotation", 0);
@@ -196,8 +203,8 @@ public class TouchpadActivity extends AppCompatActivity {
 
         _setupModeSpinner();
 
-        findViewById(R.id.rotateButton).setOnClickListener(v -> {
-            rotation = (rotation + 1) % 4; // CW
+        findViewById(R.id.rotateCcwButton).setOnClickListener(v -> {
+            rotation = (rotation + 1) % 4; // CCW
             cursorX = 0;
             cursorY = 0;
             _updateCursorPosition(0, 0);
@@ -205,7 +212,7 @@ public class TouchpadActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.rotateCwButton).setOnClickListener(v -> {
-            rotation = (rotation + 3) % 4; // CCW
+            rotation = (rotation + 3) % 4; // CW
             cursorX = 0;
             cursorY = 0;
             _updateCursorPosition(0, 0);
@@ -213,7 +220,7 @@ public class TouchpadActivity extends AppCompatActivity {
         });
 
         _setupScrollStrip();
-        _setupSensitivitySlider();
+        sensitivity = Pref.getTouchpadSensitivity();
 
         findViewById(R.id.exitButton).setOnClickListener(v -> finish());
 
@@ -348,19 +355,16 @@ public class TouchpadActivity extends AppCompatActivity {
     }
 
     private void _updateHelp() {
-        String singleFingerAction;
         int selectedMode = modeSpinner.getSelectedItemPosition();
-        
-        switch (selectedMode) {
-            case MODE_CURSOR_LOCKED:
-                singleFingerAction = getString(R.string.touchpad_help_cursor_locked);
-                break;
-            default:
-                singleFingerAction = getString(R.string.touchpad_help_move_cursor);
-                break;
-        }
+        gestureHint.setText(selectedMode == MODE_CURSOR_LOCKED
+                ? getString(R.string.touchpad_help_cursor_locked)
+                : getString(R.string.touchpad_help_normal));
+    }
 
-        touchpadArea.setText(getString(R.string.touchpad_help_text, singleFingerAction));
+    private void _bindHintRow(int rowId, int iconRes, int textRes) {
+        View row = findViewById(rowId);
+        ((ImageView) row.findViewById(R.id.hint_icon)).setImageResource(iconRes);
+        ((TextView) row.findViewById(R.id.hint_text)).setText(textRes);
     }
 
     private void _recycleGestureEvents() {
@@ -424,6 +428,7 @@ public class TouchpadActivity extends AppCompatActivity {
 
         if (touchpadOverlay == null) {
             touchpadOverlay = new View(this);
+            // FLAG_ALT_FOCUSABLE_IM: touchpad overlay (on display 0) claiming IME-focusable lets the IME layer go above it on the phone, which allows the phone-side keyboard appear for inputs on the cast display
             WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 width, height,
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
@@ -551,18 +556,6 @@ public class TouchpadActivity extends AppCompatActivity {
                     return true;
             }
             return false;
-        });
-    }
-
-    private void _setupSensitivitySlider() {
-        sensitivity = Pref.getTouchpadSensitivity();
-        com.google.android.material.slider.Slider slider = findViewById(R.id.sensitivitySlider);
-        slider.setValue(Math.max(0.5f, Math.min(3.0f, sensitivity)));
-        slider.addOnChangeListener((s, value, fromUser) -> {
-            if (fromUser) {
-                sensitivity = value;
-                Pref.setTouchpadSensitivity(value);
-            }
         });
     }
 
@@ -713,6 +706,10 @@ public class TouchpadActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        // Hide only; do NOT remove from WindowManager. The overlay carries
+        // FLAG_ALT_FOCUSABLE_IM, which is what gives the phone an IME layering
+        // surface for inputs on the cast display. Removing it on pause kills
+        // cross-display IME until the activity is resumed.
         if (touchpadOverlay != null) touchpadOverlay.setVisibility(View.GONE);
         if (cursorView != null) cursorView.setVisibility(View.GONE);
     }
