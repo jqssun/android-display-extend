@@ -8,13 +8,13 @@ public class VirtualDisplayArgs implements Parcelable {
     public final int height;
     public final int refreshRate;
     public final int dpi;
-    public final boolean rotatesWithContent;
+    public final boolean followAppRotation;
     public final String virtualDisplayName;
 
     public VirtualDisplayArgs() {
         this("VirtualDisplay", 1920, 1080, 60, 160, false);
     }
-    public VirtualDisplayArgs(String virtualDisplayName, int width, int height, int refreshRate, int dpi, boolean rotatesWithContent) {
+    public VirtualDisplayArgs(String virtualDisplayName, int width, int height, int refreshRate, int dpi, boolean followAppRotation) {
         this.virtualDisplayName = virtualDisplayName;
         if(width == 0) {
             width = 1920;
@@ -32,7 +32,7 @@ public class VirtualDisplayArgs implements Parcelable {
         this.height = height;
         this.refreshRate = refreshRate;
         this.dpi = dpi;
-        this.rotatesWithContent = rotatesWithContent;
+        this.followAppRotation = followAppRotation;
     }
 
     protected VirtualDisplayArgs(Parcel in) {
@@ -41,7 +41,7 @@ public class VirtualDisplayArgs implements Parcelable {
         height = in.readInt();
         refreshRate = in.readInt();
         dpi = in.readInt();
-        rotatesWithContent = in.readByte() != 0;
+        followAppRotation = in.readByte() != 0;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class VirtualDisplayArgs implements Parcelable {
         dest.writeInt(height);
         dest.writeInt(refreshRate);
         dest.writeInt(dpi);
-        dest.writeByte((byte) (rotatesWithContent ? 1 : 0));
+        dest.writeByte((byte) (followAppRotation ? 1 : 0));
     }
 
     @Override

@@ -29,7 +29,7 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
-import io.github.jqssun.displayextend.dialog.BridgeDialog;
+import io.github.jqssun.displayextend.dialog.ManagedVirtualDisplayDialog;
 import io.github.jqssun.displayextend.dialog.DpiDialog;
 import io.github.jqssun.displayextend.dialog.ResolutionDialog;
 import io.github.jqssun.displayextend.dialog.RotationDialog;
@@ -124,10 +124,10 @@ public class DisplayDetailFragment extends Fragment {
         boolean isSecondary = displayId != Display.DEFAULT_DISPLAY;
 
         // --- Quick Actions ---
+        View actionsHeader = view.findViewById(R.id.actions_header);
         MaterialButton launchButton = view.findViewById(R.id.start_launcher_button);
         if (!isSecondary) {
             launchButton.setVisibility(View.GONE);
-            view.findViewById(R.id.actions_header).setVisibility(View.GONE);
         }
         launchButton.setOnClickListener(v -> LauncherActivity.start(getContext(), displayId));
 
@@ -138,7 +138,7 @@ public class DisplayDetailFragment extends Fragment {
         touchpadButton.setOnClickListener(v -> TouchpadActivity.startTouchpad(getContext(), displayId, false));
 
         MaterialButton resetConfigButton = view.findViewById(R.id.reset_config_button);
-        if (isSecondary && ShizukuUtils.hasShizukuStarted()) {
+        if (ShizukuUtils.hasShizukuStarted()) {
             resetConfigButton.setVisibility(View.VISIBLE);
             resetConfigButton.setOnClickListener(v -> new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                     .setTitle(R.string.reset_display_config)
@@ -148,17 +148,28 @@ public class DisplayDetailFragment extends Fragment {
                     .show());
         }
 
-        MaterialButton bridgeButton = view.findViewById(R.id.bridge_button);
-        if (displayId == State.getBridgeVirtualDisplayId() || displayId == State.bridgeDisplayId) {
-            bridgeButton.setVisibility(View.VISIBLE);
-            bridgeButton.setText(getString(R.string.exit_bridge));
-            bridgeButton.setOnClickListener(v -> {
-                BridgeActivity.stopVirtualDisplay();
-                if (BridgeActivity.getInstance() != null) BridgeActivity.getInstance().finish();
+        MaterialButton managedVirtualDisplayButton = view.findViewById(R.id.managed_virtual_display_button);
+        if (displayId == State.getManagedVirtualDisplayId()
+                || displayId == State.managedVirtualDisplayHostDisplayId) {
+            managedVirtualDisplayButton.setVisibility(View.VISIBLE);
+            managedVirtualDisplayButton.setText(getString(R.string.disable_managed_virtual_display_mode));
+            managedVirtualDisplayButton.setOnClickListener(v -> {
+                ManagedVirtualDisplayActivity.stopVirtualDisplay();
+                if (ManagedVirtualDisplayActivity.getInstance() != null) {
+                    ManagedVirtualDisplayActivity.getInstance().finish();
+                }
             });
         } else if (isSecondary && ShizukuUtils.hasShizukuStarted()) {
-            bridgeButton.setVisibility(View.VISIBLE);
-            bridgeButton.setOnClickListener(v -> _showBridgeDialog());
+            managedVirtualDisplayButton.setVisibility(View.VISIBLE);
+            managedVirtualDisplayButton.setOnClickListener(v -> _showManagedVirtualDisplayDialog());
+        }
+
+        if (actionsHeader != null) {
+            boolean hasVisibleActions = launchButton.getVisibility() == View.VISIBLE
+                    || touchpadButton.getVisibility() == View.VISIBLE
+                    || resetConfigButton.getVisibility() == View.VISIBLE
+                    || managedVirtualDisplayButton.getVisibility() == View.VISIBLE;
+            actionsHeader.setVisibility(hasVisibleActions ? View.VISIBLE : View.GONE);
         }
 
         // --- Display Settings (only for secondary displays) ---
@@ -381,14 +392,8 @@ public class DisplayDetailFragment extends Fragment {
 
             try {
                 int imePolicy = windowManager.getDisplayImePolicy(displayId);
-                String imePolicyStr;
-                switch (imePolicy) {
-                    case 0: imePolicyStr = "LOCAL"; break;
-                    case 1: imePolicyStr = "FALLBACK_DISPLAY"; break;
-                    case 2: imePolicyStr = "HIDE"; break;
-                    default: imePolicyStr = String.valueOf(imePolicy);
-                }
-                InfoRow.add(ctx, shizukuTable, getString(R.string.info_keyboard_policy), imePolicyStr);
+                InfoRow.add(ctx, shizukuTable, getString(R.string.info_keyboard_policy),
+                        DisplayImePolicyCompat.toDebugString(imePolicy));
             } catch (Throwable e) { /* ignore */ }
 
             DisplayInfo displayInfo = ServiceUtils.getDisplayManager().getDisplayInfo(displayId);
@@ -442,11 +447,11 @@ public class DisplayDetailFragment extends Fragment {
         }
     }
 
-    private void _showBridgeDialog() {
+    private void _showManagedVirtualDisplayDialog() {
         if (Build.VERSION.SDK_INT >= 34) {
             Toast.makeText(getContext(), getString(R.string.android15_rotation_hint), Toast.LENGTH_SHORT).show();
         }
-        BridgeDialog.show(getContext(), display, displayId);
+        ManagedVirtualDisplayDialog.show(getContext(), display, displayId);
     }
 
 }

@@ -57,7 +57,7 @@
             android:theme="@style/AppTheme" />
         
         <activity
-            android:name=".BridgeActivity"
+            android:name=".ManagedVirtualDisplayActivity"
             android:launchMode="singleTask"
             android:exported="false"
             android:theme="@style/AppTheme" />

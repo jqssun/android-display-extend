@@ -124,12 +124,20 @@ public class DisplayMonitor {
     }
 
     private static void handleAutoOpenLastApp(Context context, Display display) {
-        boolean autoBridge = Pref.getAutoBridge(display.getName());
-        if (ShizukuUtils.hasPermission() && (autoBridge || display.getDisplayId() == State.bridgeDisplayId)) {
+        boolean autoManagedVirtualDisplay = Pref.getAutoManagedVirtualDisplay(display.getName());
+        if (ShizukuUtils.hasPermission() && (autoManagedVirtualDisplay
+                || display.getDisplayId() == State.managedVirtualDisplayHostDisplayId)) {
             new Handler().postDelayed(() -> {
                 DisplayMetrics metrics = new DisplayMetrics();
                 display.getMetrics(metrics);
-                State.startNewJob(new ProjectViaBridge(display, new VirtualDisplayArgs(context.getString(R.string.bridge_display), display.getWidth(), display.getHeight(), (int) display.getRefreshRate(), metrics.densityDpi, Pref.getRotatesWithContent())));
+                State.startNewJob(new PresentManagedVirtualDisplay(display,
+                        new VirtualDisplayArgs(
+                                context.getString(R.string.managed_virtual_display_name),
+                                display.getWidth(),
+                                display.getHeight(),
+                                (int) display.getRefreshRate(),
+                                metrics.densityDpi,
+                                Pref.getFollowAppRotation())));
             }, 500);
             return;
         }

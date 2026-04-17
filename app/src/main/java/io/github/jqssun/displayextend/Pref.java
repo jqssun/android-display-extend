@@ -7,7 +7,7 @@ import android.content.SharedPreferences;
 public class Pref {
     private static final String PREF_NAME = "settings";
     private static final String APP_PREF_NAME = "app_preferences";
-    private static final String BRIDGE_PREF_NAME = "bridge_settings";
+    private static final String MANAGED_VIRTUAL_DISPLAY_PREF_NAME = "bridge_settings";
     private static final String FLOATING_PREF_NAME = "FloatingButtonPrefs";
 
     // settings keys
@@ -16,8 +16,8 @@ public class Pref {
     public static final String KEY_AUTO_BIND_INPUT = "auto_bind_input";
     public static final String KEY_AUTO_SCREEN_OFF = "auto_screen_off";
 
-    // bridge keys
-    public static final String KEY_ROTATES_WITH_CONTENT = "rotates_with_content";
+    // managed virtual display keys
+    public static final String KEY_FOLLOW_APP_ROTATION = "rotates_with_content";
     public static final String KEY_SKIP_SCREEN_CAPTURE_PERMISSION = "skip_screen_capture_permission";
 
     // app_preferences keys
@@ -27,7 +27,7 @@ public class Pref {
     public static final String KEY_FORCE_DPI = "force_dpi";
     public static final String KEY_TOUCHPAD_SENSITIVITY = "touchpad_sensitivity";
     private static final String PREFIX_FLOATING_BUTTON = "FLOATING_BUTTON_";
-    private static final String PREFIX_AUTO_BRIDGE = "AUTO_BRIDGE_";
+    private static final String PREFIX_AUTO_MANAGED_VIRTUAL_DISPLAY = "AUTO_BRIDGE_";
     private static final String PREFIX_AUTO_OPEN_LAST_APP = "AUTO_OPEN_LAST_APP_";
     private static final String PREFIX_LAUNCH_TIME = "launch_time_";
 
@@ -69,22 +69,22 @@ public class Pref {
         _prefs().edit().putBoolean(KEY_AUTO_SCREEN_OFF, v).apply();
     }
 
-    // bridge prefs
+    // managed virtual display prefs
 
-    public static boolean getRotatesWithContent() {
-        return _bridge().getBoolean(KEY_ROTATES_WITH_CONTENT, true);
+    public static boolean getFollowAppRotation() {
+        return _managedVirtualDisplay().getBoolean(KEY_FOLLOW_APP_ROTATION, true);
     }
 
-    public static void setRotatesWithContent(boolean v) {
-        _bridge().edit().putBoolean(KEY_ROTATES_WITH_CONTENT, v).apply();
+    public static void setFollowAppRotation(boolean v) {
+        _managedVirtualDisplay().edit().putBoolean(KEY_FOLLOW_APP_ROTATION, v).apply();
     }
 
     public static boolean getSkipScreenCapturePermission() {
-        return _bridge().getBoolean(KEY_SKIP_SCREEN_CAPTURE_PERMISSION, false);
+        return _managedVirtualDisplay().getBoolean(KEY_SKIP_SCREEN_CAPTURE_PERMISSION, false);
     }
 
     public static void setSkipScreenCapturePermission(boolean v) {
-        _bridge().edit().putBoolean(KEY_SKIP_SCREEN_CAPTURE_PERMISSION, v).apply();
+        _managedVirtualDisplay().edit().putBoolean(KEY_SKIP_SCREEN_CAPTURE_PERMISSION, v).apply();
     }
 
     // app prefs
@@ -137,12 +137,12 @@ public class Pref {
         _app().edit().putBoolean(KEY_FLOATING_BUTTON_FORCE_LANDSCAPE, v).apply();
     }
 
-    public static boolean getAutoBridge(String displayName) {
-        return _app().getBoolean(PREFIX_AUTO_BRIDGE + displayName, false);
+    public static boolean getAutoManagedVirtualDisplay(String displayName) {
+        return _app().getBoolean(PREFIX_AUTO_MANAGED_VIRTUAL_DISPLAY + displayName, false);
     }
 
-    public static void setAutoBridge(String displayName, boolean v) {
-        _app().edit().putBoolean(PREFIX_AUTO_BRIDGE + displayName, v).apply();
+    public static void setAutoManagedVirtualDisplay(String displayName, boolean v) {
+        _app().edit().putBoolean(PREFIX_AUTO_MANAGED_VIRTUAL_DISPLAY + displayName, v).apply();
     }
 
     public static boolean getAutoOpenLastApp(String displayName) {
@@ -185,8 +185,8 @@ public class Pref {
         return _ctx().getSharedPreferences(APP_PREF_NAME, Context.MODE_PRIVATE);
     }
 
-    private static SharedPreferences _bridge() {
-        return _ctx().getSharedPreferences(BRIDGE_PREF_NAME, Context.MODE_PRIVATE);
+    private static SharedPreferences _managedVirtualDisplay() {
+        return _ctx().getSharedPreferences(MANAGED_VIRTUAL_DISPLAY_PREF_NAME, Context.MODE_PRIVATE);
     }
 
     private static SharedPreferences _floating() {

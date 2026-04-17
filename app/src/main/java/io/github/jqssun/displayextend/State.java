@@ -33,8 +33,8 @@ public class State {
     public static MediaProjection mediaProjectionInUse;
     public static int lastSingleAppDisplay;
     public static volatile IUserService userService;
-    public static VirtualDisplay bridgeVirtualDisplay;
-    public static int bridgeDisplayId = -1;
+    public static VirtualDisplay managedVirtualDisplay;
+    public static int managedVirtualDisplayHostDisplayId = -1;
     public static VirtualDisplay mirrorVirtualDisplay;
     public static int mirrorDisplayId = -1;
     public static FloatingButtonService floatingButtonService;
@@ -184,9 +184,9 @@ public class State {
         }
     }
 
-    public static int getBridgeVirtualDisplayId() {
-        if (bridgeVirtualDisplay == null) return -1;
-        return bridgeVirtualDisplay.getDisplay().getDisplayId();
+    public static int getManagedVirtualDisplayId() {
+        if (managedVirtualDisplay == null) return -1;
+        return managedVirtualDisplay.getDisplay().getDisplayId();
     }
 
     public static int getMirrorVirtualDisplayId() {

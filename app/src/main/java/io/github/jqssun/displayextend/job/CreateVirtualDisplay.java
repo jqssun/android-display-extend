@@ -142,7 +142,7 @@ public class CreateVirtualDisplay {
         if (ownContentOnly) {
             flags |= VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY;
         }
-        if (virtualDisplayArgs.rotatesWithContent) {
+        if (virtualDisplayArgs.followAppRotation) {
             flags |= VIRTUAL_DISPLAY_FLAG_ROTATES_WITH_CONTENT;
         }
         if (Build.VERSION.SDK_INT >= AndroidVersions.API_33_ANDROID_13) {

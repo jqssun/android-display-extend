@@ -8,20 +8,21 @@ import android.view.IWindowManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.slider.Slider;
 
 import io.github.jqssun.displayextend.shizuku.ServiceUtils;
 import io.github.jqssun.displayextend.shizuku.ShizukuUtils;
 
 public class TouchpadFragment extends Fragment {
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +38,7 @@ public class TouchpadFragment extends Fragment {
         TextView statusTitle = view.findViewById(R.id.statusTitle);
         TextView statusDetail = view.findViewById(R.id.statusDetail);
         View imePolicyRow = view.findViewById(R.id.ime_policy_row);
-        MaterialSwitch imePolicySwitch = view.findViewById(R.id.ime_policy_switch);
+        Spinner imePolicySpinner = view.findViewById(R.id.ime_policy_spinner);
         View sensitivityLabel = view.findViewById(R.id.sensitivityLabel);
         Slider sensitivitySlider = view.findViewById(R.id.sensitivitySlider);
         View startBtn = view.findViewById(R.id.startTouchpadBtn);
@@ -58,21 +59,21 @@ public class TouchpadFragment extends Fragment {
                     display != null ? display.getWidth() : 0,
                     display != null ? display.getHeight() : 0));
             statusDetail.setText(display != null ? display.getName() : String.valueOf(displayId));
-            _setupImePolicy(imePolicyRow, imePolicySwitch, displayId);
+            _setupImePolicy(imePolicyRow, imePolicySpinner, displayId);
         } else {
             statusIcon.setImageResource(R.drawable.ic_error);
             statusTitle.setText(R.string.touchpad_no_cast);
             statusDetail.setText(R.string.touchpad_no_cast_message);
             imePolicyRow.setVisibility(View.VISIBLE);
-            imePolicySwitch.setOnCheckedChangeListener(null);
-            imePolicySwitch.setChecked(false);
+            _setupImePolicySpinner(imePolicySpinner);
+            imePolicySpinner.setSelection(DisplayImePolicyCompat.indexOf(DisplayImePolicyCompat.FALLBACK_DISPLAY), false);
         }
 
         float disabledAlpha = 0.38f;
         sensitivityLabel.setAlpha(hasCast ? 1f : disabledAlpha);
         sensitivitySlider.setEnabled(hasCast);
         imePolicyRow.setAlpha(hasCast ? 1f : disabledAlpha);
-        imePolicySwitch.setEnabled(hasCast);
+        imePolicySpinner.setEnabled(hasCast);
         startBtn.setEnabled(hasCast);
 
         startBtn.setOnClickListener(v -> TouchpadActivity.startTouchpad(getContext(), State.lastSingleAppDisplay, false));
@@ -80,39 +81,74 @@ public class TouchpadFragment extends Fragment {
         return view;
     }
 
-    private void _setupImePolicy(View row, MaterialSwitch toggle, int displayId) {
+    private void _setupImePolicy(View row, Spinner spinner, int displayId) {
         if (!ShizukuUtils.hasPermission()) {
             row.setVisibility(View.GONE);
             return;
         }
         try {
             IWindowManager wm = ServiceUtils.getWindowManager();
-            int imePolicy = wm.getDisplayImePolicy(displayId);
             row.setVisibility(View.VISIBLE);
-            toggle.setOnCheckedChangeListener(null);
-            toggle.setChecked(imePolicy == 0);
-            toggle.setOnCheckedChangeListener((b, checked) -> {
-                if (checked) {
-                    wm.setDisplayImePolicy(Display.DEFAULT_DISPLAY, 1);
-                    try {
-                        wm.setDisplayImePolicy(displayId, 0);
-                        State.refreshUI();
-                    } catch (Throwable e) {
-                        try { wm.setDisplayImePolicy(Display.DEFAULT_DISPLAY, 0); } catch (Throwable ignored) {}
-                        toggle.setChecked(false);
-                        State.log("failed to set IME policy: " + e);
-                        if (getContext() != null) {
-                            Toast.makeText(getContext(), R.string.ime_policy_unsupported, Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                } else {
-                    wm.setDisplayImePolicy(Display.DEFAULT_DISPLAY, 0);
-                    wm.setDisplayImePolicy(displayId, 1);
-                    try { State.refreshUI(); } catch (Throwable e) { State.log("failed: " + e); }
-                }
-            });
+            _syncImePolicySpinner(wm, spinner, displayId);
         } catch (Throwable e) {
             row.setVisibility(View.GONE);
+        }
+    }
+
+    private void _setupImePolicySpinner(Spinner spinner) {
+        Context context = spinner.getContext();
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                context,
+                android.R.layout.simple_spinner_item,
+                DisplayImePolicyCompat.labels(context)
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+    }
+
+    private void _syncImePolicySpinner(IWindowManager wm, Spinner spinner, int displayId) throws Throwable {
+        _setupImePolicySpinner(spinner);
+        int currentPolicy = wm.getDisplayImePolicy(displayId);
+        spinner.setOnItemSelectedListener(null);
+        spinner.setSelection(DisplayImePolicyCompat.indexOf(currentPolicy), false);
+        final boolean[] initialized = {false};
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (!initialized[0]) {
+                    initialized[0] = true;
+                    return;
+                }
+                _applyImePolicySelection(wm, spinner, displayId, DisplayImePolicyCompat.values()[position]);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // no-op
+            }
+        });
+    }
+
+    private void _applyImePolicySelection(IWindowManager wm, Spinner spinner, int displayId, int requestedPolicy) {
+        try {
+            int currentPolicy = wm.getDisplayImePolicy(displayId);
+            if (currentPolicy == requestedPolicy) {
+                return;
+            }
+
+            wm.setDisplayImePolicy(Display.DEFAULT_DISPLAY, DisplayImePolicyCompat.LOCAL);
+            wm.setDisplayImePolicy(displayId, requestedPolicy);
+            State.refreshUI();
+        } catch (Throwable e) {
+            try {
+                _syncImePolicySpinner(wm, spinner, displayId);
+            } catch (Throwable ignored) {
+                spinner.setOnItemSelectedListener(null);
+            }
+            State.log("failed to set IME policy: " + e);
+            if (getContext() != null) {
+                Toast.makeText(getContext(), R.string.ime_policy_unsupported, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

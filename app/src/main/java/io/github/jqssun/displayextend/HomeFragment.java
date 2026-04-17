@@ -92,7 +92,8 @@ public class HomeFragment extends Fragment {
         Display[] displays = dm.getDisplays();
         int count = 0;
         for (Display d : displays) {
-            if (d.getDisplayId() != State.bridgeDisplayId && d.getDisplayId() != State.mirrorDisplayId) {
+            if (d.getDisplayId() != State.managedVirtualDisplayHostDisplayId
+                    && d.getDisplayId() != State.mirrorDisplayId) {
                 count++;
             }
         }

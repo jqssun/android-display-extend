@@ -3,8 +3,8 @@ package io.github.jqssun.displayextend.job;
 import android.content.Context;
 import android.content.Intent;
 
-import io.github.jqssun.displayextend.BridgeActivity;
 import io.github.jqssun.displayextend.FloatingButtonService;
+import io.github.jqssun.displayextend.ManagedVirtualDisplayActivity;
 import io.github.jqssun.displayextend.MediaProjectionService;
 import io.github.jqssun.displayextend.State;
 import io.github.jqssun.displayextend.TouchpadAccessibilityService;
@@ -24,12 +24,12 @@ public class ExitAll {
         touchpadIntent.setAction(TouchpadAccessibilityService.class.getName());
         context.stopService(touchpadIntent);
 
-        if (BridgeActivity.getInstance() != null) {
-            BridgeActivity.getInstance().finish();
+        if (ManagedVirtualDisplayActivity.getInstance() != null) {
+            ManagedVirtualDisplayActivity.getInstance().finish();
         }
-        if (State.bridgeVirtualDisplay != null) {
-            State.bridgeVirtualDisplay.release();
-            State.bridgeVirtualDisplay = null;
+        if (State.managedVirtualDisplay != null) {
+            State.managedVirtualDisplay.release();
+            State.managedVirtualDisplay = null;
         }
         if (State.mirrorVirtualDisplay != null) {
             State.mirrorVirtualDisplay.release();

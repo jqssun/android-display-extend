@@ -87,14 +87,17 @@
     <string name="floating_button_desc">Show a draggable back button on this display</string>
     <string name="floating_button_force_landscape">Force landscape for the floating back button</string>
     <string name="floating_button_force_landscape_desc">Keep the floating button in landscape orientation</string>
-    <string name="ime_to_this_display_desc">Show keyboard on this display instead of the built-in screen. Requires a trusted virtual display.</string>
-    <string name="bridge_button_text">Enable Rotation Control</string>
-    <string name="exit_bridge">Disable Rotation Control</string>
+    <string name="ime_to_this_display_desc">Choose where the on-screen keyboard appears for this display. Requires a trusted virtual display.</string>
+    <string name="managed_virtual_display_button_text">Managed Virtual Display Mode</string>
+    <string name="disable_managed_virtual_display_mode">Disable Managed Virtual Display Mode</string>
     <string name="status_authorized_server">Authorized (UID: %d)</string>
     <string name="status_started_not_authorized_server">Unauthorized (UID: %d)</string>
     <string name="status_authorized">Authorized</string>
-    <string name="ime_to_this_display">Show on-screen keyboard on this display</string>
+    <string name="ime_to_this_display">On-screen keyboard location</string>
     <string name="ime_policy_unsupported">Cannot set keyboard policy on this virtual display</string>
+    <string name="ime_policy_local">This display</string>
+    <string name="ime_policy_fallback_display">Built-in screen</string>
+    <string name="ime_policy_hide">Hidden</string>
     <string name="android15_rotation_hint">Android 15+ supports rotation natively - this mode is not required</string>
 
     <!-- Settings -->
@@ -141,8 +144,8 @@
     <string name="touchpad_hint_back">Go back on target display</string>
     <string name="touchpad_hint_home">Reopen last casted app</string>
     <string name="touchpad_hint_screen_off">Turn off built-in screen</string>
-    <string name="touchpad_hint_rotate_cw">Rotate screen clockwise</string>
-    <string name="touchpad_hint_rotate_ccw">Rotate screen counter-clockwise</string>
+    <string name="touchpad_hint_rotate_cw">Rotate built-in screen clockwise</string>
+    <string name="touchpad_hint_rotate_ccw">Rotate built-in screen counter-clockwise</string>
     <string name="show_cursor_failed">Failed to show cursor</string>
     <string name="rotate">Rotate</string>
     <string name="rotate_cw">Rotate Clockwise</string>
@@ -160,13 +163,13 @@
     <string name="confirm_dpi_format">Change DPI from %1$d to %2$d?</string>
     <string name="confirm_resolution_format">Change resolution from %1$dx%2$d to %3$dx%4$d?</string>
 
-    <!-- Rotation control dialog -->
-    <string name="bridge_settings">Rotation Control Settings</string>
-    <string name="bridge_description">Creates a virtual display layer that allows you to control the rotation of apps on this screen. Also keeps apps alive if the display disconnects.</string>
-    <string name="rotate_with_content">Follow app rotation</string>
+    <!-- Managed virtual display dialog -->
+    <string name="managed_virtual_display_settings">Managed Virtual Display Settings</string>
+    <string name="managed_virtual_display_description">Run an instance of managed virtual display on this screen. Use this mode for separate rotation handling or to keep the app session alive when the physical display disconnects.</string>
+    <string name="follow_app_rotation">Display orientation follows app rotation</string>
     <string name="skip_screen_capture_permission">Skip screen capture permission</string>
-    <string name="auto_bridge_next_time">Auto-enable next time this display connects</string>
-    <string name="bridge_display">Virtual display</string>
+    <string name="auto_managed_virtual_display_next_time">Automatically enable managed mode next time this display connects</string>
+    <string name="managed_virtual_display_name">Managed virtual display</string>
 
     <!-- App list / Launcher -->
     <string name="cast">Cast</string>

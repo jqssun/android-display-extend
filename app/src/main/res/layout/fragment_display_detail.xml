@@ -46,12 +46,12 @@
                 style="@style/Widget.Material3.Button.TonalButton" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/bridge_button"
+                android:id="@+id/managed_virtual_display_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:visibility="gone"
-                android:text="@string/bridge_button_text"
+                android:text="@string/managed_virtual_display_button_text"
                 style="@style/Widget.Material3.Button.TonalButton" />
 
             <com.google.android.material.button.MaterialButton

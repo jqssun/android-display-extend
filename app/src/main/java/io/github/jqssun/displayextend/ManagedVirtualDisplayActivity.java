@@ -23,11 +23,11 @@ import io.github.jqssun.displayextend.shizuku.ServiceUtils;
 
 import dev.rikka.tools.refine.Refine;
 
-public class BridgeActivity extends AppCompatActivity {
+public class ManagedVirtualDisplayActivity extends AppCompatActivity {
 
-    private static BridgeActivity instance;
+    private static ManagedVirtualDisplayActivity instance;
 
-    public static BridgeActivity getInstance() {
+    public static ManagedVirtualDisplayActivity getInstance() {
         return instance;
     }
 
@@ -65,12 +65,12 @@ public class BridgeActivity extends AppCompatActivity {
     }
 
     public static void stopVirtualDisplay() {
-        if (State.bridgeVirtualDisplay == null) {
+        if (State.managedVirtualDisplay == null) {
             return;
         }
-        State.bridgeDisplayId = -1;
-        State.bridgeVirtualDisplay.release();
-        State.bridgeVirtualDisplay = null;
+        State.managedVirtualDisplayHostDisplayId = -1;
+        State.managedVirtualDisplay.release();
+        State.managedVirtualDisplay = null;
     }
 
     @Override
@@ -104,16 +104,16 @@ public class BridgeActivity extends AppCompatActivity {
             public void surfaceCreated(SurfaceHolder holder) {
                 Surface surface = holder.getSurface();
                 
-                if (State.bridgeVirtualDisplay == null) {
+                if (State.managedVirtualDisplay == null) {
                     stopVirtualDisplay();
-                    State.bridgeVirtualDisplay = CreateVirtualDisplay.createVirtualDisplay(args, surface);
-                    State.log("BridgeActivity created new virtual display");
+                    State.managedVirtualDisplay = CreateVirtualDisplay.createVirtualDisplay(args, surface);
+                    State.log("ManagedVirtualDisplayActivity created new virtual display");
                 } else {
-                    State.bridgeVirtualDisplay.setSurface(surface);
-                    State.log("BridgeActivity reusing existing virtual display");
+                    State.managedVirtualDisplay.setSurface(surface);
+                    State.log("ManagedVirtualDisplayActivity reusing existing virtual display");
                 }
                 
-                Display jumpToDisplay = State.bridgeVirtualDisplay.getDisplay();
+                Display jumpToDisplay = State.managedVirtualDisplay.getDisplay();
                 if (State.currentActivity.get() instanceof MainActivity) {
                     ((MainActivity) State.currentActivity.get()).navigateToDisplayDetail(
                         jumpToDisplay.getDisplayId());
@@ -125,17 +125,17 @@ public class BridgeActivity extends AppCompatActivity {
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
-                if (State.bridgeVirtualDisplay != null) {
+                if (State.managedVirtualDisplay != null) {
                     if (keepAliveReader != null) keepAliveReader.close();
                     keepAliveReader = ImageReader.newInstance(args.width, args.height, 1, 2);
-                    State.bridgeVirtualDisplay.setSurface(keepAliveReader.getSurface());
+                    State.managedVirtualDisplay.setSurface(keepAliveReader.getSurface());
                 }
             }
         });
         
         surfaceView.setOnTouchListener((v, event) -> {
-            if (State.bridgeVirtualDisplay != null) {
-                Display virtualDisplay = State.bridgeVirtualDisplay.getDisplay();
+            if (State.managedVirtualDisplay != null) {
+                Display virtualDisplay = State.managedVirtualDisplay.getDisplay();
                 int rotation = virtualDisplay.getRotation();
                 int displayId = virtualDisplay.getDisplayId();
 
@@ -153,7 +153,7 @@ public class BridgeActivity extends AppCompatActivity {
                 try {
                     ServiceUtils.getInputManager().injectInputEvent(event, 0);
                 } catch (Exception e) {
-                    Log.e("BridgeActivity", "failed to inject touch event", e);
+                    Log.e("ManagedVirtualDisplayActivity", "failed to inject touch event", e);
                 }
             }
             return true;
@@ -164,7 +164,7 @@ public class BridgeActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        Log.i("BridgeActivity", "BridgeActivity onDestroy");
+        Log.i("ManagedVirtualDisplayActivity", "ManagedVirtualDisplayActivity onDestroy");
         if (keepAliveReader != null) {
             keepAliveReader.close();
             keepAliveReader = null;

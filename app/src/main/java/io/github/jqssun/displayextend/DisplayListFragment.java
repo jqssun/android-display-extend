@@ -36,7 +36,8 @@ public class DisplayListFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         List<Display> displayList = new ArrayList<>();
         for (Display display : displays) {
-            if (display.getDisplayId() != State.bridgeDisplayId && display.getDisplayId() != State.mirrorDisplayId) {
+            if (display.getDisplayId() != State.managedVirtualDisplayHostDisplayId
+                    && display.getDisplayId() != State.mirrorDisplayId) {
                 displayList.add(display);
             }
         }
