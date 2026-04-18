@@ -122,7 +122,7 @@ public class Pref {
     }
 
     public static float getTouchpadSensitivity() {
-        return _app().getFloat(KEY_TOUCHPAD_SENSITIVITY, 1.5f);
+        return _app().getFloat(KEY_TOUCHPAD_SENSITIVITY, 3.0f);
     }
 
     public static void setTouchpadSensitivity(float v) {

@@ -41,7 +41,8 @@ public class MediaProjectionService extends Service {
         State.log("MediaProjectionService onStartCommand");
         isStarting = false;
         if (intent != null && intent.hasExtra("data")) {
-            MediaProjectionManager mediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+            MediaProjectionManager mediaProjectionManager = (MediaProjectionManager) getSystemService(
+                    Context.MEDIA_PROJECTION_SERVICE);
             Intent data = intent.getParcelableExtra("data");
             State.setMediaProjection(mediaProjectionManager.getMediaProjection(RESULT_OK, data));
             State.getMediaProjection().registerCallback(new MediaProjection.Callback() {
@@ -76,8 +77,7 @@ public class MediaProjectionService extends Service {
         NotificationChannel serviceChannel = new NotificationChannel(
                 CHANNEL_ID,
                 "Media Projection Service",
-                NotificationManager.IMPORTANCE_DEFAULT
-        );
+                NotificationManager.IMPORTANCE_DEFAULT);
         NotificationManager manager = getSystemService(NotificationManager.class);
         manager.createNotificationChannel(serviceChannel);
     }
@@ -90,4 +90,4 @@ public class MediaProjectionService extends Service {
                 .setPriority(Notification.PRIORITY_DEFAULT);
         return builder.build();
     }
-} 
+}

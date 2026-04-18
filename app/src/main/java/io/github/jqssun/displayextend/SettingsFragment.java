@@ -38,6 +38,8 @@ import java.util.List;
 import dev.rikka.tools.refine.Refine;
 
 public class SettingsFragment extends Fragment {
+    private static final float TRACKING_SPEED_MIN = 0.5f;
+    private static final float TRACKING_SPEED_MAX = 5.0f;
     private static final String MATCH_CONTENT_FRAME_RATE_KEY = "match_content_frame_rate";
     private static final String USB_AUDIO_AUTOMATIC_ROUTING_DISABLED_KEY =
             "usb_audio_automatic_routing_disabled";
@@ -153,7 +155,9 @@ public class SettingsFragment extends Fragment {
     }
 
     private void _setupTrackingSpeedSlider() {
-        trackingSpeedSlider.setValue(Math.max(0.5f, Math.min(3.0f, Pref.getTouchpadSensitivity())));
+        trackingSpeedSlider.setValue(Math.max(
+                TRACKING_SPEED_MIN,
+                Math.min(TRACKING_SPEED_MAX, Pref.getTouchpadSensitivity())));
         trackingSpeedSlider.addOnChangeListener((slider, value, fromUser) -> {
             if (fromUser) {
                 Pref.setTouchpadSensitivity(value);

@@ -60,6 +60,12 @@ public class DisplayDetailFragment extends Fragment {
     private TextView scaleText;
     private Slider scaleSlider;
     private View scaleRow;
+    private View actionsHeader;
+    private MaterialButton launchButton;
+    private MaterialButton touchpadButton;
+    private MaterialButton touchscreenButton;
+    private MaterialButton resetConfigButton;
+    private MaterialButton managedVirtualDisplayButton;
     private int nativeWidth;
     private int nativeHeight;
 
@@ -86,6 +92,8 @@ public class DisplayDetailFragment extends Fragment {
             ((DisplayManager) ctx.getSystemService(Context.DISPLAY_SERVICE))
                     .registerDisplayListener(displayListener, null);
         }
+        _updateMirrorTouchscreenAction();
+        _updateActionsVisibility();
     }
 
     @Override
@@ -137,20 +145,23 @@ public class DisplayDetailFragment extends Fragment {
         boolean isSecondary = displayId != Display.DEFAULT_DISPLAY;
 
         // --- Quick Actions ---
-        View actionsHeader = view.findViewById(R.id.actions_header);
-        MaterialButton launchButton = view.findViewById(R.id.start_launcher_button);
+        actionsHeader = view.findViewById(R.id.actions_header);
+        launchButton = view.findViewById(R.id.start_launcher_button);
         if (!isSecondary) {
             launchButton.setVisibility(View.GONE);
         }
         launchButton.setOnClickListener(v -> LauncherActivity.start(getContext(), displayId));
 
-        MaterialButton touchpadButton = view.findViewById(R.id.touchpad_button);
+        touchpadButton = view.findViewById(R.id.touchpad_button);
         if (isSecondary && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R || ShizukuUtils.hasPermission())) {
             touchpadButton.setVisibility(View.VISIBLE);
         }
         touchpadButton.setOnClickListener(v -> TouchpadActivity.startTouchpad(getContext(), displayId, false));
+        touchscreenButton = view.findViewById(R.id.touchscreen_button);
+        touchscreenButton.setOnClickListener(v ->
+                MirrorIntegrationHelper.openMirrorTouchscreen(requireContext(), displayId));
 
-        MaterialButton resetConfigButton = view.findViewById(R.id.reset_config_button);
+        resetConfigButton = view.findViewById(R.id.reset_config_button);
         if (ShizukuUtils.hasShizukuStarted()) {
             resetConfigButton.setVisibility(View.VISIBLE);
             resetConfigButton.setOnClickListener(v -> new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
@@ -161,7 +172,7 @@ public class DisplayDetailFragment extends Fragment {
                     .show());
         }
 
-        MaterialButton managedVirtualDisplayButton = view.findViewById(R.id.managed_virtual_display_button);
+        managedVirtualDisplayButton = view.findViewById(R.id.managed_virtual_display_button);
         if (displayId == State.getManagedVirtualDisplayId()
                 || displayId == State.managedVirtualDisplayHostDisplayId) {
             managedVirtualDisplayButton.setVisibility(View.VISIBLE);
@@ -185,13 +196,8 @@ public class DisplayDetailFragment extends Fragment {
             managedVirtualDisplayButton.setOnClickListener(v -> _showManagedVirtualDisplayDialog());
         }
 
-        if (actionsHeader != null) {
-            boolean hasVisibleActions = launchButton.getVisibility() == View.VISIBLE
-                    || touchpadButton.getVisibility() == View.VISIBLE
-                    || resetConfigButton.getVisibility() == View.VISIBLE
-                    || managedVirtualDisplayButton.getVisibility() == View.VISIBLE;
-            actionsHeader.setVisibility(hasVisibleActions ? View.VISIBLE : View.GONE);
-        }
+        _updateMirrorTouchscreenAction();
+        _updateActionsVisibility();
 
         // --- Display Settings (only for secondary displays) ---
         View settingsHeader = view.findViewById(R.id.settings_header);
@@ -378,6 +384,8 @@ public class DisplayDetailFragment extends Fragment {
         Display.Mode currentMode = d.getMode();
         _setupDisplayModes(d.getSupportedModes(), currentMode != null ? currentMode.getModeId() : -1);
         _updateShizukuStatus();
+        _updateMirrorTouchscreenAction();
+        _updateActionsVisibility();
     }
 
     private void _populateInfoTable(Display d, Context ctx) {
@@ -453,6 +461,27 @@ public class DisplayDetailFragment extends Fragment {
             if (header != null) header.setVisibility(View.GONE);
             State.log("failed to load advanced display info: " + e.getMessage());
         }
+    }
+
+    private void _updateMirrorTouchscreenAction() {
+        if (touchscreenButton == null || getContext() == null) {
+            return;
+        }
+        boolean showTouchscreen = displayId != Display.DEFAULT_DISPLAY
+                && MirrorIntegrationHelper.isTouchscreenAvailableForDisplay(requireContext(), displayId);
+        touchscreenButton.setVisibility(showTouchscreen ? View.VISIBLE : View.GONE);
+    }
+
+    private void _updateActionsVisibility() {
+        if (actionsHeader == null) {
+            return;
+        }
+        boolean hasVisibleActions = (launchButton != null && launchButton.getVisibility() == View.VISIBLE)
+                || (touchpadButton != null && touchpadButton.getVisibility() == View.VISIBLE)
+                || (touchscreenButton != null && touchscreenButton.getVisibility() == View.VISIBLE)
+                || (resetConfigButton != null && resetConfigButton.getVisibility() == View.VISIBLE)
+                || (managedVirtualDisplayButton != null && managedVirtualDisplayButton.getVisibility() == View.VISIBLE);
+        actionsHeader.setVisibility(hasVisibleActions ? View.VISIBLE : View.GONE);
     }
 
     private String _getDisplayFlags(Display display) {

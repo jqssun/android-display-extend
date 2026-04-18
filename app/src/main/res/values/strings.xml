@@ -40,12 +40,15 @@
     <!-- Display list -->
     <string name="display_list_header">Select a physical or virtual display to cast applications to.</string>
     <string name="wireless_cast_hint">Use Android Wireless Display</string>
+    <string name="create_airplay_display">Use AirPlay, DisplayLink or Moonlight Display(s)</string>
+    <string name="mirror_app_not_installed">Install the Mirror app to proceed</string>
+    <string name="display_unavailable_opened_overview">That display is no longer available. Opened Overview instead.</string>
     <string name="display_id_format">Display %1$d (%2$dx%3$d)</string>
     <string name="display_name_format">%s</string>
 
     <!-- Display detail -->
     <string name="display_config_header">Configuration</string>
-    <string name="display_info_header">Display Info</string>
+    <string name="display_info_header">Display Information</string>
     <string name="advanced_info_header">Advanced (Requires Shizuku)</string>
     <string name="resolution_label">Resolution</string>
     <string name="scale_label">Scale (entire display scaling)</string>
@@ -142,8 +145,8 @@
     <string name="mode_normal">Normal</string>
     <string name="mode_cursor_locked">Locked Cursor</string>
     <string name="tracking_speed">On-screen touchpad tracking speed</string>
-    <string name="touchpad_help_normal">Only multi-touch gestures are relayed to display:\n1. Tap to click\n2. Swipe with one finger\n3. Scroll, pinch and rotate with two fingers\n4. Alternatively, scroll with scroll strip</string>
-    <string name="touchpad_help_cursor_locked">All gestures are relayed to display</string>
+    <string name="touchpad_help_normal">Only multi-touch gestures are relayed directly\n\nThe following gestures are available:\n1. Tap to click\n2. Swipe with one finger\n3. Scroll, pinch and rotate with two fingers\n4. Alternatively, scroll with scroll strip</string>
+    <string name="touchpad_help_cursor_locked">All gestures are relayed directly</string>
     <string name="touchpad_hint_back">Go back on target display</string>
     <string name="touchpad_hint_home">Reopen last casted app</string>
     <string name="touchpad_hint_screen_off">Turn off built-in screen</string>
@@ -201,7 +204,7 @@
     <string name="check_download_log">Check for \'Extend.log\' in the Downloads folder</string>
 
     <!-- Input device detail -->
-    <string name="device_info_header">Device Info</string>
+    <string name="device_info_header">Device Information</string>
     <string name="bind_to_display_header">Manually Bind to Display</string>
     <string name="info_device_name">Name</string>
     <string name="info_device_id">Device ID</string>

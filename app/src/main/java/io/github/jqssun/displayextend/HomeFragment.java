@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
-
     private TextView shizukuStatus;
     private MaterialButton shizukuPermissionBtn;
     private TextView inputBindingStatus;
@@ -66,6 +65,8 @@ public class HomeFragment extends Fragment {
             intent.setAction(android.provider.Settings.ACTION_CAST_SETTINGS);
             startActivity(intent);
         });
+        view.findViewById(R.id.openMirrorOverviewBtn).setOnClickListener(v ->
+                MirrorIntegrationHelper.openMirrorOverview(requireContext()));
 
         view.findViewById(R.id.screen_off_button).setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), PureBlackActivity.class);

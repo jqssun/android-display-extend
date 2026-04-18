@@ -36,7 +36,7 @@ public class ManagedVirtualDisplayActivity extends AppCompatActivity {
     private ImageReader keepAliveReader;
 
     private static float[] _adjustTouchCoordinates(float x, float y, int rotation,
-                                                  int targetWidth, int targetHeight, int sourceWidth, int sourceHeight) {
+            int targetWidth, int targetHeight, int sourceWidth, int sourceHeight) {
         float scaleX = (float) targetWidth / sourceWidth;
         float scaleY = (float) targetHeight / sourceHeight;
 
@@ -99,12 +99,12 @@ public class ManagedVirtualDisplayActivity extends AppCompatActivity {
 
         surfaceView = new SurfaceView(this);
         VirtualDisplayArgs args = getIntent().getParcelableExtra("virtualDisplayArgs");
-        
+
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
                 Surface surface = holder.getSurface();
-                
+
                 if (State.managedVirtualDisplay == null) {
                     stopVirtualDisplay();
                     State.managedVirtualDisplay = CreateVirtualDisplay.createVirtualDisplay(args, surface);
@@ -113,27 +113,29 @@ public class ManagedVirtualDisplayActivity extends AppCompatActivity {
                     State.managedVirtualDisplay.setSurface(surface);
                     State.log("ManagedVirtualDisplayActivity reusing existing virtual display");
                 }
-                
+
                 Display jumpToDisplay = State.managedVirtualDisplay.getDisplay();
                 if (State.currentActivity.get() instanceof MainActivity) {
                     ((MainActivity) State.currentActivity.get()).navigateToDisplayDetail(
-                        jumpToDisplay.getDisplayId());
+                            jumpToDisplay.getDisplayId());
                 }
             }
 
             @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            }
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
                 if (State.managedVirtualDisplay != null) {
-                    if (keepAliveReader != null) keepAliveReader.close();
+                    if (keepAliveReader != null)
+                        keepAliveReader.close();
                     keepAliveReader = ImageReader.newInstance(args.width, args.height, PixelFormat.RGBA_8888, 2);
                     State.managedVirtualDisplay.setSurface(keepAliveReader.getSurface());
                 }
             }
         });
-        
+
         surfaceView.setOnTouchListener((v, event) -> {
             if (State.managedVirtualDisplay != null) {
                 Display virtualDisplay = State.managedVirtualDisplay.getDisplay();
@@ -142,13 +144,13 @@ public class ManagedVirtualDisplayActivity extends AppCompatActivity {
 
                 float x = event.getX();
                 float y = event.getY();
-                
-                float[] adjustedCoords = _adjustTouchCoordinates(x, y, rotation, 
-                    args.width, args.height,
-                    surfaceView.getWidth(), surfaceView.getHeight());
-                
+
+                float[] adjustedCoords = _adjustTouchCoordinates(x, y, rotation,
+                        args.width, args.height,
+                        surfaceView.getWidth(), surfaceView.getHeight());
+
                 event.setLocation(adjustedCoords[0], adjustedCoords[1]);
-                
+
                 MotionEventHidden motionEventHidden = Refine.unsafeCast(event);
                 motionEventHidden.setDisplayId(displayId);
                 try {
@@ -159,7 +161,7 @@ public class ManagedVirtualDisplayActivity extends AppCompatActivity {
             }
             return true;
         });
-        
+
         setContentView(surfaceView);
     }
 

@@ -67,7 +67,7 @@ public class TouchpadActivity extends AppCompatActivity {
     private GestureState gestureState = new GestureState();
     private final ExecutorService ipcExecutor = Executors.newSingleThreadExecutor();
     private boolean isCursorLocked = false;
-    private float sensitivity = 1.5f;
+    private float sensitivity = 3.0f;
     private Spinner modeSpinner;
     private static final int MODE_NORMAL = 0;
     private static final int MODE_CURSOR_LOCKED = 1;
