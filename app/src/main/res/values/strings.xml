@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Extend</string>
     <string name="accessibility_service_description">Accessibility service for simulating touch events on secondary screens</string>
-    <string name="display_off_button">Display Off</string>
     <string name="back_button">Back</string>
     <string name="home_button">Home</string>
 
@@ -149,7 +148,7 @@
     <string name="touchpad_help_cursor_locked">All gestures are relayed directly</string>
     <string name="touchpad_hint_back">Go back on target display</string>
     <string name="touchpad_hint_home">Reopen last casted app</string>
-    <string name="touchpad_hint_screen_off">Turn off built-in screen</string>
+    <string name="touchpad_hint_night_mode">Turn on night mode</string>
     <string name="touchpad_hint_rotate_cw">Rotate built-in screen clockwise</string>
     <string name="touchpad_hint_rotate_ccw">Rotate built-in screen counter-clockwise</string>
     <string name="show_cursor_failed">Failed to show cursor</string>

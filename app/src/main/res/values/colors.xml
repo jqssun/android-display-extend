@@ -3,4 +3,8 @@
     <color name="black">#FF000000</color>
     <color name="touchpad_surface">#F5F5F5</color>
     <color name="touchpad_outline">#DDDDDD</color>
+    <color name="touchpad_night_surface">#FF000000</color>
+    <color name="touchpad_night_button">#FF0A0A0A</color>
+    <color name="touchpad_night_outline">#FF333333</color>
+    <color name="touchpad_night_button_icon">#FFE3E3E3</color>
 </resources>

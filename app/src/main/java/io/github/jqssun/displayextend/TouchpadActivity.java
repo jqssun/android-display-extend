@@ -1,13 +1,15 @@
 package io.github.jqssun.displayextend;
 
 import android.accessibilityservice.GestureDescription;
-import android.app.ActivityOptions;
 import android.app.ActivityTaskManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
+import android.content.res.ColorStateList;
 import android.hardware.display.DisplayManager;
 import android.hardware.input.IInputManager;
 import android.net.Uri;
@@ -27,6 +29,8 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.MotionEventHidden;
 import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -43,9 +47,13 @@ import io.github.jqssun.displayextend.shizuku.ShizukuUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import com.google.android.material.button.MaterialButton;
 
 import dev.rikka.tools.refine.Refine;
 
@@ -54,6 +62,10 @@ public class TouchpadActivity extends AppCompatActivity {
     public static final int INJECT_INPUT_EVENT_MODE_ASYNC = 0;
     private View touchpadArea;
     private TextView gestureHint;
+    private View touchpadHintContainer;
+    private View touchpadRoot;
+    private View topBar;
+    private View bottomButtons;
     private View touchpadOverlay;
     private ImageView cursorView;
     private int displayId;
@@ -72,6 +84,15 @@ public class TouchpadActivity extends AppCompatActivity {
     private static final int MODE_NORMAL = 0;
     private static final int MODE_CURSOR_LOCKED = 1;
     private int rotation = 0; // 0=0°, 1=90°CW, 2=180°, 3=270°CW
+    private boolean isNightModeEnabled = false;
+    private MaterialButton nightModeButton;
+    private View scrollStrip;
+    private final Map<MaterialButton, ColorStateList> nightModeButtonTints = new LinkedHashMap<>();
+    private final Map<MaterialButton, ColorStateList> nightModeButtonIconTints = new LinkedHashMap<>();
+    private final Map<MaterialButton, Drawable> nightModeTextButtonBackgrounds = new LinkedHashMap<>();
+    private Drawable defaultRootBackground;
+    private Drawable defaultTopBarBackground;
+    private Drawable defaultBottomButtonsBackground;
 
     private static class GestureState {
         List<MotionEvent> allMotionEvents = new ArrayList<>();
@@ -156,18 +177,26 @@ public class TouchpadActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_touchpad);
 
+        touchpadRoot = findViewById(R.id.touchpadRoot);
+        topBar = findViewById(R.id.topBar);
+        bottomButtons = findViewById(R.id.bottomButtons);
         modeSpinner = findViewById(R.id.modeSpinner);
         touchpadArea = findViewById(R.id.touchpad_area);
         gestureHint = findViewById(R.id.touchpad_gesture_hint);
+        touchpadHintContainer = findViewById(R.id.touchpad_button_hints);
+        defaultRootBackground = touchpadRoot.getBackground();
+        defaultTopBarBackground = topBar.getBackground();
+        defaultBottomButtonsBackground = bottomButtons.getBackground();
         _updateHelp();
         _bindHintRow(R.id.hint_back, R.drawable.ic_back, R.string.touchpad_hint_back);
         _bindHintRow(R.id.hint_home, R.drawable.ic_home, R.string.touchpad_hint_home);
-        _bindHintRow(R.id.hint_screen_off, R.drawable.ic_screen_off, R.string.touchpad_hint_screen_off);
+        _bindHintRow(R.id.hint_night_mode, R.drawable.ic_night_mode, R.string.touchpad_hint_night_mode);
         _bindHintRow(R.id.hint_rotate_ccw, R.drawable.ic_rotate, R.string.touchpad_hint_rotate_ccw);
         _bindHintRow(R.id.hint_rotate_cw, R.drawable.ic_rotate_cw, R.string.touchpad_hint_rotate_cw);
 
         if (savedInstanceState != null) {
             rotation = savedInstanceState.getInt("rotation", 0);
+            isNightModeEnabled = savedInstanceState.getBoolean("night_mode_enabled", false);
         }
 
         displayId = getIntent().getIntExtra("display_id", Display.DEFAULT_DISPLAY);
@@ -191,7 +220,15 @@ public class TouchpadActivity extends AppCompatActivity {
                 (v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) ->
                         _syncTouchpadOverlay());
 
-        findViewById(R.id.displayOffButton).setOnClickListener(v -> _toggleDarkMode());
+        nightModeButton = findViewById(R.id.nightModeButton);
+        _registerNightModeButton((MaterialButton) findViewById(R.id.backButton));
+        _registerNightModeButton((MaterialButton) findViewById(R.id.homeButton));
+        _registerNightModeButton(nightModeButton);
+        _registerNightModeButton((MaterialButton) findViewById(R.id.rotateCcwButton));
+        _registerNightModeButton((MaterialButton) findViewById(R.id.rotateCwButton));
+        _registerNightModeButton((MaterialButton) findViewById(R.id.switchModeButton));
+        _registerNightModeButton((MaterialButton) findViewById(R.id.exitButton));
+        nightModeButton.setOnClickListener(v -> _toggleNightMode());
 
         findViewById(R.id.backButton).setOnClickListener(v -> {
             performBackGesture(inputManager, displayId);
@@ -221,6 +258,7 @@ public class TouchpadActivity extends AppCompatActivity {
 
         _setupScrollStrip();
         sensitivity = Pref.getTouchpadSensitivity();
+        _applyNightMode();
 
         findViewById(R.id.exitButton).setOnClickListener(v -> finish());
 
@@ -355,6 +393,17 @@ public class TouchpadActivity extends AppCompatActivity {
     }
 
     private void _updateHelp() {
+        if (isNightModeEnabled) {
+            gestureHint.setVisibility(View.GONE);
+            if (touchpadHintContainer != null) {
+                touchpadHintContainer.setVisibility(View.GONE);
+            }
+            return;
+        }
+        gestureHint.setVisibility(View.VISIBLE);
+        if (touchpadHintContainer != null) {
+            touchpadHintContainer.setVisibility(View.VISIBLE);
+        }
         int selectedMode = modeSpinner.getSelectedItemPosition();
         gestureHint.setText(selectedMode == MODE_CURSOR_LOCKED
                 ? getString(R.string.touchpad_help_cursor_locked)
@@ -531,14 +580,84 @@ public class TouchpadActivity extends AppCompatActivity {
         }
     }
 
-    private void _toggleDarkMode() {
-        Intent intent = new Intent(this, PureBlackActivity.class);
-        ActivityOptions options = ActivityOptions.makeBasic();
-        startActivity(intent, options.toBundle());
+    private void _toggleNightMode() {
+        isNightModeEnabled = !isNightModeEnabled;
+        _applyNightMode();
+    }
+
+    private void _applyNightMode() {
+        _applyNightModeSurface(touchpadRoot, defaultRootBackground);
+        _applyNightModeSurface(topBar, defaultTopBarBackground);
+        _applyNightModeSurface(bottomButtons, defaultBottomButtonsBackground);
+        if (touchpadArea != null) {
+            touchpadArea.setBackgroundResource(
+                    isNightModeEnabled ? R.drawable.touchpad_background_night : R.drawable.touchpad_background);
+        }
+        if (scrollStrip != null) {
+            scrollStrip.setBackgroundResource(
+                    isNightModeEnabled ? R.drawable.scroll_track_background_night : R.drawable.scroll_track_background);
+        }
+        _applyStatusBarVisibility();
+        if (isNightModeEnabled) {
+            int nightColor = getColor(R.color.touchpad_night_button);
+            ColorStateList nightTint = ColorStateList.valueOf(nightColor);
+            ColorStateList nightIconTint = ColorStateList.valueOf(getColor(R.color.touchpad_night_button_icon));
+            for (MaterialButton button : nightModeButtonTints.keySet()) {
+                if (button.getIcon() == null) {
+                    button.setBackground(new ColorDrawable(nightColor));
+                } else {
+                    button.setBackgroundTintList(nightTint);
+                    button.setIconTint(nightIconTint);
+                }
+            }
+        } else {
+            for (Map.Entry<MaterialButton, ColorStateList> entry : nightModeButtonTints.entrySet()) {
+                MaterialButton button = entry.getKey();
+                if (button.getIcon() == null) {
+                    button.setBackground(nightModeTextButtonBackgrounds.get(button));
+                } else {
+                    button.setBackgroundTintList(entry.getValue());
+                    button.setIconTint(nightModeButtonIconTints.get(button));
+                }
+            }
+        }
+        _updateHelp();
+    }
+
+    private void _applyStatusBarVisibility() {
+        WindowInsetsController controller = getWindow().getInsetsController();
+        if (controller == null) return;
+        if (isNightModeEnabled) {
+            controller.hide(WindowInsets.Type.statusBars());
+            controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+        } else {
+            controller.show(WindowInsets.Type.statusBars());
+        }
+    }
+
+    private void _registerNightModeButton(MaterialButton button) {
+        if (button != null) {
+            nightModeButtonTints.put(button, button.getBackgroundTintList());
+            nightModeButtonIconTints.put(button, button.getIconTint());
+            if (button.getIcon() == null) {
+                nightModeTextButtonBackgrounds.put(button, button.getBackground());
+            }
+        }
+    }
+
+    private void _applyNightModeSurface(View target, Drawable defaultBackground) {
+        if (target == null) {
+            return;
+        }
+        if (isNightModeEnabled) {
+            target.setBackgroundColor(getColor(R.color.touchpad_night_surface));
+        } else {
+            target.setBackground(defaultBackground);
+        }
     }
 
     private void _setupScrollStrip() {
-        View scrollStrip = findViewById(R.id.scrollStrip);
+        scrollStrip = findViewById(R.id.scrollStrip);
         final float[] lastY = {0};
         scrollStrip.setOnTouchListener((v, event) -> {
             switch (event.getAction()) {
@@ -736,6 +855,7 @@ public class TouchpadActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("rotation", rotation);
+        outState.putBoolean("night_mode_enabled", isNightModeEnabled);
     }
 
     private void _switchMode() {

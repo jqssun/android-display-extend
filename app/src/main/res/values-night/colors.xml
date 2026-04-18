@@ -2,4 +2,8 @@
 <resources>
     <color name="touchpad_surface">#2C2C2C</color>
     <color name="touchpad_outline">#444444</color>
+    <color name="touchpad_night_surface">#FF000000</color>
+    <color name="touchpad_night_button">#FF0A0A0A</color>
+    <color name="touchpad_night_outline">#FF333333</color>
+    <color name="touchpad_night_button_icon">#FFE3E3E3</color>
 </resources>

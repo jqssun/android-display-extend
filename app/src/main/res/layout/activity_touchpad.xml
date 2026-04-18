@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/touchpadRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -88,7 +89,7 @@
                     android:layout_marginBottom="4dp" />
 
                 <include layout="@layout/touchpad_hint_row"
-                    android:id="@+id/hint_screen_off"
+                    android:id="@+id/hint_night_mode"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp" />
@@ -131,7 +132,6 @@
             android:layout_margin="8dp"
             app:icon="@drawable/ic_back"
             app:iconGravity="textStart"
-            app:iconPadding="0dp"
             android:contentDescription="@string/back_button"
             style="@style/Widget.Material3.Button.IconButton.Filled.Tonal" />
 
@@ -142,19 +142,17 @@
             android:layout_margin="8dp"
             app:icon="@drawable/ic_home"
             app:iconGravity="textStart"
-            app:iconPadding="0dp"
             android:contentDescription="@string/home_button"
             style="@style/Widget.Material3.Button.IconButton.Filled.Tonal" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/displayOffButton"
+            android:id="@+id/nightModeButton"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_margin="8dp"
-            app:icon="@drawable/ic_screen_off"
+            app:icon="@drawable/ic_night_mode"
             app:iconGravity="textStart"
-            app:iconPadding="0dp"
-            android:contentDescription="@string/display_off_button"
+            android:contentDescription="@string/touchpad_hint_night_mode"
             style="@style/Widget.Material3.Button.IconButton.Filled.Tonal" />
 
         <com.google.android.material.button.MaterialButton
@@ -164,7 +162,6 @@
             android:layout_margin="8dp"
             app:icon="@drawable/ic_rotate"
             app:iconGravity="textStart"
-            app:iconPadding="0dp"
             android:contentDescription="@string/rotate"
             style="@style/Widget.Material3.Button.IconButton.Filled.Tonal" />
 
@@ -175,7 +172,6 @@
             android:layout_margin="8dp"
             app:icon="@drawable/ic_rotate_cw"
             app:iconGravity="textStart"
-            app:iconPadding="0dp"
             android:contentDescription="@string/rotate_cw"
             style="@style/Widget.Material3.Button.IconButton.Filled.Tonal" />
     </LinearLayout>
