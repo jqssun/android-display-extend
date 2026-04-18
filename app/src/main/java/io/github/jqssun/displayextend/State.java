@@ -96,7 +96,7 @@ public class State {
 
     public static void startNewJob(Job job) {
         if (currentJob != null) {
-            if (currentActivity != null && currentActivity.get() != null) {
+            if (currentActivity.get() != null) {
                 State.log("job already running: " + currentJob.getClass().getSimpleName());
             }
             return;
@@ -155,7 +155,7 @@ public class State {
     }
 
     public static void refreshUI() {
-        Activity activity = currentActivity != null ? currentActivity.get() : null;
+        Activity activity = currentActivity.get();
         if (activity != null) {
             activity.runOnUiThread(() -> _updateUiState(activity));
         }
@@ -163,17 +163,6 @@ public class State {
 
     private static void _updateUiState(Activity activity) {
         ExtendUiState state = new ExtendUiState();
-        state.useRealScreenOff = Pref.getUseRealScreenOff();
-        state.hasProjection = lastSingleAppDisplay > 0;
-
-        try {
-            String ver = activity.getPackageManager()
-                    .getPackageInfo(activity.getPackageName(), 0).versionName;
-            state.versionText = activity.getString(R.string.version_format, ver, android.os.Build.VERSION.RELEASE);
-        } catch (Exception e) {
-            state.versionText = activity.getString(R.string.version_unknown);
-        }
-
         boolean started = io.github.jqssun.displayextend.shizuku.ShizukuUtils.hasShizukuStarted();
         boolean hasPerm = io.github.jqssun.displayextend.shizuku.ShizukuUtils.hasPermission();
         if (!started) {

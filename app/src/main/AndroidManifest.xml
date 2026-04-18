@@ -24,6 +24,8 @@
      android:requestLegacyExternalStorage="true"
         android:allowBackup="true"
         android:enableOnBackInvokedCallback="true"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -46,6 +48,10 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="io.github.jqssun.displayextend.action.OPEN_DISPLAY_DETAIL" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="io.github.jqssun.displayextend.action.OPEN_SETTINGS" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

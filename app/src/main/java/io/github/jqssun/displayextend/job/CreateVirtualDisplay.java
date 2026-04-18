@@ -1,5 +1,6 @@
 package io.github.jqssun.displayextend.job;
 
+import android.annotation.SuppressLint;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.DisplayManagerGlobal;
 import android.hardware.display.IDisplayManager;
@@ -29,13 +30,10 @@ public class CreateVirtualDisplay {
     private static final int VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY = android.hardware.display.DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY;
     private static final int VIRTUAL_DISPLAY_FLAG_SUPPORTS_TOUCH = 1 << 6;
     private static final int VIRTUAL_DISPLAY_FLAG_ROTATES_WITH_CONTENT = 1 << 7;
-    private static final int VIRTUAL_DISPLAY_FLAG_DESTROY_CONTENT_ON_REMOVAL = 1 << 8;
-    private static final int VIRTUAL_DISPLAY_FLAG_SHOULD_SHOW_SYSTEM_DECORATIONS = 1 << 9;
     private static final int VIRTUAL_DISPLAY_FLAG_TRUSTED = 1 << 10;
     private static final int VIRTUAL_DISPLAY_FLAG_OWN_DISPLAY_GROUP = 1 << 11;
     private static final int VIRTUAL_DISPLAY_FLAG_ALWAYS_UNLOCKED = 1 << 12;
     private static final int VIRTUAL_DISPLAY_FLAG_TOUCH_FEEDBACK_DISABLED = 1 << 13;
-    private static final int VIRTUAL_DISPLAY_FLAG_OWN_FOCUS = 1 << 14;
     private static final int VIRTUAL_DISPLAY_FLAG_DEVICE_DISPLAY_GROUP = 1 << 15;
 
     public static VirtualDisplay createVirtualDisplay(VirtualDisplayArgs virtualDisplayArgs, Surface surface) {
@@ -98,7 +96,6 @@ public class CreateVirtualDisplay {
     private static int getFlags(VirtualDisplayArgs virtualDisplayArgs, boolean ownContentOnly) {
         int flags = VIRTUAL_DISPLAY_FLAG_PUBLIC
                 | VIRTUAL_DISPLAY_FLAG_SUPPORTS_TOUCH;
-        //    | VIRTUAL_DISPLAY_FLAG_DESTROY_CONTENT_ON_REMOVAL;
         if (ownContentOnly) {
             flags |= VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY;
         }
@@ -112,8 +109,6 @@ public class CreateVirtualDisplay {
                     | VIRTUAL_DISPLAY_FLAG_TOUCH_FEEDBACK_DISABLED;
             if (Build.VERSION.SDK_INT >= AndroidVersions.API_34_ANDROID_14) {
                 flags |= VIRTUAL_DISPLAY_FLAG_DEVICE_DISPLAY_GROUP;
-                //    flags |= VIRTUAL_DISPLAY_FLAG_OWN_FOCUS
-                //            | VIRTUAL_DISPLAY_FLAG_DEVICE_DISPLAY_GROUP;
             }
         }
         return flags;
@@ -128,6 +123,7 @@ public class CreateVirtualDisplay {
         }
     }
 
+    @SuppressLint("NewApi")
     private static VirtualDisplayConfig buildVirtualDisplayConfig(
             VirtualDisplayArgs virtualDisplayArgs, Surface surface, int flags, int width) {
         VirtualDisplayConfig.Builder builder = new VirtualDisplayConfig.Builder(

@@ -79,6 +79,8 @@ public class TouchpadActivity extends AppCompatActivity {
     private GestureState gestureState = new GestureState();
     private final ExecutorService ipcExecutor = Executors.newSingleThreadExecutor();
     private boolean isCursorLocked = false;
+    private boolean useAccessibilityCursor = false;
+    private boolean useAccessibilityTouchOverlay = false;
     private float sensitivity = 3.0f;
     private Spinner modeSpinner;
     private static final int MODE_NORMAL = 0;
@@ -133,6 +135,9 @@ public class TouchpadActivity extends AppCompatActivity {
         }
         
         if (ShizukuUtils.hasShizukuStarted()) {
+            if (!dryRun && Pref.getTouchpadAccessibilityOverlay()) {
+                TouchpadAccessibilityService.ensureServiceAvailable(context, false);
+            }
             if (!dryRun) {
                 State.startNewJob(new StartTouchPad(displayId, context));
             }
@@ -262,10 +267,6 @@ public class TouchpadActivity extends AppCompatActivity {
 
         findViewById(R.id.exitButton).setOnClickListener(v -> finish());
 
-        if (ShizukuUtils.hasPermission()) {
-            ipcExecutor.execute(() -> setFocus(inputManager, displayId));
-        }
-
         findViewById(R.id.switchModeButton).setOnClickListener(v -> _switchMode());
     }
 
@@ -348,7 +349,8 @@ public class TouchpadActivity extends AppCompatActivity {
                     event.getAction() == MotionEvent.ACTION_CANCEL) {
                 Log.d(TAG, "touch ended, isSingleFinger: " + gestureState.isSingleFinger);
                 if (!gestureState.isSingleFinger) {
-                    if (!isCursorLocked && gestureState.lastReplayed == 0 && (Math.abs(relativeX) > 10 || Math.abs(relativeY) > 10)) {
+                    if (!isCursorLocked && gestureState.lastReplayed == 0
+                            && (Math.abs(relativeX) > 10 || Math.abs(relativeY) > 10)) {
                         // ignore
                     } else {
                         _replayBufferedEvents();
@@ -359,8 +361,11 @@ public class TouchpadActivity extends AppCompatActivity {
             }
 
             if (!isCursorLocked && gestureState.lastReplayed == 0) {
-                if (gestureState.isSingleFinger || (event.getPointerCount() == 1 && (gestureState.allMotionEvents.size() == 5 || Math.abs(relativeX) > 10 || Math.abs(relativeY) > 10))) {
-                    if (gestureState.allMotionEvents.size() == 5 && Math.abs(relativeX) < 1 && Math.abs(relativeY) < 1) {
+                if (gestureState.isSingleFinger || (event.getPointerCount() == 1
+                        && (gestureState.allMotionEvents.size() == 5
+                        || Math.abs(relativeX) > 10 || Math.abs(relativeY) > 10))) {
+                    if (gestureState.allMotionEvents.size() == 5
+                            && Math.abs(relativeX) < 1 && Math.abs(relativeY) < 1) {
                         Log.d(TAG, "no movement detected");
                         return true;
                     }
@@ -476,6 +481,26 @@ public class TouchpadActivity extends AppCompatActivity {
         touchpadArea.getLocationOnScreen(loc);
 
         if (touchpadOverlay == null) {
+            // Opt-in a11y-overlay path (see _showMouseCursor). Must pair with the cursor
+            // path: app overlays on display 0 are hidden globally while Settings is
+            // focused, which would freeze touch delivery and strand the a11y cursor.
+            if (Pref.getTouchpadAccessibilityOverlay()) {
+                TouchpadAccessibilityService service = TouchpadAccessibilityService.getInstance();
+                if (service != null) {
+                    View overlay = service.addTouchOverlay(Display.DEFAULT_DISPLAY, loc[0], loc[1], width, height);
+                    if (overlay != null) {
+                        touchpadOverlay = overlay;
+                        useAccessibilityTouchOverlay = true;
+                        if (inputManager == null) {
+                            _setupTouchListenerForAccessibility();
+                        } else {
+                            _setupTouchListenerForInputManager();
+                        }
+                        return;
+                    }
+                }
+            }
+
             touchpadOverlay = new View(this);
             // FLAG_ALT_FOCUSABLE_IM: touchpad overlay (on display 0) claiming IME-focusable lets the IME layer go above it on the phone, which allows the phone-side keyboard appear for inputs on the cast display
             WindowManager.LayoutParams params = new WindowManager.LayoutParams(
@@ -500,6 +525,14 @@ public class TouchpadActivity extends AppCompatActivity {
             return;
         }
 
+        if (useAccessibilityTouchOverlay) {
+            TouchpadAccessibilityService service = TouchpadAccessibilityService.getInstance();
+            if (service != null) {
+                service.updateTouchOverlayBounds(loc[0], loc[1], width, height);
+            }
+            return;
+        }
+
         WindowManager.LayoutParams params = (WindowManager.LayoutParams) touchpadOverlay.getLayoutParams();
         if (params.x == loc[0] && params.y == loc[1] && params.width == width && params.height == height) {
             return;
@@ -513,6 +546,18 @@ public class TouchpadActivity extends AppCompatActivity {
     }
 
     private void _showMouseCursor(Display targetDisplay) {
+        // Opt-in TYPE_ACCESSIBILITY_OVERLAY path: app overlays are hidden over System
+        // Settings and other secure screens, but accessibility overlays stay visible.
+        // Off by default because routing touches through the a11y input filter makes
+        // multi-touch gestures slightly less responsive.
+        if (Pref.getTouchpadAccessibilityOverlay()) {
+            TouchpadAccessibilityService service = TouchpadAccessibilityService.getInstance();
+            if (service != null && service.showCursor(displayId, R.drawable.mouse_cursor)) {
+                useAccessibilityCursor = true;
+                return;
+            }
+        }
+
         cursorParams = new WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -522,16 +567,16 @@ public class TouchpadActivity extends AppCompatActivity {
             WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             PixelFormat.TRANSLUCENT
         );
-        
+
         cursorParams.x = 0;
         cursorParams.y = 0;
-        
+
         cursorView = new ImageView(this);
         cursorView.setImageResource(R.drawable.mouse_cursor);
-        
+
         Context displayContext = createDisplayContext(targetDisplay);
         WindowManager windowManager = (WindowManager) displayContext.getSystemService(Context.WINDOW_SERVICE);
-        
+
         try {
             windowManager.addView(cursorView, cursorParams);
         } catch (Exception e) {
@@ -543,15 +588,23 @@ public class TouchpadActivity extends AppCompatActivity {
     private void _updateCursorPosition(float deltaX, float deltaY) {
         cursorX += deltaX * sensitivity;
         cursorY += deltaY * sensitivity;
-        
-        if (cursorX < -halfWidth || cursorX > halfWidth || 
+
+        if (cursorX < -halfWidth || cursorX > halfWidth ||
             cursorY < -halfHeight || cursorY > halfHeight) {
             Log.w(TAG, "cursor out of bounds - position: (" + cursorX + ", " + cursorY + ")");
         }
-        
+
         cursorX = Math.max(-halfWidth, Math.min(cursorX, halfWidth));
         cursorY = Math.max(-halfHeight, Math.min(cursorY, halfHeight));
-        
+
+        if (useAccessibilityCursor) {
+            TouchpadAccessibilityService service = TouchpadAccessibilityService.getInstance();
+            if (service != null) {
+                service.updateCursorPosition((int) cursorX, (int) cursorY);
+            }
+            return;
+        }
+
         if (cursorView != null && cursorParams != null) {
             cursorParams.x = (int) cursorX;
             cursorParams.y = (int) cursorY;
@@ -564,19 +617,35 @@ public class TouchpadActivity extends AppCompatActivity {
         }
     }
 
+    private void _setCursorVisible(boolean visible) {
+        if (useAccessibilityCursor) {
+            TouchpadAccessibilityService service = TouchpadAccessibilityService.getInstance();
+            if (service != null) {
+                service.setCursorVisible(visible);
+            }
+            return;
+        }
+        if (cursorView != null) {
+            cursorView.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
+    }
+
     public static void performBackGesture(IInputManager inputManager, int displayId) {
         new Thread(() -> _performBackGestureSync(inputManager, displayId)).start();
     }
 
     private static void _performBackGestureSync(IInputManager inputManager, int displayId) {
-        if (inputManager != null) {
+        TouchpadAccessibilityService accessibilityService = TouchpadAccessibilityService.getInstance();
+        if (inputManager != null && _trySetTaskFocus(displayId)) {
             _injectKeyEvent(inputManager, displayId, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK, 0, 0, INJECT_INPUT_EVENT_MODE_ASYNC);
             _injectKeyEvent(inputManager, displayId, KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK, 0, 0, INJECT_INPUT_EVENT_MODE_ASYNC);
             return;
         }
-        TouchpadAccessibilityService accessibilityService = TouchpadAccessibilityService.getInstance();
         if (accessibilityService != null) {
             accessibilityService.performBackGesture(displayId);
+        } else if (inputManager != null) {
+            _injectKeyEvent(inputManager, displayId, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK, 0, 0, INJECT_INPUT_EVENT_MODE_ASYNC);
+            _injectKeyEvent(inputManager, displayId, KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK, 0, 0, INJECT_INPUT_EVENT_MODE_ASYNC);
         }
     }
 
@@ -625,13 +694,28 @@ public class TouchpadActivity extends AppCompatActivity {
     }
 
     private void _applyStatusBarVisibility() {
-        WindowInsetsController controller = getWindow().getInsetsController();
-        if (controller == null) return;
-        if (isNightModeEnabled) {
-            controller.hide(WindowInsets.Type.statusBars());
-            controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            WindowInsetsController controller = getWindow().getInsetsController();
+            if (controller == null) {
+                return;
+            }
+            if (isNightModeEnabled) {
+                controller.hide(WindowInsets.Type.statusBars());
+                controller.setSystemBarsBehavior(
+                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            } else {
+                controller.show(WindowInsets.Type.statusBars());
+            }
         } else {
-            controller.show(WindowInsets.Type.statusBars());
+            View decorView = getWindow().getDecorView();
+            int systemUiFlags = decorView.getSystemUiVisibility();
+            if (isNightModeEnabled) {
+                systemUiFlags |= View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            } else {
+                systemUiFlags &= ~View.SYSTEM_UI_FLAG_FULLSCREEN;
+                systemUiFlags &= ~View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            }
+            decorView.setSystemUiVisibility(systemUiFlags);
         }
     }
 
@@ -711,36 +795,49 @@ public class TouchpadActivity extends AppCompatActivity {
         }
     }
 
-    public static void setFocus(IInputManager inputManager, int displayId) {
+    private static boolean _trySetTaskFocus(int displayId) {
         try {
-            if (inputManager != null) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                    ServiceUtils.getActivityTaskManager().focusTopTask(displayId);
-                } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                    List<ActivityTaskManager.RootTaskInfo> taskInfos = ServiceUtils.getActivityTaskManager().getAllRootTaskInfosOnDisplay(displayId);
-                    for (ActivityTaskManager.RootTaskInfo taskInfo : taskInfos) {
-                        ServiceUtils.getActivityTaskManager().setFocusedRootTask(taskInfo.taskId);
-                        break;
-                    }
-                } else {
-                    List<Object> stackInfos = ServiceUtils.getActivityTaskManager().getAllStackInfosOnDisplay(displayId);
-                    if (!stackInfos.isEmpty()) {
-                        Object stackInfo = stackInfos.get(0);
-                        Field stackIdField = stackInfo.getClass().getDeclaredField("stackId");
-                        stackIdField.setAccessible(true);
-                        int stackId = stackIdField.getInt(stackInfo);
-                        ServiceUtils.getActivityTaskManager().setFocusedStack(stackId);
-                    }
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                ServiceUtils.getActivityTaskManager().focusTopTask(displayId);
+                return true;
+            }
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                List<ActivityTaskManager.RootTaskInfo> taskInfos =
+                        ServiceUtils.getActivityTaskManager().getAllRootTaskInfosOnDisplay(displayId);
+                for (ActivityTaskManager.RootTaskInfo taskInfo : taskInfos) {
+                    ServiceUtils.getActivityTaskManager().setFocusedRootTask(taskInfo.taskId);
+                    return true;
                 }
-            } else {
-                TouchpadAccessibilityService accessibilityService = TouchpadAccessibilityService.getInstance();
-                if (accessibilityService != null) {
-                    accessibilityService.setFocus(displayId);
-                }
+                return false;
+            }
+            List<Object> stackInfos = ServiceUtils.getActivityTaskManager().getAllStackInfosOnDisplay(displayId);
+            if (!stackInfos.isEmpty()) {
+                Object stackInfo = stackInfos.get(0);
+                Field stackIdField = stackInfo.getClass().getDeclaredField("stackId");
+                stackIdField.setAccessible(true);
+                int stackId = stackIdField.getInt(stackInfo);
+                ServiceUtils.getActivityTaskManager().setFocusedStack(stackId);
+                return true;
+            }
+        } catch (Throwable e) {
+            Log.e(TAG, "failed to set task focus", e);
+        }
+        return false;
+    }
+
+    public static boolean setFocus(IInputManager inputManager, int displayId) {
+        if (inputManager != null && _trySetTaskFocus(displayId)) {
+            return true;
+        }
+        try {
+            TouchpadAccessibilityService accessibilityService = TouchpadAccessibilityService.getInstance();
+            if (accessibilityService != null) {
+                return accessibilityService.setFocus(displayId);
             }
         } catch (Throwable e) {
             Log.e(TAG, "failed to set focus", e);
         }
+        return false;
     }
 
     @Override
@@ -748,10 +845,19 @@ public class TouchpadActivity extends AppCompatActivity {
         super.onDestroy();
         ipcExecutor.shutdown();
         WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-        if (touchpadOverlay != null && touchpadOverlay.getWindowToken() != null) {
+        TouchpadAccessibilityService service = TouchpadAccessibilityService.getInstance();
+        if (useAccessibilityTouchOverlay) {
+            if (service != null) {
+                service.removeTouchOverlay();
+            }
+        } else if (touchpadOverlay != null && touchpadOverlay.getWindowToken() != null) {
             wm.removeView(touchpadOverlay);
         }
-        if (cursorView != null && cursorView.getWindowToken() != null) {
+        if (useAccessibilityCursor) {
+            if (service != null) {
+                service.hideCursor();
+            }
+        } else if (cursorView != null && cursorView.getWindowToken() != null) {
             wm.removeView(cursorView);
         }
     }
@@ -805,11 +911,11 @@ public class TouchpadActivity extends AppCompatActivity {
                 switch (position) {
                     case MODE_NORMAL:
                         isCursorLocked = false;
-                        if (cursorView != null) cursorView.setVisibility(View.VISIBLE);
+                        _setCursorVisible(true);
                         break;
                     case MODE_CURSOR_LOCKED:
                         isCursorLocked = true;
-                        if (cursorView != null) cursorView.setVisibility(View.GONE);
+                        _setCursorVisible(false);
                         break;
                 }
                 _updateHelp();
@@ -830,14 +936,14 @@ public class TouchpadActivity extends AppCompatActivity {
         // surface for inputs on the cast display. Removing it on pause kills
         // cross-display IME until the activity is resumed.
         if (touchpadOverlay != null) touchpadOverlay.setVisibility(View.GONE);
-        if (cursorView != null) cursorView.setVisibility(View.GONE);
+        _setCursorVisible(false);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (touchpadOverlay != null) touchpadOverlay.setVisibility(View.VISIBLE);
-        if (cursorView != null && !isCursorLocked) cursorView.setVisibility(View.VISIBLE);
+        if (!isCursorLocked) _setCursorVisible(true);
     }
 
     private static final int[] ORIENTATIONS = {

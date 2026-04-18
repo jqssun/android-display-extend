@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String ACTION_USB_PERMISSION = "io.github.jqssun.displayextend.USB_PERMISSION";
     public static final String ACTION_OPEN_OVERVIEW = "io.github.jqssun.displayextend.action.OPEN_OVERVIEW";
     public static final String ACTION_OPEN_DISPLAY_DETAIL = "io.github.jqssun.displayextend.action.OPEN_DISPLAY_DETAIL";
+    public static final String ACTION_OPEN_SETTINGS = "io.github.jqssun.displayextend.action.OPEN_SETTINGS";
     public static final String EXTRA_DISPLAY_ID = "display_id";
     public static final String EXTRA_SOURCE_SCREEN = "source_screen";
     public static final String MIRROR_PACKAGE_NAME = "io.github.jqssun.displaymirror";
@@ -50,12 +51,13 @@ public class MainActivity extends AppCompatActivity {
     private static final String MIRROR_SCREEN_MOONLIGHT = "moonlight";
     private static final String MIRROR_SCREEN_AIRPLAY = "airplay";
     private static final String MIRROR_SCREEN_DISPLAYLINK = "displaylink";
+    private static final String MIRROR_SCREEN_SETTINGS = "settings";
 
     private NavController navController;
     private BottomNavigationView bottomNav;
     private OnBackPressedCallback crossAppBackCallback;
     private String crossAppMirrorScreen;
-    private boolean crossAppLandingOverview;
+    private int crossAppLandingDestinationId = -1;
     private int crossAppLandingDisplayId = -1;
 
     private final ActivityResultLauncher<Intent> mediaProjectionLauncher = registerForActivityResult(
@@ -235,9 +237,17 @@ public class MainActivity extends AppCompatActivity {
         if (ACTION_OPEN_OVERVIEW.equals(action)) {
             _navigateToOverview();
             if (_isValidMirrorScreen(sourceScreen)) {
-                crossAppMirrorScreen = sourceScreen;
-                crossAppLandingOverview = true;
-                crossAppLandingDisplayId = -1;
+                _setCrossAppBackTarget(sourceScreen, R.id.nav_overview, -1);
+            } else {
+                _clearCrossAppBackTarget();
+            }
+            _updateCrossAppBackState();
+            return;
+        }
+        if (ACTION_OPEN_SETTINGS.equals(action)) {
+            _navigateToSettings();
+            if (_isValidMirrorScreen(sourceScreen)) {
+                _setCrossAppBackTarget(sourceScreen, R.id.nav_settings, -1);
             } else {
                 _clearCrossAppBackTarget();
             }
@@ -257,9 +267,7 @@ public class MainActivity extends AppCompatActivity {
             _navigateToOverview();
             Toast.makeText(this, R.string.display_unavailable_opened_overview, Toast.LENGTH_SHORT).show();
             if (_isValidMirrorScreen(sourceScreen)) {
-                crossAppMirrorScreen = sourceScreen;
-                crossAppLandingOverview = true;
-                crossAppLandingDisplayId = -1;
+                _setCrossAppBackTarget(sourceScreen, R.id.nav_overview, -1);
             } else {
                 _clearCrossAppBackTarget();
             }
@@ -268,9 +276,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (_isValidMirrorScreen(sourceScreen)) {
-            crossAppMirrorScreen = sourceScreen;
-            crossAppLandingOverview = false;
-            crossAppLandingDisplayId = displayId;
+            _setCrossAppBackTarget(sourceScreen, R.id.nav_display_detail, displayId);
         } else {
             _clearCrossAppBackTarget();
         }
@@ -285,12 +291,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void _navigateToOverview() {
-        if (bottomNav != null && bottomNav.getSelectedItemId() != R.id.nav_overview) {
-            bottomNav.setSelectedItemId(R.id.nav_overview);
+        _navigateToTopLevelDestination(R.id.nav_overview);
+    }
+
+    private void _navigateToSettings() {
+        _navigateToTopLevelDestination(R.id.nav_settings);
+    }
+
+    private void _navigateToTopLevelDestination(int destinationId) {
+        if (bottomNav != null && bottomNav.getSelectedItemId() != destinationId) {
+            bottomNav.setSelectedItemId(destinationId);
         }
         if (navController.getCurrentDestination() != null
-                && navController.getCurrentDestination().getId() != R.id.nav_overview) {
-            navController.popBackStack(R.id.nav_overview, false);
+                && navController.getCurrentDestination().getId() != destinationId) {
+            navController.popBackStack(destinationId, false);
         }
     }
 
@@ -310,8 +324,11 @@ public class MainActivity extends AppCompatActivity {
         if (crossAppMirrorScreen == null || navController == null || navController.getCurrentDestination() == null) {
             return false;
         }
-        if (crossAppLandingOverview) {
-            return navController.getCurrentDestination().getId() == R.id.nav_overview;
+        if (navController.getCurrentDestination().getId() != crossAppLandingDestinationId) {
+            return false;
+        }
+        if (crossAppLandingDestinationId != R.id.nav_display_detail) {
+            return true;
         }
         return _isShowingDisplayDetail(crossAppLandingDisplayId);
     }
@@ -325,14 +342,22 @@ public class MainActivity extends AppCompatActivity {
 
     private void _clearCrossAppBackTarget() {
         crossAppMirrorScreen = null;
-        crossAppLandingOverview = false;
+        crossAppLandingDestinationId = -1;
         crossAppLandingDisplayId = -1;
     }
 
     private boolean _isValidMirrorScreen(String screen) {
         return MIRROR_SCREEN_MOONLIGHT.equals(screen)
                 || MIRROR_SCREEN_AIRPLAY.equals(screen)
-                || MIRROR_SCREEN_DISPLAYLINK.equals(screen);
+                || MIRROR_SCREEN_DISPLAYLINK.equals(screen)
+                || MIRROR_SCREEN_SETTINGS.equals(screen);
+    }
+
+    private void _setCrossAppBackTarget(String mirrorScreen, int landingDestinationId,
+                                        int landingDisplayId) {
+        crossAppMirrorScreen = mirrorScreen;
+        crossAppLandingDestinationId = landingDestinationId;
+        crossAppLandingDisplayId = landingDisplayId;
     }
 
     private void _returnToMirrorScreen() {

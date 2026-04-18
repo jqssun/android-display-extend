@@ -28,6 +28,8 @@ import java.util.List;
 public class HomeFragment extends Fragment {
     private TextView shizukuStatus;
     private MaterialButton shizukuPermissionBtn;
+    private TextView accessibilityStatus;
+    private MaterialButton accessibilityPermissionBtn;
     private TextView inputBindingStatus;
     private LinearLayout displaysContainer;
 
@@ -57,6 +59,12 @@ public class HomeFragment extends Fragment {
         shizukuPermissionBtn.setOnClickListener(v -> State.startNewJob(new AcquireShizuku()));
 
         shizukuStatus = view.findViewById(R.id.shizukuStatus);
+        accessibilityStatus = view.findViewById(R.id.accessibilityStatus);
+        accessibilityPermissionBtn = view.findViewById(R.id.accessibilityPermissionBtn);
+        accessibilityPermissionBtn.setOnClickListener(v -> {
+            TouchpadAccessibilityService.ensureServiceAvailable(requireContext(), true);
+            _updateAccessibilityStatus();
+        });
         inputBindingStatus = view.findViewById(R.id.inputBindingStatus);
         displaysContainer = view.findViewById(R.id.displaysContainer);
 
@@ -111,9 +119,26 @@ public class HomeFragment extends Fragment {
             shizukuStatus.setText(state.shizukuStatus);
         }
         shizukuPermissionBtn.setVisibility(state.shizukuPermissionVisible ? View.VISIBLE : View.GONE);
+        _updateAccessibilityStatus();
 
         _refreshDisplayList();
         _updateInputBindingStatus();
+    }
+
+    private void _updateAccessibilityStatus() {
+        if (accessibilityStatus == null || accessibilityPermissionBtn == null || getContext() == null) {
+            return;
+        }
+        boolean enabled = TouchpadAccessibilityService.isAccessibilityServiceEnabled(requireContext());
+        if (enabled) {
+            accessibilityStatus.setText(R.string.accessibility_status_enabled);
+            accessibilityPermissionBtn.setVisibility(View.GONE);
+            return;
+        }
+        accessibilityStatus.setText(Pref.getTouchpadAccessibilityOverlay()
+                ? R.string.accessibility_status_required_for_touchpad_surfaces
+                : R.string.accessibility_status_optional_for_touchpad_surfaces);
+        accessibilityPermissionBtn.setVisibility(View.VISIBLE);
     }
 
     private void _refreshDisplayList() {

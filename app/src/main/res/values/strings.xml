@@ -29,11 +29,16 @@
 
     <!-- Home -->
     <string name="shizuku_permission_status">Shizuku</string>
+    <string name="accessibility_permission_status">Accessibility</string>
     <string name="authorize">Authorize</string>
+    <string name="enable">Enable</string>
     <string name="screen_off">Turn Off Built-in Screen</string>
     <string name="touchpad">Touchpad</string>
     <string name="settings">Settings</string>
     <string name="status_not_started">Not started</string>
+    <string name="accessibility_status_enabled">Enabled</string>
+    <string name="accessibility_status_required_for_touchpad_surfaces">Required for controlling popup and system surfaces on external displays</string>
+    <string name="accessibility_status_optional_for_touchpad_surfaces">Optional; only needed for popup and system surfaces on external displays</string>
     <string name="shizuku_required">Shizuku permission is required</string>
 
     <!-- Display list -->
@@ -121,7 +126,7 @@
     <string name="enable_non_resizable_multiwindow">Non-resizable multi-window</string>
     <string name="enable_non_resizable_multiwindow_desc">Allow non-resizable apps in multi-window mode</string>
     <string name="disable_screen_share_protection">Disable screen share protection</string>
-    <string name="disable_screen_share_protection_desc">Remove DRM restrictions when sharing screen</string>
+    <string name="disable_screen_share_protection_desc">Remove screen sharing protection for certain surfaces in applications and notifications</string>
     <string name="use_real_screen_off">Use real screen off</string>
     <string name="use_real_screen_off_desc">Turn off screen instead of simulating a black image; wake with volume keys</string>
     <string name="stay_on_while_plugged">Keep screen on while charging</string>
@@ -144,6 +149,8 @@
     <string name="mode_normal">Normal</string>
     <string name="mode_cursor_locked">Locked Cursor</string>
     <string name="tracking_speed">On-screen touchpad tracking speed</string>
+    <string name="touchpad_accessibility_overlay">Use accessibility overlay for touchpad</string>
+    <string name="touchpad_accessibility_overlay_desc">Route the touchpad through an accessibility overlay so cursor stays visible over secure screens</string>
     <string name="touchpad_help_normal">Only multi-touch gestures are relayed directly\n\nThe following gestures are available:\n1. Tap to click\n2. Swipe with one finger\n3. Scroll, pinch and rotate with two fingers\n4. Alternatively, scroll with scroll strip</string>
     <string name="touchpad_help_cursor_locked">All gestures are relayed directly</string>
     <string name="touchpad_hint_back">Go back on target display</string>

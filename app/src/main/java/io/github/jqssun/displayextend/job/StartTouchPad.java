@@ -22,10 +22,10 @@ public class StartTouchPad implements Job {
         if (!acquireShizuku.acquired) {
             return;
         }
+        TouchpadAccessibilityService.ensureServiceAvailable(context, false);
         Intent intent = new Intent(context, TouchpadActivity.class);
         intent.putExtra("display_id", displayId);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
-        TouchpadAccessibilityService.startServiceByShizuku(context);
     }
 }

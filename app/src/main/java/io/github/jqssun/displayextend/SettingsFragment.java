@@ -60,6 +60,7 @@ public class SettingsFragment extends Fragment {
     private MaterialSwitch disableScreenShareProtectionCheckbox;
     private MaterialSwitch disableUsbAudioCheckbox;
     private MaterialSwitch useRealScreenOffCheckbox;
+    private MaterialSwitch touchpadAccessibilityOverlayCheckbox;
     private MaterialSwitch stayOnWhilePluggedCheckbox;
     private MaterialSwitch autoScreenOffCheckbox;
     private MaterialSwitch showSystemSettingNamesSwitch;
@@ -87,6 +88,7 @@ public class SettingsFragment extends Fragment {
         disableScreenShareProtectionCheckbox = view.findViewById(R.id.disableScreenShareProtectionCheckbox);
         disableUsbAudioCheckbox = view.findViewById(R.id.disableUsbAudioCheckbox);
         useRealScreenOffCheckbox = view.findViewById(R.id.useRealScreenOffCheckbox);
+        touchpadAccessibilityOverlayCheckbox = view.findViewById(R.id.touchpadAccessibilityOverlayCheckbox);
         stayOnWhilePluggedCheckbox = view.findViewById(R.id.stayOnWhilePluggedCheckbox);
         autoScreenOffCheckbox = view.findViewById(R.id.autoScreenOffCheckbox);
         showSystemSettingNamesSwitch = view.findViewById(R.id.showSystemSettingNamesSwitch);
@@ -111,6 +113,7 @@ public class SettingsFragment extends Fragment {
         _setupDisableUsbAudioCheckbox();
         _setupMatchContentFrameRateRow();
         _setupUseRealScreenOffCheckbox();
+        _setupTouchpadAccessibilityOverlayCheckbox();
         _setupStayOnWhilePluggedCheckbox();
         _setupAutoScreenOffCheckbox();
         _setupTrackingSpeedSlider();
@@ -272,6 +275,21 @@ public class SettingsFragment extends Fragment {
         useRealScreenOffCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             Pref.setUseRealScreenOff(isChecked);
         });
+    }
+
+    private void _setupTouchpadAccessibilityOverlayCheckbox() {
+        touchpadAccessibilityOverlayCheckbox.setOnCheckedChangeListener(null);
+        touchpadAccessibilityOverlayCheckbox.setChecked(Pref.getTouchpadAccessibilityOverlay());
+        touchpadAccessibilityOverlayCheckbox.setOnCheckedChangeListener((buttonView, isChecked) ->
+                Pref.setTouchpadAccessibilityOverlay(isChecked));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (touchpadAccessibilityOverlayCheckbox != null) {
+            _setupTouchpadAccessibilityOverlayCheckbox();
+        }
     }
 
     private void _setupStayOnWhilePluggedCheckbox() {
@@ -457,6 +475,7 @@ public class SettingsFragment extends Fragment {
         disableScreenShareProtectionCheckbox.setOnCheckedChangeListener(null);
         disableUsbAudioCheckbox.setOnCheckedChangeListener(null);
         useRealScreenOffCheckbox.setOnCheckedChangeListener(null);
+        touchpadAccessibilityOverlayCheckbox.setOnCheckedChangeListener(null);
         stayOnWhilePluggedCheckbox.setOnCheckedChangeListener(null);
         autoScreenOffCheckbox.setOnCheckedChangeListener(null);
         showSystemSettingNamesSwitch.setOnCheckedChangeListener(null);
@@ -471,6 +490,7 @@ public class SettingsFragment extends Fragment {
         _setupDisableUsbAudioCheckbox();
         _setupMatchContentFrameRateRow();
         _setupUseRealScreenOffCheckbox();
+        _setupTouchpadAccessibilityOverlayCheckbox();
         _setupStayOnWhilePluggedCheckbox();
         _setupAutoScreenOffCheckbox();
         _setupTrackingSpeedSlider();
