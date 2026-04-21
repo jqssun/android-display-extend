@@ -17,6 +17,7 @@ public class Pref {
     public static final String KEY_AUTO_SCREEN_OFF = "auto_screen_off";
     public static final String KEY_SHOW_SYSTEM_SETTING_NAMES = "show_system_setting_names";
     public static final String KEY_TOUCHPAD_ACCESSIBILITY_OVERLAY = "touchpad_accessibility_overlay";
+    public static final String KEY_TOUCHPAD_TAP_HOLD_DRAG = "touchpad_tap_hold_drag";
 
     // managed virtual display keys
     public static final String KEY_FOLLOW_APP_ROTATION = "rotates_with_content";
@@ -88,6 +89,14 @@ public class Pref {
 
     public static void setTouchpadAccessibilityOverlay(boolean v) {
         _prefs().edit().putBoolean(KEY_TOUCHPAD_ACCESSIBILITY_OVERLAY, v).apply();
+    }
+
+    public static boolean getTouchpadTapHoldDrag() {
+        return _prefs().getBoolean(KEY_TOUCHPAD_TAP_HOLD_DRAG, true);
+    }
+
+    public static void setTouchpadTapHoldDrag(boolean v) {
+        _prefs().edit().putBoolean(KEY_TOUCHPAD_TAP_HOLD_DRAG, v).apply();
     }
 
     // managed virtual display prefs

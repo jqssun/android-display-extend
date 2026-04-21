@@ -1,5 +1,6 @@
 package io.github.jqssun.displayextend;
 
+import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.GestureDescription;
 import android.app.ActivityTaskManager;
 import android.content.Context;
@@ -16,6 +17,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Log;
@@ -29,6 +31,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.MotionEventHidden;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
@@ -78,6 +81,11 @@ public class TouchpadActivity extends AppCompatActivity {
     private IInputManager inputManager;
     private GestureState gestureState = new GestureState();
     private final ExecutorService ipcExecutor = Executors.newSingleThreadExecutor();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private int doubleTapTimeout;
+    private int touchSlop;
+    private static final long TAP_MAX_DURATION_MS = 180;
+    private static final long DRAG_SEGMENT_DURATION_MS = 20;
     private boolean isCursorLocked = false;
     private boolean useAccessibilityCursor = false;
     private boolean useAccessibilityTouchOverlay = false;
@@ -102,6 +110,24 @@ public class TouchpadActivity extends AppCompatActivity {
         boolean isSingleFinger;
         float initialTouchX = 0;
         float initialTouchY = 0;
+
+        // tap-hold-drag: first tap is deferred so a followup hold can latch drag
+        List<MotionEvent> pendingTapEvents = new ArrayList<>();
+        Runnable pendingTapReplay;
+        long lastTapUpTime = 0;
+        float lastTapUpX = 0;
+        float lastTapUpY = 0;
+        long downTime = 0;
+        boolean dragLatched;
+
+        // accessibility drag-stroke chaining state
+        GestureDescription.StrokeDescription dragStroke;
+        boolean dragStrokeInFlight;
+        float lastStrokeX;
+        float lastStrokeY;
+        float pendingDragX;
+        float pendingDragY;
+        boolean dragEndPending;
     }
 
     private static class StrokePoint {
@@ -206,6 +232,10 @@ public class TouchpadActivity extends AppCompatActivity {
 
         displayId = getIntent().getIntExtra("display_id", Display.DEFAULT_DISPLAY);
 
+        ViewConfiguration vc = ViewConfiguration.get(this);
+        doubleTapTimeout = ViewConfiguration.getDoubleTapTimeout();
+        touchSlop = vc.getScaledTouchSlop();
+
         if (ShizukuUtils.hasPermission()) {
             inputManager = ServiceUtils.getInputManager();
         }
@@ -272,6 +302,10 @@ public class TouchpadActivity extends AppCompatActivity {
 
     private void _setupTouchListenerForAccessibility() {
         touchpadOverlay.setOnTouchListener((v, event) -> {
+            if (_handleDragTouch(event)) {
+                return true;
+            }
+
             if (gestureState.allMotionEvents.isEmpty()) {
                 gestureState.initialTouchX = event.getX();
                 gestureState.initialTouchY = event.getY();
@@ -298,7 +332,13 @@ public class TouchpadActivity extends AppCompatActivity {
                             alwaysSingleFinger = false;
                         }
                     }
-                    if (!isCursorLocked && alwaysSingleFinger && (Math.abs(relativeX) > 10 || Math.abs(relativeY) > 10)) {
+                    boolean significantMove = Math.abs(relativeX) > 10 || Math.abs(relativeY) > 10;
+                    if (_isCleanTap(event, alwaysSingleFinger, significantMove)) {
+                        _scheduleTapReplay(event);
+                        _recycleGestureEvents();
+                        return true;
+                    }
+                    if (!isCursorLocked && alwaysSingleFinger && significantMove) {
                         // ignore
                     } else {
                         _replayGestureViaAccessibility();
@@ -329,6 +369,10 @@ public class TouchpadActivity extends AppCompatActivity {
 
     private void _setupTouchListenerForInputManager() {
         touchpadOverlay.setOnTouchListener((v, event) -> {
+            if (_handleDragTouch(event)) {
+                return true;
+            }
+
             if (gestureState.allMotionEvents.isEmpty()) {
                 gestureState.initialTouchX = event.getX();
                 gestureState.initialTouchY = event.getY();
@@ -349,8 +393,14 @@ public class TouchpadActivity extends AppCompatActivity {
                     event.getAction() == MotionEvent.ACTION_CANCEL) {
                 Log.d(TAG, "touch ended, isSingleFinger: " + gestureState.isSingleFinger);
                 if (!gestureState.isSingleFinger) {
-                    if (!isCursorLocked && gestureState.lastReplayed == 0
-                            && (Math.abs(relativeX) > 10 || Math.abs(relativeY) > 10)) {
+                    boolean alwaysSingleFinger = gestureState.lastReplayed == 0;
+                    boolean significantMove = Math.abs(relativeX) > 10 || Math.abs(relativeY) > 10;
+                    if (_isCleanTap(event, alwaysSingleFinger, significantMove)) {
+                        _scheduleTapReplay(event);
+                        _recycleGestureEvents();
+                        return true;
+                    }
+                    if (!isCursorLocked && alwaysSingleFinger && significantMove) {
                         // ignore
                     } else {
                         _replayBufferedEvents();
@@ -449,6 +499,303 @@ public class TouchpadActivity extends AppCompatActivity {
                 event.recycle();
             }
         });
+    }
+
+    private void _replayPendingTap() {
+        if (gestureState.pendingTapEvents.isEmpty()) {
+            return;
+        }
+        if (inputManager != null) {
+            List<MotionEvent> toReplay = new ArrayList<>(gestureState.pendingTapEvents);
+            gestureState.pendingTapEvents.clear();
+            ipcExecutor.execute(() -> {
+                for (MotionEvent event : toReplay) {
+                    MotionEventHidden eventHidden = Refine.unsafeCast(event);
+                    eventHidden.setDisplayId(displayId);
+                    inputManager.injectInputEvent(event, INJECT_INPUT_EVENT_MODE_ASYNC);
+                    event.recycle();
+                }
+            });
+            return;
+        }
+        _dispatchPendingTapViaAccessibility();
+    }
+
+    private void _dispatchPendingTapViaAccessibility() {
+        TouchpadAccessibilityService service = TouchpadAccessibilityService.getInstance();
+        if (service == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.R
+                || gestureState.pendingTapEvents.isEmpty()) {
+            _recyclePendingTapEvents();
+            return;
+        }
+        MotionEvent first = gestureState.pendingTapEvents.get(0);
+        float x = Math.max(0, first.getX());
+        float y = Math.max(0, first.getY());
+
+        Path path = new Path();
+        path.moveTo(x, y);
+        path.lineTo(x + 0.1f, y);
+        GestureDescription.Builder builder = new GestureDescription.Builder();
+        builder.setDisplayId(displayId);
+        builder.addStroke(new GestureDescription.StrokeDescription(path, 0, 40, false));
+        service.setFocus(displayId);
+        service.dispatchGesture(builder.build(), null, null);
+        _recyclePendingTapEvents();
+    }
+
+    private void _recyclePendingTapEvents() {
+        for (MotionEvent e : gestureState.pendingTapEvents) {
+            e.recycle();
+        }
+        gestureState.pendingTapEvents.clear();
+    }
+
+    private void _cancelPendingTapReplay() {
+        if (gestureState.pendingTapReplay != null) {
+            mainHandler.removeCallbacks(gestureState.pendingTapReplay);
+            gestureState.pendingTapReplay = null;
+        }
+    }
+
+    // Called on ACTION_UP of a clean tap. Defers the tap replay so a followup
+    // ACTION_DOWN within the double-tap window can cancel it and latch drag.
+    private void _scheduleTapReplay(MotionEvent upEventCopy) {
+        _recyclePendingTapEvents();
+        for (MotionEvent e : gestureState.allMotionEvents) {
+            gestureState.pendingTapEvents.add(MotionEvent.obtain(e));
+        }
+        gestureState.lastTapUpTime = upEventCopy.getEventTime();
+        gestureState.lastTapUpX = upEventCopy.getX();
+        gestureState.lastTapUpY = upEventCopy.getY();
+        Runnable r = () -> {
+            gestureState.pendingTapReplay = null;
+            _replayPendingTap();
+        };
+        gestureState.pendingTapReplay = r;
+        mainHandler.postDelayed(r, doubleTapTimeout);
+    }
+
+    // Intercept touches consumed by the tap-hold-drag state machine.
+    // Returns true if the event was handled and must not flow into the
+    // buffer-and-replay path.
+    private boolean _handleDragTouch(MotionEvent event) {
+        if (!Pref.getTouchpadTapHoldDrag()) {
+            return false;
+        }
+        int action = event.getActionMasked();
+        if (action == MotionEvent.ACTION_DOWN && !isCursorLocked) {
+            if (_tryLatchDrag(event)) {
+                return true;
+            }
+        }
+        if (!gestureState.dragLatched) {
+            return false;
+        }
+        switch (action) {
+            case MotionEvent.ACTION_MOVE:
+                if (event.getPointerCount() == 1) {
+                    float relX = event.getX() - gestureState.initialTouchX;
+                    float relY = event.getY() - gestureState.initialTouchY;
+                    _updateCursorPosition(relX * 0.5f, relY * 0.5f);
+                    gestureState.initialTouchX = event.getX();
+                    gestureState.initialTouchY = event.getY();
+                    _handleDragMove();
+                }
+                return true;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                _endDragMode();
+                return true;
+            default:
+                // additional pointers while dragging: ignore, keep drag active
+                return true;
+        }
+    }
+
+    private boolean _isCleanTap(MotionEvent upEvent, boolean alwaysSingleFinger, boolean significantMove) {
+        return Pref.getTouchpadTapHoldDrag()
+                && !isCursorLocked
+                && alwaysSingleFinger
+                && !significantMove
+                && upEvent.getAction() == MotionEvent.ACTION_UP
+                && (upEvent.getEventTime() - upEvent.getDownTime()) <= TAP_MAX_DURATION_MS;
+    }
+
+    // Check if this ACTION_DOWN is the second half of a tap-hold-drag gesture.
+    private boolean _tryLatchDrag(MotionEvent down) {
+        if (gestureState.pendingTapReplay == null) {
+            return false;
+        }
+        long dt = down.getEventTime() - gestureState.lastTapUpTime;
+        if (dt < 0 || dt > doubleTapTimeout) {
+            return false;
+        }
+        float dx = down.getX() - gestureState.lastTapUpX;
+        float dy = down.getY() - gestureState.lastTapUpY;
+        if (dx * dx + dy * dy > touchSlop * touchSlop * 4) {
+            return false;
+        }
+        _cancelPendingTapReplay();
+        _recyclePendingTapEvents();
+        gestureState.initialTouchX = down.getX();
+        gestureState.initialTouchY = down.getY();
+        _armDragMode(down.getDownTime());
+        return true;
+    }
+
+    private void _armDragMode(long ignored) {
+        gestureState.dragLatched = true;
+        if (inputManager != null) {
+            long now = SystemClock.uptimeMillis();
+            gestureState.downTime = now;
+            ipcExecutor.execute(() -> {
+                _injectMouseEvent(now, now, MotionEvent.ACTION_DOWN, 0, MotionEvent.BUTTON_PRIMARY);
+                _injectMouseEvent(now, now, MotionEvent.ACTION_BUTTON_PRESS,
+                        MotionEvent.BUTTON_PRIMARY, MotionEvent.BUTTON_PRIMARY);
+            });
+        } else {
+            _startDragStroke();
+        }
+    }
+
+    private void _handleDragMove() {
+        if (inputManager != null) {
+            long down = gestureState.downTime;
+            long now = SystemClock.uptimeMillis();
+            ipcExecutor.execute(() -> _injectMouseEvent(down, now,
+                    MotionEvent.ACTION_MOVE, 0, MotionEvent.BUTTON_PRIMARY));
+        } else {
+            _continueDragStroke(false);
+        }
+    }
+
+    private void _endDragMode() {
+        if (!gestureState.dragLatched) {
+            return;
+        }
+        gestureState.dragLatched = false;
+        if (inputManager != null) {
+            long down = gestureState.downTime;
+            long now = SystemClock.uptimeMillis();
+            ipcExecutor.execute(() -> {
+                _injectMouseEvent(down, now, MotionEvent.ACTION_BUTTON_RELEASE,
+                        MotionEvent.BUTTON_PRIMARY, 0);
+                _injectMouseEvent(down, now, MotionEvent.ACTION_UP, 0, 0);
+            });
+        } else {
+            _continueDragStroke(true);
+        }
+    }
+
+    private void _injectMouseEvent(long downTime, long eventTime, int action,
+                                   int actionButton, int buttonState) {
+        MotionEvent.PointerProperties[] props = {new MotionEvent.PointerProperties()};
+        props[0].id = 0;
+        props[0].toolType = MotionEvent.TOOL_TYPE_MOUSE;
+        MotionEvent.PointerCoords[] coords = {new MotionEvent.PointerCoords()};
+        coords[0].x = cursorX + halfWidth;
+        coords[0].y = cursorY + halfHeight;
+        MotionEvent event = MotionEvent.obtain(downTime, eventTime, action,
+                1, props, coords, 0, buttonState, 1f, 1f, 0, 0,
+                InputDevice.SOURCE_MOUSE, 0);
+        MotionEventHidden hidden = Refine.unsafeCast(event);
+        hidden.setDisplayId(displayId);
+        if (action == MotionEvent.ACTION_BUTTON_PRESS
+                || action == MotionEvent.ACTION_BUTTON_RELEASE) {
+            hidden.setActionButton(actionButton);
+        }
+        inputManager.injectInputEvent(event, INJECT_INPUT_EVENT_MODE_ASYNC);
+        event.recycle();
+    }
+
+    private final AccessibilityService.GestureResultCallback dragStrokeCallback =
+            new AccessibilityService.GestureResultCallback() {
+                @Override
+                public void onCompleted(GestureDescription gestureDescription) {
+                    mainHandler.post(TouchpadActivity.this::_onDragStrokeFinished);
+                }
+
+                @Override
+                public void onCancelled(GestureDescription gestureDescription) {
+                    mainHandler.post(TouchpadActivity.this::_onDragStrokeFinished);
+                }
+            };
+
+    private void _startDragStroke() {
+        TouchpadAccessibilityService service = TouchpadAccessibilityService.getInstance();
+        if (service == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            return;
+        }
+        float x = Math.max(0, cursorX + halfWidth);
+        float y = Math.max(0, cursorY + halfHeight);
+        Path p = new Path();
+        p.moveTo(x, y);
+        p.lineTo(x + 0.1f, y);
+        gestureState.lastStrokeX = x + 0.1f;
+        gestureState.lastStrokeY = y;
+        gestureState.dragStroke = new GestureDescription.StrokeDescription(
+                p, 0, DRAG_SEGMENT_DURATION_MS, true);
+        GestureDescription.Builder b = new GestureDescription.Builder();
+        b.setDisplayId(displayId);
+        b.addStroke(gestureState.dragStroke);
+        service.setFocus(displayId);
+        gestureState.dragStrokeInFlight = true;
+        service.dispatchGesture(b.build(), dragStrokeCallback, mainHandler);
+    }
+
+    private void _continueDragStroke(boolean finalSegment) {
+        if (gestureState.dragStroke == null) {
+            return;
+        }
+        float toX = Math.max(0, cursorX + halfWidth);
+        float toY = Math.max(0, cursorY + halfHeight);
+        if (gestureState.dragStrokeInFlight) {
+            gestureState.pendingDragX = toX;
+            gestureState.pendingDragY = toY;
+            if (finalSegment) {
+                gestureState.dragEndPending = true;
+            }
+            return;
+        }
+        _dispatchDragSegment(toX, toY, !finalSegment);
+    }
+
+    private void _dispatchDragSegment(float toX, float toY, boolean willContinue) {
+        TouchpadAccessibilityService service = TouchpadAccessibilityService.getInstance();
+        if (service == null || gestureState.dragStroke == null) {
+            return;
+        }
+        float fromX = gestureState.lastStrokeX;
+        float fromY = gestureState.lastStrokeY;
+        if (toX == fromX && toY == fromY) {
+            toX = fromX + 0.1f;
+        }
+        Path p = new Path();
+        p.moveTo(fromX, fromY);
+        p.lineTo(toX, toY);
+        GestureDescription.StrokeDescription next = gestureState.dragStroke.continueStroke(
+                p, 0, DRAG_SEGMENT_DURATION_MS, willContinue);
+        gestureState.lastStrokeX = toX;
+        gestureState.lastStrokeY = toY;
+        gestureState.dragStroke = willContinue ? next : null;
+        GestureDescription.Builder b = new GestureDescription.Builder();
+        b.setDisplayId(displayId);
+        b.addStroke(next);
+        gestureState.dragStrokeInFlight = true;
+        service.dispatchGesture(b.build(), willContinue ? dragStrokeCallback : null, mainHandler);
+    }
+
+    private void _onDragStrokeFinished() {
+        gestureState.dragStrokeInFlight = false;
+        if (gestureState.dragEndPending) {
+            gestureState.dragEndPending = false;
+            _dispatchDragSegment(gestureState.pendingDragX, gestureState.pendingDragY, false);
+            return;
+        }
+        if (gestureState.dragLatched) {
+            // keepalive: system drops the continuation if no follow-up arrives
+            _dispatchDragSegment(cursorX + halfWidth, cursorY + halfHeight, true);
+        }
     }
 
     private static void _injectKeyEvent(IInputManager inputManager, int displayId, int action, int keyCode, int repeat, int metaState, int injectMode) {
@@ -843,6 +1190,11 @@ public class TouchpadActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        _cancelPendingTapReplay();
+        _recyclePendingTapEvents();
+        if (gestureState.dragLatched) {
+            _endDragMode();
+        }
         ipcExecutor.shutdown();
         WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         TouchpadAccessibilityService service = TouchpadAccessibilityService.getInstance();

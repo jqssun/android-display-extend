@@ -61,6 +61,7 @@ public class SettingsFragment extends Fragment {
     private MaterialSwitch disableUsbAudioCheckbox;
     private MaterialSwitch useRealScreenOffCheckbox;
     private MaterialSwitch touchpadAccessibilityOverlayCheckbox;
+    private MaterialSwitch touchpadTapHoldDragCheckbox;
     private MaterialSwitch stayOnWhilePluggedCheckbox;
     private MaterialSwitch autoScreenOffCheckbox;
     private MaterialSwitch showSystemSettingNamesSwitch;
@@ -89,6 +90,7 @@ public class SettingsFragment extends Fragment {
         disableUsbAudioCheckbox = view.findViewById(R.id.disableUsbAudioCheckbox);
         useRealScreenOffCheckbox = view.findViewById(R.id.useRealScreenOffCheckbox);
         touchpadAccessibilityOverlayCheckbox = view.findViewById(R.id.touchpadAccessibilityOverlayCheckbox);
+        touchpadTapHoldDragCheckbox = view.findViewById(R.id.touchpadTapHoldDragCheckbox);
         stayOnWhilePluggedCheckbox = view.findViewById(R.id.stayOnWhilePluggedCheckbox);
         autoScreenOffCheckbox = view.findViewById(R.id.autoScreenOffCheckbox);
         showSystemSettingNamesSwitch = view.findViewById(R.id.showSystemSettingNamesSwitch);
@@ -114,6 +116,7 @@ public class SettingsFragment extends Fragment {
         _setupMatchContentFrameRateRow();
         _setupUseRealScreenOffCheckbox();
         _setupTouchpadAccessibilityOverlayCheckbox();
+        _setupTouchpadTapHoldDragCheckbox();
         _setupStayOnWhilePluggedCheckbox();
         _setupAutoScreenOffCheckbox();
         _setupTrackingSpeedSlider();
@@ -284,11 +287,21 @@ public class SettingsFragment extends Fragment {
                 Pref.setTouchpadAccessibilityOverlay(isChecked));
     }
 
+    private void _setupTouchpadTapHoldDragCheckbox() {
+        touchpadTapHoldDragCheckbox.setOnCheckedChangeListener(null);
+        touchpadTapHoldDragCheckbox.setChecked(Pref.getTouchpadTapHoldDrag());
+        touchpadTapHoldDragCheckbox.setOnCheckedChangeListener((buttonView, isChecked) ->
+                Pref.setTouchpadTapHoldDrag(isChecked));
+    }
+
     @Override
     public void onResume() {
         super.onResume();
         if (touchpadAccessibilityOverlayCheckbox != null) {
             _setupTouchpadAccessibilityOverlayCheckbox();
+        }
+        if (touchpadTapHoldDragCheckbox != null) {
+            _setupTouchpadTapHoldDragCheckbox();
         }
     }
 
@@ -476,6 +489,7 @@ public class SettingsFragment extends Fragment {
         disableUsbAudioCheckbox.setOnCheckedChangeListener(null);
         useRealScreenOffCheckbox.setOnCheckedChangeListener(null);
         touchpadAccessibilityOverlayCheckbox.setOnCheckedChangeListener(null);
+        touchpadTapHoldDragCheckbox.setOnCheckedChangeListener(null);
         stayOnWhilePluggedCheckbox.setOnCheckedChangeListener(null);
         autoScreenOffCheckbox.setOnCheckedChangeListener(null);
         showSystemSettingNamesSwitch.setOnCheckedChangeListener(null);
@@ -491,6 +505,7 @@ public class SettingsFragment extends Fragment {
         _setupMatchContentFrameRateRow();
         _setupUseRealScreenOffCheckbox();
         _setupTouchpadAccessibilityOverlayCheckbox();
+        _setupTouchpadTapHoldDragCheckbox();
         _setupStayOnWhilePluggedCheckbox();
         _setupAutoScreenOffCheckbox();
         _setupTrackingSpeedSlider();
