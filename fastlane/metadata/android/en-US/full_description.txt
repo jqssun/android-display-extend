@@ -1,0 +1,9 @@
+- Launch any application on any external display in full screen
+- Fully customizable resolution, scaling, DPI, and rotation for any display
+- Reset any per-display configuration back to system defaults
+- Built-in on-screen touchpad and keyboard for controlling any display
+- Touchpad control with support for multi-touch, rotation, digitizer only mode
+- External input device to display routing per input and display combination
+- Navigation controls including Back and Home buttons for content on external displays
+- Turning off built-in screen while keeping external displays active
+- Managed virtual display mode with customizable on-screen keyboard routing and window behavior

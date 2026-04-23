@@ -1,0 +1,1 @@
+Extend is an all-purpose Android display manager for any connected physical or virtual display.

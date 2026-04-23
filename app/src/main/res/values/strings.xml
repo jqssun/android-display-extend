@@ -88,8 +88,8 @@
     <string name="auto_open_last_app">Open last app automatically</string>
     <string name="auto_open_last_app_desc">Launch the last app when this display connects</string>
     <string name="floating_button_desc">Show a draggable back button on this display</string>
-    <string name="floating_button_force_landscape">Force landscape for the floating back button</string>
-    <string name="floating_button_force_landscape_desc">Keep the floating button in landscape orientation</string>
+    <string name="floating_button_force_landscape">Force landscape for floating back button</string>
+    <string name="floating_button_force_landscape_desc">Keep floating button in landscape orientation</string>
     <string name="ime_to_this_display_desc">Choose where the on-screen keyboard appears for this display. Requires a trusted virtual display.</string>
     <string name="managed_virtual_display_button_text">Managed Virtual Display Mode</string>
     <string name="disable_managed_virtual_display_mode">Disable Managed Virtual Display Mode</string>
@@ -132,7 +132,7 @@
     <string name="stay_on_while_plugged">Keep screen on while charging</string>
     <string name="stay_on_while_plugged_desc">Prevent screen from turning off when plugged in</string>
     <string name="auto_screen_off">Turn screen off when a display connects</string>
-    <string name="auto_screen_off_desc">Show a black screen on this device automatically when an external display is detected</string>
+    <string name="auto_screen_off_desc">Show a black screen on this device automatically when external display connects</string>
     <string name="input_binding_title">External Input Device Binding</string>
     <string name="input_binding_status_auto">Automatic Binding</string>
     <string name="input_binding_status_manual">Manual Binding</string>
