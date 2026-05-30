@@ -44,7 +44,7 @@ jobs:
           echo ${{ secrets.STORE }} | base64 -d > upload.jks
           echo ${{ secrets.LOCAL }} | base64 -d > local.properties
           chmod +x ./gradlew;
-          ./gradlew assembleRelease --stacktrace
+          ./gradlew assembleRelease bundleRelease --stacktrace
           rm upload.jks local.properties
 
       - name: Publish (GitHub)
@@ -55,3 +55,4 @@ jobs:
           tag_name: v${{ env.version }}
           files: |
             ${{ env.main_project_module }}/build/outputs/apk/release/app-release.apk
+            ${{ env.main_project_module }}/build/outputs/bundle/release/app-release.aab

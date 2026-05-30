@@ -53,7 +53,6 @@ Extend manages physical and virtual displays while Mirror creates them. External
 | Floating button | O | F | 26 (`TYPE_APPLICATION_OVERLAY` and `SYSTEM_ALERT_WINDOW`) |
 | Built-in screen off | R | N | 26 (`SurfaceControl.setDisplayPowerMode`) <br> 35 (`IDisplayManager.requestDisplayPower`) |
 | Physical-key routing | R | N | 26 |
-| Sharing logs | R | N | 26 (base) <br> 30 (`MANAGE_EXTERNAL_STORAGE`) |
 | Display hotplug monitor | I | N | 26 |
 | Input hotplug monitor | I | N | 26 |
 

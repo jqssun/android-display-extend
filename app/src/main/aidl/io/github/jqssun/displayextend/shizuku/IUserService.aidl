@@ -1,12 +1,14 @@
 package io.github.jqssun.displayextend.shizuku;
 
+import android.os.ParcelFileDescriptor;
+
 interface IUserService {
 
     void destroy() = 16777114; // destroy method defined by Shizuku server
 
     void exit() = 1; // exit method defined by user
 
-    String fetchLogs() = 2;
+    void fetchLogs(in ParcelFileDescriptor sink) = 2;
 
     String dumpInput() = 3;
 

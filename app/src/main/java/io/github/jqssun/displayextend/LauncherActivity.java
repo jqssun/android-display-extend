@@ -178,16 +178,18 @@ public class LauncherActivity extends AppCompatActivity {
 
   private List<AppListAdapter.AppEntry> _getFilteredApps(
       boolean showAll, Set<String> excludedPackages) {
+    PackageManager pm = getPackageManager();
     List<ApplicationInfo> packages = new ArrayList<>();
     try {
-      packages = getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA);
+      packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
     } catch (SecurityException e) {
-      Toast.makeText(this, getString(R.string.query_apps_permission_required), Toast.LENGTH_LONG)
+      Toast.makeText(this, getString(R.string.cannot_get_app_list), Toast.LENGTH_LONG)
           .show();
       State.log("failed to query app list: " + e);
     }
     return packages
         .stream()
+        .filter(app -> pm.getLaunchIntentForPackage(app.packageName) != null)
         .filter(app -> showAll || (app.flags & ApplicationInfo.FLAG_SYSTEM) == 0)
         .filter(app -> excludedPackages == null || !excludedPackages.contains(app.packageName))
         .map(
@@ -225,7 +227,7 @@ public class LauncherActivity extends AppCompatActivity {
     } catch (SecurityException e) {
       Toast.makeText(
               context,
-              context.getString(R.string.query_apps_permission_required),
+              context.getString(R.string.cannot_get_app_list),
               Toast.LENGTH_LONG)
           .show();
       State.log("failed to query app list: " + e);

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.hardware.display.IDisplayManager;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.ParcelFileDescriptor;
 import android.os.RemoteException;
 import android.util.Log;
 import android.view.Display;
@@ -41,22 +42,18 @@ public class UserService extends IUserService.Stub {
   }
 
   @Override
-  public String fetchLogs() throws RemoteException {
-    try {
-      Process process = Runtime.getRuntime().exec("logcat -d -f /sdcard/Download/Extend.log");
-      java.io.BufferedReader reader =
-          new java.io.BufferedReader(new java.io.InputStreamReader(process.getInputStream()));
-
-      StringBuilder output = new StringBuilder();
-      String line;
-      while ((line = reader.readLine()) != null) {
-        output.append(line).append("\n");
+  public void fetchLogs(ParcelFileDescriptor sink) throws RemoteException {
+    try (java.io.OutputStream out = new ParcelFileDescriptor.AutoCloseOutputStream(sink)) {
+      Process process = Runtime.getRuntime().exec(new String[] {"logcat", "-d"});
+      try (java.io.InputStream in = process.getInputStream()) {
+        byte[] buf = new byte[8192];
+        int n;
+        while ((n = in.read(buf)) != -1) {
+          out.write(buf, 0, n);
+        }
       }
-
-      reader.close();
+      out.flush();
       process.waitFor();
-
-      return output.toString();
     } catch (Exception e) {
       Log.e("UserService", "logcat -d failed", e);
       throw new RemoteException("Failed to execute logcat -d: " + e.getMessage());
@@ -65,10 +62,10 @@ public class UserService extends IUserService.Stub {
 
   @Override
   public String dumpInput() throws RemoteException {
-    return _exec("dumpsys input");
+    return _exec("dumpsys", "input");
   }
 
-  private String _exec(String command) throws RemoteException {
+  private String _exec(String... command) throws RemoteException {
     try {
       Process process = Runtime.getRuntime().exec(command);
       java.io.BufferedReader reader =
@@ -145,7 +142,7 @@ public class UserService extends IUserService.Stub {
         new Thread(
             () -> {
               try {
-                listenVolumeKeyProcess = Runtime.getRuntime().exec("getevent");
+                listenVolumeKeyProcess = Runtime.getRuntime().exec(new String[] {"getevent"});
                 java.io.BufferedReader reader =
                     new java.io.BufferedReader(
                         new java.io.InputStreamReader(listenVolumeKeyProcess.getInputStream()));

@@ -193,7 +193,6 @@
     <string name="running_tasks_header">Running Tasks</string>
     <string name="installed_apps_header">All Apps</string>
     <string name="floating_button">Floating back button</string>
-    <string name="query_apps_permission_required">QUERY_ALL_PACKAGES permission is required</string>
     <string name="cannot_get_app_list">Cannot get app list, please check permissions</string>
     <string name="first_launch_hint">Opened on phone first to grant permissions. Tap again to cast.</string>
     <string name="input_routing_limitation">Due to Android version limitation, tap \'Turn display off\' to use the touchscreen</string>
@@ -206,10 +205,9 @@
 
     <!-- Fetch log -->
     <string name="user_service_unavailable">Cannot start user service for log export</string>
-    <string name="grant_file_access">Please grant file access permission</string>
-    <string name="log_not_generated">Log file was not generated</string>
+    <string name="no_logs_to_export">No logs to export</string>
     <string name="share_log">Share Log File</string>
-    <string name="check_download_log">Check for \'Extend.log\' in the Downloads folder</string>
+    <string name="log_export_failed">Failed to export logs</string>
 
     <!-- Input device detail -->
     <string name="device_info_header">Device Information</string>
