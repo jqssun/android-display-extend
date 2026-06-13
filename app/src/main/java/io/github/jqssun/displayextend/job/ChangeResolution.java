@@ -10,6 +10,8 @@ import io.github.jqssun.displayextend.State;
 import io.github.jqssun.displayextend.shizuku.ServiceUtils;
 
 public class ChangeResolution implements Job {
+  public static final int CONFIRM_TIMEOUT_SECONDS = 8;
+
   private final AcquireShizuku acquireShizuku = new AcquireShizuku();
   private final int displayId;
   private final int width;
@@ -86,7 +88,7 @@ public class ChangeResolution implements Job {
           new Thread(
               () -> {
                 try {
-                  Thread.sleep(5000);
+                  Thread.sleep(CONFIRM_TIMEOUT_SECONDS * 1000L);
                   Activity activity = State.currentActivity.get();
                   if (activity != null) {
                     activity.runOnUiThread(

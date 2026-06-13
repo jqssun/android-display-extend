@@ -3,6 +3,7 @@ package io.github.jqssun.displayextend.dialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
@@ -18,6 +19,11 @@ public class ResolutionDialog {
 
     widthInput.setText(String.valueOf(currentWidth));
     heightInput.setText(String.valueOf(currentHeight));
+
+    TextView warning = dialogView.findViewById(R.id.resolution_warning_text);
+    warning.setText(
+        context.getString(
+            R.string.resolution_warning, ChangeResolution.CONFIRM_TIMEOUT_SECONDS));
 
     new MaterialAlertDialogBuilder(context)
         .setTitle(context.getString(R.string.edit_resolution))

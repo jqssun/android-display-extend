@@ -17,8 +17,8 @@ android {
         applicationId "io.github.jqssun.displayextend"
         minSdk 26
         targetSdk 35
-        versionCode 21
-        versionName "0.0.21"
+        versionCode 22
+        versionName "0.0.22"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -67,10 +67,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.9.7'
     implementation 'androidx.recyclerview:recyclerview:1.4.0'
     implementation 'androidx.fragment:fragment:1.8.9'
-    implementation 'androidx.core:core-ktx:1.18.0'
     implementation 'androidx.appcompat:appcompat:1.7.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
-    implementation libs.androidx.window
     compileOnly project(':hidden-api-stub')
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit

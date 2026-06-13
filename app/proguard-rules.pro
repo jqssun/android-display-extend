@@ -8,5 +8,7 @@
 # AIDL generated
 -keep class * implements android.os.IInterface { *; }
 
+-keep class io.github.jqssun.displayextend.** extends android.os.Binder { *; }
+
 # Shizuku
 -keep class rikka.shizuku.** { *; }

@@ -177,7 +177,7 @@
     <string name="edit_resolution">Change Resolution</string>
     <string name="width">Width</string>
     <string name="height">Height</string>
-    <string name="resolution_warning">The aspect ratio applied may not be fully supported by the display if content appears stretched. Changes will revert automatically after 2 seconds. Changing the aspect ratio on unsupported displays requires root.</string>
+    <string name="resolution_warning">The aspect ratio applied may not be fully supported by the display if content appears stretched. If you don\'t confirm within %1$d seconds, the change reverts automatically.</string>
     <string name="edit_rotation">Change Rotation (Android 15+ only)</string>
     <string name="rotation_none">No change</string>
     <string name="confirm_dpi_format">Change DPI from %1$d to %2$d?</string>
