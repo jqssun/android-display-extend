@@ -96,7 +96,7 @@ public class FloatingButtonService extends Service {
       displayId = intent.getIntExtra("display_id", -1);
       if (displayId != -1) {
         if (floatingView != null) {
-          this.onDestroy();
+          _removeView();
         }
         _createFloatingButton();
       }
@@ -226,16 +226,20 @@ public class FloatingButtonService extends Service {
     _startFadeOutTimer();
   }
 
-  @Override
-  public void onDestroy() {
+  private void _removeView() {
     if (handler != null) {
       handler.removeCallbacks(fadeOutRunnable);
     }
-    super.onDestroy();
     if (floatingView != null && windowManager != null) {
       windowManager.removeView(floatingView);
       floatingView = null;
     }
+  }
+
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    _removeView();
     State.floatingButtonService = null;
   }
 

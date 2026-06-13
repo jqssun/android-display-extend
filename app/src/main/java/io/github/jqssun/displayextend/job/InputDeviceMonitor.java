@@ -10,7 +10,13 @@ import io.github.jqssun.displayextend.PlatformCompat;
 import io.github.jqssun.displayextend.State;
 
 public class InputDeviceMonitor {
+  private static boolean registered = false;
+
   public static void init(InputManager inputManager) {
+    if (registered) {
+      return;
+    }
+    registered = true;
     int[] deviceIds = inputManager.getInputDeviceIds();
     for (int deviceId : deviceIds) {
       android.view.InputDevice device = inputManager.getInputDevice(deviceId);
