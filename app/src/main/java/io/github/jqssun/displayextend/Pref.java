@@ -18,6 +18,7 @@ public class Pref {
   public static final String KEY_SHOW_SYSTEM_SETTING_NAMES = "show_system_setting_names";
   public static final String KEY_TOUCHPAD_ACCESSIBILITY_OVERLAY = "touchpad_accessibility_overlay";
   public static final String KEY_TOUCHPAD_TAP_HOLD_DRAG = "touchpad_tap_hold_drag";
+  public static final String KEY_ACCESSIBILITY_CONSENT = "accessibility_consent";
 
   // managed virtual display keys
   public static final String KEY_FOLLOW_APP_ROTATION = "rotates_with_content";
@@ -98,6 +99,14 @@ public class Pref {
 
   public static void setTouchpadTapHoldDrag(boolean v) {
     _prefs().edit().putBoolean(KEY_TOUCHPAD_TAP_HOLD_DRAG, v).apply();
+  }
+
+  public static boolean getAccessibilityConsent(Context ctx) {
+    return _prefs(ctx).getBoolean(KEY_ACCESSIBILITY_CONSENT, false);
+  }
+
+  public static void setAccessibilityConsent(Context ctx, boolean v) {
+    _prefs(ctx).edit().putBoolean(KEY_ACCESSIBILITY_CONSENT, v).apply();
   }
 
   // managed virtual display prefs
@@ -208,7 +217,11 @@ public class Pref {
   // internal
 
   private static SharedPreferences _prefs() {
-    return _ctx().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    return _prefs(_ctx());
+  }
+
+  private static SharedPreferences _prefs(Context ctx) {
+    return ctx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
   }
 
   private static SharedPreferences _app() {

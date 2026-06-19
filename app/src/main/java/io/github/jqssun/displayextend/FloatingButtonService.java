@@ -56,8 +56,7 @@ public class FloatingButtonService extends Service {
 
     if (!TouchpadAccessibilityService.isAccessibilityServiceEnabled(context)) {
       if (!dryRun) {
-        Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-        context.startActivity(intent);
+        TouchpadAccessibilityService.ensureServiceAvailable(context, true);
       }
       return false;
     }
@@ -72,8 +71,7 @@ public class FloatingButtonService extends Service {
         .postDelayed(
             () -> {
               if (TouchpadAccessibilityService.getInstance() == null) {
-                Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-                context.startActivity(intent);
+                TouchpadAccessibilityService.ensureServiceAvailable(context, true);
               } else {
                 Intent serviceIntent2 = new Intent(context, FloatingButtonService.class);
                 serviceIntent2.putExtra("display_id", displayId);

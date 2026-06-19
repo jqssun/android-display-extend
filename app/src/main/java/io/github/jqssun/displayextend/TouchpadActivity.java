@@ -171,8 +171,7 @@ public class TouchpadActivity extends AppCompatActivity {
 
     if (!TouchpadAccessibilityService.isAccessibilityServiceEnabled(context)) {
       if (!dryRun) {
-        Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-        context.startActivity(intent);
+        TouchpadAccessibilityService.ensureServiceAvailable(context, true);
       }
       return false;
     }
@@ -191,8 +190,7 @@ public class TouchpadActivity extends AppCompatActivity {
           .postDelayed(
               () -> {
                 if (TouchpadAccessibilityService.getInstance() == null) {
-                  Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-                  context.startActivity(intent);
+                  TouchpadAccessibilityService.ensureServiceAvailable(context, true);
                 } else {
                   Intent touchpadIntent = new Intent(context, TouchpadActivity.class);
                   touchpadIntent.putExtra("display_id", displayId);

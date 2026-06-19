@@ -58,6 +58,9 @@ public class TouchpadAccessibilityService extends AccessibilityService {
     if (TouchpadAccessibilityService.getInstance() != null) {
       return;
     }
+    if (!Pref.getAccessibilityConsent(context)) {
+      return;
+    }
     if (PermissionManager.grant("android.permission.WRITE_SECURE_SETTINGS")) {
       String existingServices =
           Settings.Secure.getString(
@@ -86,6 +89,12 @@ public class TouchpadAccessibilityService extends AccessibilityService {
     if (isAccessibilityServiceEnabled(context)) {
       _startLocalService(context);
       return true;
+    }
+    if (!Pref.getAccessibilityConsent(context)) {
+      if (openSettingsFallback) {
+        AccessibilityConsentActivity.start(context);
+      }
+      return false;
     }
     if (ShizukuUtils.hasPermission()) {
       startServiceByShizuku(context);

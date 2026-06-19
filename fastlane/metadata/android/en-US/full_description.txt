@@ -7,3 +7,10 @@
 - Navigation controls including Back and Home buttons for content on external displays
 - Turning off built-in screen while keeping external displays active
 - Managed virtual display mode with customizable on-screen keyboard routing and window behavior
+
+Accessibility Service API may be used to support additional features on external displays. With your consent, it can:
+- Simulate navigation actions for the on-screen touchpad and floating button
+- Draw the on-screen cursor
+- Read window details to direct your input to the focused window on the correct display
+
+This information is used only on your device and is never collected, stored, or shared.

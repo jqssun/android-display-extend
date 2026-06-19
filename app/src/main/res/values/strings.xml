@@ -39,6 +39,12 @@
     <string name="accessibility_status_enabled">Enabled</string>
     <string name="accessibility_status_required_for_touchpad_surfaces">Required for controlling popup and system surfaces on external displays</string>
     <string name="accessibility_status_optional_for_touchpad_surfaces">Optional; only needed for popup and system surfaces on external displays</string>
+
+    <!-- Accessibility disclosure -->
+    <string name="accessibility_consent_title">Enable accessibility access</string>
+    <string name="accessibility_consent_message">Extend uses the Accessibility Service to operate your external displays: it simulates navigation actions for the on-screen touchpad and floating button, draws the on-screen cursor, and reads window details to direct your input to the focused window on the correct display. This information is used only on your device and is never collected, stored, or shared. Would you like to enable Accessibility Service?</string>
+    <string name="accessibility_consent_agree">Enable</string>
+    <string name="accessibility_consent_decline">Not now</string>
     <string name="shizuku_required">Shizuku permission is required</string>
 
     <!-- Display list -->

@@ -69,6 +69,13 @@
             android:theme="@style/AppTheme" />
 
         <activity
+            android:name=".AccessibilityConsentActivity"
+            android:launchMode="singleTask"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:theme="@style/AppTheme.Transparent" />
+
+        <activity
             android:name=".ManagedVirtualDisplayActivity"
             android:launchMode="singleTask"
             android:exported="false"

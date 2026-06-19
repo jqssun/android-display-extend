@@ -10,7 +10,11 @@
 
 Combined with any supported launcher, it is a full open-source replacement for [Samsung DeX](https://www.samsung.com/us/apps/dex/), [Motorola Smart Connect Mobile Desktop (formerly Ready For)](https://www.motorola.com/we/en/motoverse/smart-connect), and Honor Easy Projection, with additional features on top.
 
-<video loop src='https://github.com/user-attachments/assets/59470754-c654-4f09-bef3-43b920d1400f' alt="demo" width="1200" style="display: block; margin: auto;"></video>
+[<img height="48" alt="Get it on Google Play" src="https://jqssun.github.io/images/badges/google-play-store.svg">](https://play.google.com/store/apps/details?id=io.github.jqssun.displayextend)
+[<img height="48" alt="Get it on F-Droid" src="https://jqssun.github.io/images/badges/fdroid.svg">](https://f-droid.org/packages/io.github.jqssun.displayextend)
+[<img height="48" alt="Get it on GitHub" src="https://jqssun.github.io/images/badges/github.svg">](https://github.com/jqssun/android-display-extend/releases/latest)
+
+<video loop src='https://github.com/user-attachments/assets/6aa99e29-67cf-4043-99f4-00be456c48f6' alt="demo" width="1200" style="display: block; margin: auto;"></video>
 
 ## Usage
 
