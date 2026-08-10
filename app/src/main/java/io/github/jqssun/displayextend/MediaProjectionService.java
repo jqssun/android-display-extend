@@ -71,7 +71,9 @@ public class MediaProjectionService extends Service {
   private void _createNotificationChannel() {
     NotificationChannel serviceChannel =
         new NotificationChannel(
-            CHANNEL_ID, "Media Projection Service", NotificationManager.IMPORTANCE_DEFAULT);
+            CHANNEL_ID,
+            getString(R.string.media_projection_notification_title),
+            NotificationManager.IMPORTANCE_DEFAULT);
     NotificationManager manager = getSystemService(NotificationManager.class);
     manager.createNotificationChannel(serviceChannel);
   }
@@ -79,8 +81,8 @@ public class MediaProjectionService extends Service {
   private Notification _createNotification() {
     Notification.Builder builder =
         new Notification.Builder(this, CHANNEL_ID)
-            .setContentTitle("Media Projection Service")
-            .setContentText("Running in the background")
+            .setContentTitle(getString(R.string.media_projection_notification_title))
+            .setContentText(getString(R.string.media_projection_notification_text))
             .setSmallIcon(android.R.drawable.ic_notification_overlay)
             .setPriority(Notification.PRIORITY_DEFAULT);
     return builder.build();
