@@ -43,6 +43,9 @@ public class ServiceUtils {
   private static IPackageManager packageManager;
   private static IAudioService audioManager;
   private static java.lang.reflect.Constructor<?> displayModeConstructor;
+  private static java.lang.reflect.Method displayModeSetter;
+  private static java.lang.reflect.Method displayModeResetter;
+  private static boolean displayModeMethodsResolved;
 
   private static void initWithShizuku() {
     if (!ShizukuUtils.hasPermission()) {
@@ -275,7 +278,45 @@ public class ServiceUtils {
   }
 
   public static boolean canSetUserPreferredDisplayMode() {
-    return ShizukuUtils.hasPermission();
+    if (!ShizukuUtils.hasPermission()) return false;
+    try {
+      _resolveDisplayModeMethods();
+    } catch (Throwable e) {
+      return false;
+    }
+    return displayModeSetter != null;
+  }
+
+  // bind whatever the running build declares
+  private static void _resolveDisplayModeMethods() {
+    if (displayModeMethodsResolved) return;
+    IDisplayManager dm = getDisplayManager();
+    if (dm == null) return;
+    for (java.lang.reflect.Method m : dm.getClass().getMethods()) {
+      if (m.getName().equals("setUserPreferredDisplayMode")) {
+        displayModeSetter = m;
+      } else if (m.getName().equals("resetUserPreferredDisplayMode")) {
+        displayModeResetter = m;
+      }
+    }
+    displayModeMethodsResolved = true;
+  }
+
+  private static void _applyDisplayMode(int displayId, Display.Mode mode, boolean storeMode)
+      throws Exception {
+    _resolveDisplayModeMethods();
+    if (displayModeSetter == null) {
+      throw new NoSuchMethodException("setUserPreferredDisplayMode");
+    }
+    int argc = displayModeSetter.getParameterTypes().length;
+    if (argc == 3) {
+      displayModeSetter.invoke(getDisplayManager(), displayId, mode, storeMode);
+    } else if (argc == 2) {
+      // pre-36.1 always persists
+      displayModeSetter.invoke(getDisplayManager(), displayId, mode);
+    } else {
+      throw new NoSuchMethodException("unsupported signature: " + displayModeSetter);
+    }
   }
 
   public static void setUserPreferredDisplayMode(
@@ -288,7 +329,9 @@ public class ServiceUtils {
               getDisplayModeConstructor()
                   .newInstance(
                       mode.getPhysicalWidth(), mode.getPhysicalHeight(), mode.getRefreshRate());
-      getDisplayManager().setUserPreferredDisplayMode(displayId, preferredMode, storeMode);
+      _applyDisplayMode(displayId, preferredMode, storeMode);
+    } catch (java.lang.reflect.InvocationTargetException e) {
+      throw new RuntimeException("failed to set display mode", e.getCause());
     } catch (Throwable e) {
       throw new RuntimeException("failed to set display mode", e);
     }
@@ -296,7 +339,14 @@ public class ServiceUtils {
 
   public static void resetUserPreferredDisplayMode(int displayId) {
     try {
-      getDisplayManager().resetUserPreferredDisplayMode(displayId);
+      _resolveDisplayModeMethods();
+      if (displayModeResetter != null) {
+        displayModeResetter.invoke(getDisplayManager(), displayId);
+      } else {
+        _applyDisplayMode(displayId, null, false);
+      }
+    } catch (java.lang.reflect.InvocationTargetException e) {
+      throw new RuntimeException("failed to reset preferred display mode", e.getCause());
     } catch (Throwable e) {
       throw new RuntimeException("failed to reset preferred display mode", e);
     }

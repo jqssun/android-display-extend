@@ -1,5 +1,5 @@
 plugins {
-    id 'com.android.application'
+    alias(libs.plugins.android.application)
     id 'dev.rikka.tools.refine'
 }
 
@@ -10,17 +10,17 @@ if (localPropsFile.exists()) {
 }
 
 android {
-    namespace 'io.github.jqssun.displayextend'
-    compileSdk 36
+    namespace = 'io.github.jqssun.displayextend'
+    compileSdk = 37
 
     defaultConfig {
-        applicationId "io.github.jqssun.displayextend"
-        minSdk 26
-        targetSdk 36
-        versionCode 26
-        versionName "0.0.26"
+        applicationId = "io.github.jqssun.displayextend"
+        minSdk = 26
+        targetSdk = 37
+        versionCode = 27
+        versionName = "0.0.27"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     dependenciesInfo {
@@ -31,33 +31,33 @@ android {
     if (localProps.containsKey("storeFile")) {
         signingConfigs {
             release {
-                storeFile file(localProps.getProperty('storeFile'))
-                storePassword localProps.getProperty('storePassword')
-                keyAlias localProps.getProperty('keyAlias')
-                keyPassword localProps.getProperty('keyPassword')
+                storeFile = file(localProps.getProperty('storeFile'))
+                storePassword = localProps.getProperty('storePassword')
+                keyAlias = localProps.getProperty('keyAlias')
+                keyPassword = localProps.getProperty('keyPassword')
             }
         }
     }
 
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled = true
+            shrinkResources = true
             if (localProps.containsKey("storeFile")) {
-                signingConfig signingConfigs.release
+                signingConfig = signingConfigs.release
             }
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    
+
     buildFeatures {
-        aidl true
-        buildConfig true
+        aidl = true
+        buildConfig = true
     }
-    
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 
@@ -77,4 +77,4 @@ dependencies {
     implementation 'dev.rikka.tools.refine:runtime:4.4.0'
     implementation 'org.lsposed.hiddenapibypass:hiddenapibypass:6.1'
     implementation "androidx.lifecycle:lifecycle-livedata:2.10.0"
-} 
+}

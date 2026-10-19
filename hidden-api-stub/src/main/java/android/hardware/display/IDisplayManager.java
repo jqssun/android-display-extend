@@ -15,9 +15,7 @@ public interface IDisplayManager extends IInterface {
     }
   }
 
-  void setUserPreferredDisplayMode(int displayId, Display.Mode mode, boolean storeMode);
-
-  void resetUserPreferredDisplayMode(int displayId);
+  // set/resetUserPreferredDisplayMode are deliberately absent
 
   Display.Mode getUserPreferredDisplayMode(int displayId);
 
