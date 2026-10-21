@@ -1,0 +1,250 @@
+<resources>
+    <string name="app_name">Extend</string>
+    <string name="accessibility_service_description">在副屏上模拟触摸事件的无障碍服务</string>
+    <string name="back_button">返回</string>
+    <string name="home_button">主页</string>
+
+    <!-- Common -->
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="edit">编辑</string>
+    <string name="bind">绑定</string>
+    <string name="exit">退出</string>
+    <string name="yes">是</string>
+    <string name="no">否</string>
+    <string name="none">无</string>
+    <string name="unknown">未知</string>
+    <string name="copy">复制</string>
+    <string name="on">开</string>
+    <string name="off">关</string>
+    <string name="shizuku">Shizuku</string>
+    <string name="dpi_label">DPI（按密度缩放界面）</string>
+
+    <!-- Navigation -->
+    <string name="overview">概览</string>
+    <string name="tab_logs">日志</string>
+    <string name="export">导出</string>
+    <string name="clear">清空</string>
+    <string name="input_binding">手动将所有输入设备绑定到显示器</string>
+
+    <!-- Home -->
+    <string name="shizuku_permission_status">Shizuku</string>
+    <string name="accessibility_permission_status">无障碍</string>
+    <string name="authorize">授权</string>
+    <string name="enable">启用</string>
+    <string name="screen_off">关闭内置屏幕</string>
+    <string name="touchpad">触摸板</string>
+    <string name="settings">设置</string>
+    <string name="tab_settings">设置</string>
+    <string name="status_not_started">未启动</string>
+    <string name="accessibility_status_enabled">已启用</string>
+    <string name="accessibility_status_required_for_touchpad_surfaces">控制外接显示器上的弹窗和系统界面时需要</string>
+    <string name="accessibility_status_optional_for_touchpad_surfaces">可选；仅在外接显示器上控制弹窗和系统界面时需要</string>
+
+    <!-- Accessibility disclosure -->
+    <string name="accessibility_consent_title">启用无障碍访问</string>
+    <string name="accessibility_consent_message">Extend 使用无障碍服务来操作你的外接显示器：它为屏幕触摸板和悬浮按钮模拟导航操作、绘制屏幕光标，并读取窗口信息以将你的输入定向到正确显示器上获得焦点的窗口。这些信息仅在你的设备上使用，绝不会被收集、存储或共享。是否要启用无障碍服务？</string>
+    <string name="accessibility_consent_agree">启用</string>
+    <string name="accessibility_consent_decline">暂不</string>
+    <string name="shizuku_required">需要 Shizuku 权限</string>
+
+    <!-- Display list -->
+    <string name="display_list_header">选择一个物理或虚拟显示器，将应用投射到该显示器上。</string>
+    <string name="wireless_cast_hint">使用 Android 无线显示</string>
+    <string name="create_display_in_mirror">使用 AirPlay、DisplayLink 或 Sunshine（Moonlight）</string>
+    <string name="mirror_app_not_installed">请先安装 Mirror 应用</string>
+    <string name="display_unavailable_opened_overview">该显示器已不可用，已打开概览页面。</string>
+    <string name="display_id_format">显示器 %1$d（%2$dx%3$d）</string>
+    <string name="display_name_format">%s</string>
+
+    <!-- Display detail -->
+    <string name="display_config_header">配置</string>
+    <string name="display_info_header">显示器信息</string>
+    <string name="advanced_info_header">高级（需要 Shizuku）</string>
+    <string name="resolution_label">分辨率</string>
+    <string name="scale_label">缩放（整屏缩放）</string>
+    <string name="scale_format">%d%%</string>
+    <string name="edit_scale">更改缩放</string>
+    <string name="enter_scale_hint">输入缩放百分比</string>
+    <string name="rotation_label">旋转</string>
+    <string name="actions_header">操作</string>
+    <string name="info_display_id">显示器 ID</string>
+    <string name="info_name">名称</string>
+    <string name="info_refresh_rate">刷新率</string>
+    <string name="info_state">状态</string>
+    <string name="info_hdr">HDR</string>
+    <string name="info_flags">标志</string>
+    <string name="info_cutout">挖孔/刘海</string>
+    <string name="info_override_size">覆盖尺寸</string>
+    <string name="info_physical_size">物理尺寸</string>
+    <string name="info_keyboard_policy">键盘策略</string>
+    <string name="info_default_mode_id">默认模式 ID</string>
+    <string name="info_refresh_rate_override">刷新率覆盖</string>
+    <string name="info_install_orientation">安装方向</string>
+    <string name="info_windowing_mode">窗口模式</string>
+    <string name="supported_modes_header">支持的显示模式</string>
+    <string name="mode_col_id">模式</string>
+    <string name="apply">应用</string>
+    <string name="current">当前</string>
+    <string name="cast_single_app">投射应用</string>
+    <string name="reset_display_config">重置显示器配置</string>
+    <string name="reset_display_config_confirm">清除此显示器被强制设置的分辨率、DPI 和旋转？</string>
+    <string name="reset">重置</string>
+    <string name="reset_all_settings">全部重置</string>
+    <string name="reset_all_settings_confirm">将清除应用偏好设置和显示服务，恢复系统 USB 音频路由和内容帧率匹配设置，并重置已连接外接显示器上的覆盖设置。</string>
+    <string name="auto_open_last_app">自动打开上次的应用</string>
+    <string name="auto_open_last_app_desc">此显示器连接时自动启动上次使用的应用</string>
+    <string name="floating_button_desc">在此显示器上显示可拖动的返回按钮</string>
+    <string name="floating_button_force_landscape">悬浮返回按钮强制横屏</string>
+    <string name="floating_button_force_landscape_desc">保持悬浮按钮为横屏方向</string>
+    <string name="ime_to_this_display_desc">选择此显示器上屏幕键盘的显示位置。需要受信任的虚拟显示器。</string>
+    <string name="managed_virtual_display_button_text">托管虚拟显示器模式</string>
+    <string name="disable_managed_virtual_display_mode">关闭托管虚拟显示器模式</string>
+    <string name="status_authorized_server">已授权（UID：%d）</string>
+    <string name="status_started_not_authorized_server">未授权（UID：%d）</string>
+    <string name="ime_to_this_display">键盘位置（测试版）</string>
+    <string name="ime_policy_unsupported">无法在此虚拟显示器上设置键盘策略</string>
+    <string name="ime_policy_local">此显示器</string>
+    <string name="ime_policy_fallback_display">内置屏幕</string>
+    <string name="ime_policy_hide">隐藏</string>
+    <string name="android15_rotation_hint">Android 15+ 原生支持旋转——此模式不是必需的</string>
+
+    <!-- Permissions status card -->
+    <string name="permissions_granted">就绪</string>
+    <string name="permissions_granted_detail">所有权限均已授予</string>
+    <string name="permissions_not_granted">缺少权限</string>
+    <string name="permissions_not_granted_detail">部分功能将无法使用</string>
+
+    <!-- Settings -->
+    <string name="section_permissions">权限</string>
+    <string name="section_application">应用</string>
+    <string name="section_displays">显示器</string>
+    <string name="section_power">电源</string>
+
+    <string name="disable_usb_audio">关闭 USB 音频路由</string>
+    <string name="disable_usb_audio_desc">阻止音频输出切换到 USB 音频设备（外接显示器或 USB DAC）</string>
+    <string name="show_system_setting_names">显示原始 Android 设置键名</string>
+    <string name="show_system_setting_names_desc">用 Settings.Global 和 Settings.Secure 的键名替换友好标题</string>
+    <string name="match_content_frame_rate">匹配内容帧率</string>
+    <string name="match_content_frame_rate_desc">控制应用请求帧率时 Android 全局刷新率切换策略</string>
+    <string name="match_content_frame_rate_never">从不</string>
+    <string name="match_content_frame_rate_seamless">仅无缝切换</string>
+    <string name="match_content_frame_rate_always">始终</string>
+    <string name="force_desktop_mode">强制桌面模式</string>
+    <string name="force_desktop_mode_desc">Android 14 及以下版本可能需要重启</string>
+    <string name="force_resizable">强制应用可调整大小</string>
+    <string name="force_resizable_desc">允许所有应用为多窗口调整大小</string>
+    <string name="enable_freeform">自由窗口</string>
+    <string name="enable_freeform_desc">启用自由窗口支持</string>
+    <string name="enable_non_resizable_multiwindow">不可调整大小的多窗口</string>
+    <string name="enable_non_resizable_multiwindow_desc">允许不可调整大小的应用进入多窗口模式</string>
+    <string name="disable_screen_share_protection">关闭屏幕共享保护</string>
+    <string name="disable_screen_share_protection_desc">移除应用和通知中某些界面的屏幕共享保护</string>
+    <string name="use_real_screen_off">使用真正的屏幕关闭</string>
+    <string name="use_real_screen_off_desc">直接关闭屏幕而非模拟黑屏；按音量键唤醒</string>
+    <string name="stay_on_while_plugged">充电时常亮</string>
+    <string name="stay_on_while_plugged_desc">充电时防止屏幕熄灭</string>
+    <string name="auto_screen_off">显示器连接时关闭屏幕</string>
+    <string name="auto_screen_off_desc">外接显示器连接时自动在本机显示黑屏</string>
+    <string name="input_binding_title">外部输入设备绑定</string>
+    <string name="display_detail_title">显示器 {display_id}</string>
+    <string name="input_device_detail_title">设备 {device_id}</string>
+    <string name="input_binding_status_auto">自动绑定</string>
+    <string name="input_binding_status_manual">手动绑定</string>
+    <string name="auto_bind_input">自动绑定输入设备</string>
+    <string name="auto_bind_input_desc">将输入设备绑定到当前聚焦的显示器</string>
+    <string name="bind_input_devices">绑定</string>
+    <string name="external_input_devices">外部设备</string>
+    <string name="internal_input_devices">内置设备</string>
+    <string name="section_input">输入</string>
+    <string name="display_spinner_format">显示器 %1$d（%2$s）</string>
+
+    <!-- Touchpad -->
+    <string name="switch_mode">模式</string>
+    <string name="mode_normal">普通</string>
+    <string name="mode_cursor_locked">光标锁定</string>
+    <string name="tracking_speed">触摸板跟踪速度</string>
+    <string name="touchpad_accessibility_overlay">触摸板使用无障碍覆盖层</string>
+    <string name="touchpad_accessibility_overlay_desc">通过无障碍覆盖层路由触摸板，使光标在安全屏幕上仍然可见</string>
+    <string name="touchpad_tap_hold_drag">触摸板使用点按并按住来拖动</string>
+    <string name="touchpad_tap_hold_drag_desc">双击一个项目，第二次点击后不抬手直接拖动；松手放下</string>
+    <string name="touchpad_help_normal">只有多点触控手势会直接透传\n\n可用手势：\n1. 点按单击\n2. 单指滑动\n3. 点按，然后点按并按住拖动\n4. 双指滚动、缩放和旋转\n5. 也可用侧边滚动条滚动</string>
+    <string name="touchpad_help_cursor_locked">所有手势均直接透传</string>
+    <string name="touchpad_hint_back">在目标显示器上返回</string>
+    <string name="touchpad_hint_home">重新打开上次投射的应用</string>
+    <string name="touchpad_hint_night_mode">开启夜间模式</string>
+    <string name="touchpad_hint_rotate_cw">顺时针旋转内置屏幕</string>
+    <string name="touchpad_hint_rotate_ccw">逆时针旋转内置屏幕</string>
+    <string name="show_cursor_failed">显示光标失败</string>
+    <string name="rotate">旋转</string>
+    <string name="rotate_cw">顺时针旋转</string>
+
+    <!-- Dialogs -->
+    <string name="edit_dpi">更改 DPI</string>
+    <string name="enter_dpi_hint">输入 DPI 值</string>
+    <string name="invalid_number">请输入有效数字</string>
+    <string name="edit_resolution">更改分辨率</string>
+    <string name="width_label">宽度</string>
+    <string name="height_label">高度</string>
+    <string name="resolution_warning">应用的分辨率可能不被显示器完全支持，内容可能被拉伸。如果你在 %1$d 秒内未确认，更改将自动还原。</string>
+    <string name="edit_rotation">更改旋转（仅 Android 15+）</string>
+    <string name="rotation_none">不更改</string>
+    <string name="confirm_dpi_format">将 DPI 从 %1$d 改为 %2$d？</string>
+    <string name="confirm_resolution_format">将分辨率从 %1$dx%2$d 改为 %3$dx%4$d？</string>
+
+    <!-- Managed virtual display dialog -->
+    <string name="managed_virtual_display_settings">托管虚拟显示器设置</string>
+    <string name="managed_virtual_display_description">在此屏幕上运行托管虚拟显示器实例。此模式用于单独的旋转处理，或在物理显示器断开时保持应用会话存活。</string>
+    <string name="rotates_with_content">显示器方向跟随应用旋转</string>
+    <string name="skip_screen_capture_permission">跳过屏幕录制权限</string>
+    <string name="auto_managed_virtual_display_next_time">下次此显示器连接时自动启用托管模式</string>
+    <string name="managed_virtual_display_name">托管虚拟显示器</string>
+
+    <!-- App list / Launcher -->
+    <string name="cast">投射</string>
+    <string name="open_on_phone">在手机上打开</string>
+    <string name="search_apps_hint">搜索应用</string>
+    <string name="show_all_apps">显示系统应用</string>
+    <string name="running_tasks_header">运行中的任务</string>
+    <string name="installed_apps_header">所有应用</string>
+    <string name="floating_button">悬浮返回按钮</string>
+    <string name="cannot_get_app_list">无法获取应用列表，请检查权限</string>
+    <string name="first_launch_hint">已在手机上打开以授予权限。再次点击即可投射。</string>
+    <string name="input_routing_limitation">受 Android 版本限制，点击“关闭显示器”即可使用触摸屏</string>
+
+    <!-- About -->
+    <string name="version_format">版本：%1$s（Android %2$s）</string>
+    <string name="version_unknown">版本：未知</string>
+    <string name="website_label">源码：github.com/jqssun/android-display-extend</string>
+    <string name="export_log_needs_shizuku">导出日志需要 Shizuku 权限</string>
+
+    <!-- Fetch log -->
+    <string name="cannot_start_user_service">无法启动用户服务获取日志</string>
+    <string name="no_logs_to_export">没有可导出的日志</string>
+    <string name="share_log_file">分享日志文件</string>
+    <string name="log_export_failed">导出日志失败</string>
+
+    <!-- Input device detail -->
+    <string name="device_info_header">设备信息</string>
+    <string name="bind_to_display_header">手动绑定到显示器</string>
+    <string name="info_device_name">名称</string>
+    <string name="info_device_id">设备 ID</string>
+    <string name="info_product_id">产品 ID</string>
+    <string name="info_vendor_id">厂商 ID</string>
+    <string name="info_descriptor">描述符</string>
+    <string name="info_external">外部</string>
+    <string name="info_input_sources">输入源</string>
+    <string name="source_keyboard">键盘</string>
+    <string name="source_dpad">方向键</string>
+    <string name="source_gamepad">手柄</string>
+    <string name="source_touchscreen">触摸屏</string>
+    <string name="source_mouse">鼠标</string>
+
+    <!-- ServiceUtils Toast messages -->
+    <string name="shizuku_launch_failed">通过 Shizuku 启动应用失败</string>
+
+    <!-- MediaProjectionService notification -->
+    <string name="media_projection_notification_title">屏幕投射服务</string>
+    <string name="media_projection_notification_text">正在后台运行</string>
+
+</resources>
